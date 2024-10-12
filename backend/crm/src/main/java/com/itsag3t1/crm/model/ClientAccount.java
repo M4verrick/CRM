@@ -1,4 +1,4 @@
-package com.t1_g3_t1.project_2024_25.classes;
+package com.itsag3t1.crm.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

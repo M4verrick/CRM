@@ -1,7 +1,7 @@
-package com.t1_g3_t1.project_2024_25.service;
+package com.itsag3t1.crm.service;
 
-import com.t1_g3_t1.project_2024_25.classes.ClientAccount;
-import com.t1_g3_t1.project_2024_25.repository.ClientAccountRepository;
+import com.itsag3t1.crm.model.ClientAccount;
+import com.itsag3t1.crm.repository.ClientAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

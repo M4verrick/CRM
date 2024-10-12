@@ -1,7 +1,7 @@
-package com.t1_g3_t1.project_2024_25.controller;
+package com.itsag3t1.crm.controller;
 
-import com.t1_g3_t1.project_2024_25.classes.ClientAccount;
-import com.t1_g3_t1.project_2024_25.service.ClientAccountService;
+import com.itsag3t1.crm.model.ClientAccount;
+import com.itsag3t1.crm.service.ClientAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

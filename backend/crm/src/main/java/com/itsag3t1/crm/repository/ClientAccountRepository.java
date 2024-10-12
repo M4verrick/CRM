@@ -1,6 +1,6 @@
-package com.t1_g3_t1.project_2024_25.repository;
+package com.itsag3t1.crm.repository;
 
-import com.t1_g3_t1.project_2024_25.classes.ClientAccount;
+import com.itsag3t1.crm.model.ClientAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ClientAccountRepository extends JpaRepository<ClientAccount, Long> {
