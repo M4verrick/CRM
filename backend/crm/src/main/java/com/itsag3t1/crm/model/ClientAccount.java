@@ -8,22 +8,29 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
 import java.util.Date;
-
+@Table(name = "clientAccounts")
 @Entity
 public class ClientAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
+    @Column(name = "clientId")
     private Long clientId;
+    @Column(name = "accountType")
     private String accountType;
+    @Column(name = "accountStatus")
     private String accountStatus;
 
+    @Column(name = "openingDate")
     @Temporal(TemporalType.DATE)
     private Date openingDate;
 
+    @Column(name = "initialDeposit")
     private Double initialDeposit;
+    @Column(name = "currency")
     private String currency;
+    @Column(name = "branchId")
     private String branchId;
 
     //getters n setters
