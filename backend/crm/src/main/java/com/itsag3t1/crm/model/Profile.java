@@ -1,24 +1,49 @@
 package com.itsag3t1.crm.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "profiles")
 public class Profile {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
+
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(name = "phone", length = 15)
     private String phone;
+
+    @Column(name = "address", length = 255)
     private String address;
+
+    @Column(name = "city", length = 50)
     private String city;
+
+    @Column(name = "state", length = 50)
     private String state;
+
+    @Column(name = "zip", length = 10)
     private String zip;
+
+    @Column(name = "country", length = 50)
     private String country;
+
+    @Column(name = "date_of_birth", length = 10)
     private String dateOfBirth;
+
+    @Column(name = "gender", length = 10)
     private String gender;
+
+    public Profile() {
+    }
 
     private Profile(Builder builder) {
         this.id = builder.id;
@@ -33,9 +58,6 @@ public class Profile {
         this.country = builder.country;
         this.dateOfBirth = builder.dateOfBirth;
         this.gender = builder.gender;
-    }
-
-    public Profile() {
     }
 
     public static class Builder {
