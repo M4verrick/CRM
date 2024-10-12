@@ -1,13 +1,13 @@
-package com.t1_g3_t1.project_2024_25;
+package com.itsag3t1.crm;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Project202425ApplicationTests {
+class CrmApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }
