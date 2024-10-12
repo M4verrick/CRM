@@ -2,6 +2,8 @@ package com.itsag3t1.crm.model;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "profiles")
 public class Profile {
@@ -21,7 +23,7 @@ public class Profile {
     @Column(name = "phone", length = 15)
     private String phone;
 
-    @Column(name = "address", length = 255)
+    @Column(name = "address", length = 100)
     private String address;
 
     @Column(name = "city", length = 50)
@@ -36,8 +38,9 @@ public class Profile {
     @Column(name = "country", length = 50)
     private String country;
 
-    @Column(name = "date_of_birth", length = 10)
-    private String dateOfBirth;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "date_of_birth")
+    private Date dateOfBirth;
 
     @Column(name = "gender", length = 10)
     private String gender;
@@ -71,7 +74,7 @@ public class Profile {
         private String state;
         private String zip;
         private String country;
-        private String dateOfBirth;
+        private Date dateOfBirth;
         private String gender;
 
         public Builder setId(Long id) {
@@ -124,7 +127,7 @@ public class Profile {
             return this;
         }
 
-        public Builder setDateOfBirth(String dateOfBirth) {
+        public Builder setDateOfBirth(Date dateOfBirth) {
             this.dateOfBirth = dateOfBirth;
             return this;
         }
@@ -180,7 +183,7 @@ public class Profile {
         return country;
     }
 
-    public String getDateOfBirth() {
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
