@@ -1,3 +1,22 @@
+package com.itsag3t1.crm.service;
+
+import com.itsag3t1.crm.exception.DatabaseException;
+import com.itsag3t1.crm.exception.InvalidDataException;
+import com.itsag3t1.crm.exception.ResourceNotFoundException;
+import com.itsag3t1.crm.model.ClientAccount;
+import com.itsag3t1.crm.repository.ClientAccountRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.dao.DataAccessException;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 class ClientAccountServiceTest {
 
     @Mock
@@ -129,7 +148,7 @@ class ClientAccountServiceTest {
     void testCreateAccount_DatabaseError() {
         ClientAccount account = createAccount(1L, ClientAccount.AccountType.SAVINGS, ClientAccount.AccountStatus.ACTIVE, "SGD", "B001", 0.0);
         
-        // Simulate a DataAccessException being thrown when saving
+        // Mocking the save method to throw a DataAccessException
         when(accountRepository.save(any(ClientAccount.class))).thenThrow(new DataAccessException("Database error") {});
 
         DatabaseException exception = assertThrows(DatabaseException.class, () -> {

@@ -1,7 +1,10 @@
 package com.itsag3t1.crm.model;
 
+import com.itsag3t1.crm.exception.InvalidDataException;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Date;
 
 @Entity

@@ -1,12 +1,12 @@
 package com.itsag3t1.crm.service;
 
+import com.itsag3t1.crm.exception.DatabaseException;
 import com.itsag3t1.crm.model.ClientAccount;
-import com.itsag3t1.crm.model.AccountType; // Import AccountType
-import com.itsag3t1.crm.model.AccountStatus; // Import AccountStatus
 import com.itsag3t1.crm.repository.ClientAccountRepository;
 import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
