@@ -21,5 +21,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<String> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        // Check if the error is related to enum parsing
+        if (ex.getMessage().contains("AccountType")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("accountType should be SAVINGS, CHECKING, or BUSINESS");
+        } else if (ex.getMessage().contains("AccountStatus")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("accountStatus should be ACTIVE, INACTIVE, or PENDING");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request format.");
+    }
+
     // other exception handlers
 }

@@ -1,6 +1,8 @@
 package com.itsag3t1.crm.service;
 
 import com.itsag3t1.crm.model.ClientAccount;
+import com.itsag3t1.crm.model.AccountType; // Import AccountType
+import com.itsag3t1.crm.model.AccountStatus; // Import AccountStatus
 import com.itsag3t1.crm.repository.ClientAccountRepository;
 import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
@@ -16,24 +18,27 @@ public class ClientAccountService {
     private ClientAccountRepository accountRepository;
 
     public ClientAccount createAccount(ClientAccount account) {
+        // Validate Client ID
         if (account.getClientId() == null) {
             throw new InvalidDataException("Client ID must not be null");
         }
-        if (account.getAccountType() == null || 
-            (!account.getAccountType().equals("savings") && 
-             !account.getAccountType().equals("checking") && 
-             !account.getAccountType().equals("business"))) {
-            throw new InvalidDataException("Account type must be one of: savings, checking, business");
+
+        // Validate Account Type
+        if (account.getAccountType() == null) {
+            throw new InvalidDataException("Account type must not be null");
         }
-        if (account.getAccountStatus() == null || 
-            (!account.getAccountStatus().equals("active") && 
-             !account.getAccountStatus().equals("inactive") && 
-             !account.getAccountStatus().equals("pending"))) {
-            throw new InvalidDataException("Account status must be one of: active, inactive, pending");
+
+        // Validate Account Status
+        if (account.getAccountStatus() == null) {
+            throw new InvalidDataException("Account status must not be null");
         }
+
+        // Validate Currency
         if (account.getCurrency() == null) {
             throw new InvalidDataException("Currency must not be null");
         }
+
+        // Validate Branch ID
         if (account.getBranchId() == null) {
             throw new InvalidDataException("Branch ID must not be null");
         }

@@ -5,59 +5,71 @@ import jakarta.validation.constraints.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "client_accounts") // Define the table name
+@Table(name = "client_accounts")
 public class ClientAccount {
+    public enum AccountType {
+        SAVINGS,
+        CHECKING,
+        BUSINESS
+    }
+    
+    public enum AccountStatus {
+        ACTIVE,
+        INACTIVE,
+        PENDING
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "account_id") // Define column name
+    @Column(name = "account_id")
     private Long accountId;
 
     @NotNull(message = "Client ID must not be null")
-    @Column(name = "client_id", nullable = false) // Define column name and make it not nullable
+    @Column(name = "client_id", nullable = false)
     private Long clientId;
 
     @NotNull(message = "Account type must not be null")
-    @Pattern(regexp = "savings|checking|business", message = "Account type must be one of: savings, checking, business")
-    @Column(name = "account_type", nullable = false, length = 20) // Define column name and length
-    private String accountType;
+    @Enumerated(EnumType.STRING) // Store as string in the database
+    @Column(name = "account_type", nullable = false)
+    private AccountType accountType;
 
     @NotNull(message = "Account status must not be null")
-    @Pattern(regexp = "active|inactive|pending", message = "Account status must be one of: active, inactive, pending")
-    @Column(name = "account_status", nullable = false, length = 20) // Define column name and length
-    private String accountStatus;
+    @Enumerated(EnumType.STRING) // Store as string in the database
+    @Column(name = "account_status", nullable = false)
+    private AccountStatus accountStatus;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "opening_date") // Define column name
+    @Column(name = "opening_date")
     private Date openingDate;
 
     @NotNull(message = "Currency must not be null")
-    @Column(name = "currency", nullable = false, length = 3) // Define column name, and restrict length to currency code length
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
     @NotNull(message = "Branch ID must not be null")
-    @Column(name = "branch_id", nullable = false, length = 10) // Define column name
+    @Column(name = "branch_id", nullable = false, length = 10)
     private String branchId;
 
     @Min(value = 0, message = "Initial deposit must be 0 or higher")
-    @Column(name = "initial_deposit", nullable = false) // Define column name
+    @Column(name = "initial_deposit", nullable = false)
     private Double initialDeposit;
 
     // No-arg constructor for JPA
     public ClientAccount() {
     }
 
-    // Constructor for setting default initialDeposit if null
-    public ClientAccount(Long clientId, String accountType, String accountStatus, Date openingDate,
-                         Double initialDeposit, String currency, String branchId) {
-        this.clientId = clientId;
-        this.accountType = accountType;
-        this.accountStatus = accountStatus;
-        this.openingDate = openingDate;
-        this.initialDeposit = initialDeposit == null ? 0.0 : initialDeposit;
-        this.currency = currency;
-        this.branchId = branchId;
+    // Constructor for accepting String and converting it to enum
+    private ClientAccount createAccount(Long clientId, AccountType accountType, AccountStatus accountStatus, String currency, String branchId, Double initialDeposit) {
+        ClientAccount account = new ClientAccount();
+        account.setClientId(clientId);
+        account.setAccountType(accountType);
+        account.setAccountStatus(accountStatus);
+        account.setCurrency(currency);
+        account.setBranchId(branchId);
+        account.setInitialDeposit(initialDeposit);
+        return account;
     }
+    
 
     // Getters and setters
 
@@ -77,19 +89,19 @@ public class ClientAccount {
         this.clientId = clientId;
     }
 
-    public String getAccountType() {
+    public AccountType getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(String accountType) {
+    public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
     }
 
-    public String getAccountStatus() {
+    public AccountStatus getAccountStatus() {
         return accountStatus;
     }
 
-    public void setAccountStatus(String accountStatus) {
+    public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
     }
 
@@ -106,7 +118,10 @@ public class ClientAccount {
     }
 
     public void setInitialDeposit(Double initialDeposit) {
-        this.initialDeposit = initialDeposit == null ? 0.0 : initialDeposit;
+        if (initialDeposit == null) {
+            throw new InvalidDataException("Initial deposit must not be null.");
+        }
+        this.initialDeposit = initialDeposit;
     }
 
     public String getCurrency() {
