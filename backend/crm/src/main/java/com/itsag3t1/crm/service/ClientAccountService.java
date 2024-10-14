@@ -1,12 +1,15 @@
 package com.itsag3t1.crm.service;
 
-import com.itsag3t1.crm.model.ClientAccount;
-import com.itsag3t1.crm.model.AccountType; // Import AccountType
-import com.itsag3t1.crm.model.AccountStatus; // Import AccountStatus
-import com.itsag3t1.crm.repository.ClientAccountRepository;
+import com.itsag3t1.crm.exception.DatabaseException;
 import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
+import com.itsag3t1.crm.model.ClientAccount;
+import com.itsag3t1.crm.repository.ClientAccountRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -14,6 +17,7 @@ import java.util.Optional;
 
 @Service
 public class ClientAccountService {
+    private static final Logger logger = LoggerFactory.getLogger(ClientAccountService.class);
     @Autowired
     private ClientAccountRepository accountRepository;
 
@@ -50,6 +54,10 @@ public class ClientAccountService {
 
         // Set current date for opening date
         account.setOpeningDate(new Date());
+
+        // Sample log message
+        MDC.put("client_id", account.getClientId().toString());
+        logger.info("Creating account for client ID: {}", account.getClientId());
 
         try {
             return accountRepository.save(account);
