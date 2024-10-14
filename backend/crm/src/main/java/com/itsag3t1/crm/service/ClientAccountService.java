@@ -5,9 +5,9 @@ import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -56,6 +56,7 @@ public class ClientAccountService {
         account.setOpeningDate(new Date());
 
         // Sample log message
+        MDC.put("client_id", account.getClientId().toString());
         logger.info("Creating account for client ID: {}", account.getClientId());
 
         try {
