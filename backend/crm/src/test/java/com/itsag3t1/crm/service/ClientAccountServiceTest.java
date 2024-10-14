@@ -147,9 +147,10 @@ class ClientAccountServiceTest {
     @Test
     void testCreateAccount_DatabaseError() {
         ClientAccount account = createAccount(1L, ClientAccount.AccountType.SAVINGS, ClientAccount.AccountStatus.ACTIVE, "SGD", "B001", 0.0);
-        
+
         // Mocking the save method to throw a DataAccessException
-        when(accountRepository.save(any(ClientAccount.class))).thenThrow(new DataAccessException("Database error") {});
+        when(accountRepository.save(any(ClientAccount.class))).thenThrow(new DataAccessException("Database error") {
+        });
 
         DatabaseException exception = assertThrows(DatabaseException.class, () -> {
             accountService.createAccount(account);
