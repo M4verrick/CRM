@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import java.util.Date;
 
 @Entity
-public class ClientAccount {
+public class ClientAccount2 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
