@@ -17,9 +17,9 @@ import java.util.Optional;
 
 @Service
 public class ClientAccountService {
+    private static final Logger logger = LoggerFactory.getLogger(ClientAccountService.class);
     @Autowired
     private ClientAccountRepository accountRepository;
-    private static final Logger logger = LoggerFactory.getLogger(ClientAccountService.class);
 
     public ClientAccount createAccount(ClientAccount account) {
         // Validate Client ID

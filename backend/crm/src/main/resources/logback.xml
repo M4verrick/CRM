@@ -5,16 +5,16 @@
         </filter>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
-                <timestamp />
-                <loggerName />
-                <logLevel />
-                <message />
-                <mdc />
+                <timestamp/>
+                <loggerName/>
+                <logLevel/>
+                <message/>
+                <mdc/>
             </providers>
         </encoder>
     </appender>
 
     <root level="info">
-        <appender-ref ref="CLOUDWATCH" />
+        <appender-ref ref="CLOUDWATCH"/>
     </root>
 </configuration>
