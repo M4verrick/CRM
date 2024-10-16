@@ -13,8 +13,12 @@ public class ClientAccountController {
     @Autowired
     private ClientAccountService accountService;
 
+    // Adding the AgentID as a request header for account creation
     @PostMapping
-    public ResponseEntity<ClientAccount> createAccount(@RequestBody ClientAccount account) {
+    public ResponseEntity<ClientAccount> createAccount(
+        @RequestHeader("AgentID") String agentId, // AgentID from request header
+        @RequestBody ClientAccount account) {
+
         // Convert account type and status to uppercase if they are received as lowercase
         if (account.getAccountType() != null) {
             account.setAccountType(ClientAccount.AccountType.valueOf(account.getAccountType().toString().toUpperCase()));
@@ -23,15 +27,18 @@ public class ClientAccountController {
             account.setAccountStatus(ClientAccount.AccountStatus.valueOf(account.getAccountStatus().toString().toUpperCase()));
         }
 
-        // Create the account
-        ClientAccount createdAccount = accountService.createAccount(account);
+        // Pass AgentID to the service for logging
+        ClientAccount createdAccount = accountService.createAccount(account, agentId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
     }
 
-
+    // Adding the AgentID as a request header for account deletion
     @DeleteMapping("/{accountId}")
-    public ResponseEntity<String> deleteAccount(@PathVariable Long accountId) {
-        boolean isDeleted = accountService.deleteAccount(accountId);
+    public ResponseEntity<String> deleteAccount(
+        @RequestHeader("AgentID") String agentId, // AgentID from request header
+        @PathVariable Long accountId) {
+
+        boolean isDeleted = accountService.deleteAccount(accountId, agentId);
         return isDeleted 
             ? ResponseEntity.noContent().build()  // 204 No Content for successful deletion
             : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");  // 404 Not Found
