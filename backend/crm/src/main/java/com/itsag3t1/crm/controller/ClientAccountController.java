@@ -17,7 +17,7 @@ public class ClientAccountController {
     // Adding the AgentID as a request header for account creation
     @PostMapping
     public ResponseEntity<ClientAccount> createAccount(@RequestBody ClientAccount account) {
-        String agentId = CurrentAuthContext.getUserName();
+        String agentId = CurrentAuthContext.getUserId();
 
         // Convert account type and status to uppercase if they are received as lowercase
         if (account.getAccountType() != null) {

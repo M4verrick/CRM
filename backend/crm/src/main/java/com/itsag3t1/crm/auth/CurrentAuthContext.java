@@ -1,6 +1,5 @@
 package com.itsag3t1.crm.auth;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -14,7 +13,7 @@ public class CurrentAuthContext {
         return ((Jwt) principal).getClaims();
     }
 
-    public static String getUserName() {
-        return (String) extractClaim().get("username");
+    public static String getUserId() {
+        return (String) extractClaim().get("sub");
     }
 }
