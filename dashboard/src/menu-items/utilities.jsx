@@ -5,7 +5,8 @@ import {
   BarcodeOutlined,
   BgColorsOutlined,
   FontSizeOutlined,
-  LoadingOutlined
+  LoadingOutlined,
+  ProfileOutlined
 } from '@ant-design/icons';
 
 // icons
@@ -15,7 +16,8 @@ const icons = {
   BarcodeOutlined,
   AntDesignOutlined,
   LoadingOutlined,
-  AppstoreAddOutlined
+  AppstoreAddOutlined,
+  ProfileOutlined
 };
 
 // ==============================|| MENU ITEMS - UTILITIES ||============================== //
@@ -26,10 +28,24 @@ const utilities = {
   type: 'group',
   children: [
     {
-      id: 'form',
-      title: 'Form',
+      id: 'userform',
+      title: 'Add User',
       type: 'item',
-      url: '/Form',
+      url: '/UserForm',
+      icon: icons.ProfileOutlined
+    },
+    {
+      id: 'clientform',
+      title: 'Add Client Profile',
+      type: 'item',
+      url: '/ClientForm',
+      icon: icons.ProfileOutlined
+    },
+    {
+      id: 'accountform',
+      title: 'Add Account',
+      type: 'item',
+      url: '/AccountForm',
       icon: icons.BarcodeOutlined
     }
   ]
