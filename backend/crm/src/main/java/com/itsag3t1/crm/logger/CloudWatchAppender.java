@@ -13,11 +13,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
-    private CloudWatchLogsClient client;
-    private String logGroupName;
-    private String logStreamName;
+    private final CloudWatchLogsClient client;
+    private final String logGroupName;
+    private final String logStreamName;
 
-    private Queue<InputLogEvent> eventQueue;
+    private final Queue<InputLogEvent> eventQueue;
 
     public CloudWatchAppender() {
         logGroupName = "LOG-GROUP-NAME-IN-CLOUDWATCH";
