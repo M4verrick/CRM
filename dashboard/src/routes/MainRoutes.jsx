@@ -5,13 +5,16 @@ import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
 
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
+const AdminDashboard = Loadable(lazy(() => import('pages/dashboard-admin/index')));
 
 // Placeholder components (replace with your actual components)
-const AdminDashboard = () => <div>Admin Dashboard</div>;
 const Unauthorized = () => <div>You are not authorized to view this page</div>;
 
 // render pages
-const SamplePage = Loadable(lazy(() => import('pages/profiles/profile-table')));
+const ProfileTable = Loadable(lazy(() => import('pages/tables/profile-table')));
+const UserTable = Loadable(lazy(() => import('pages/tables/user-table')));
+const ClientTransactionTable = Loadable(lazy(() => import('pages/tables/profile-table')));
+const UserTransactionTable = Loadable(lazy(() => import('pages/tables/profile-table')));
 const AccountForm = Loadable(lazy(() => import('pages/forms/NewAccount')));
 const ClientForm = Loadable(lazy(() => import('pages/forms/NewClient')));
 const UserForm = Loadable(lazy(() => import('pages/forms/NewUser')));
@@ -71,9 +74,22 @@ const MainRoutes = {
         }
       ]
     },
+    // All visible for now, fix later after settling integration
     {
-      path: 'sample-page',
-      element: <SamplePage />
+      path: 'ProfileTable',
+      element: <ProfileTable />
+    },
+    {
+      path: 'UserTable',
+      element: <UserTable />
+    },
+    {
+      path: 'ClientTransactionTable',
+      element: <ClientTransactionTable />
+    },
+    {
+      path: 'UserTransactionTable',
+      element: <UserTransactionTable />
     },
     {
       path: 'AccountForm',
