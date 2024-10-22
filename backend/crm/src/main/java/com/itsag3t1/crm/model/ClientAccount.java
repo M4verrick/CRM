@@ -4,43 +4,33 @@ import com.itsag3t1.crm.exception.InvalidDataException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Date;
 
-@Getter
 @Entity
 @Table(name = "client_accounts")
 public class ClientAccount {
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
     private Long accountId;
-    @Setter
     @NotNull(message = "Client ID must not be null")
     @Column(name = "client_id", nullable = false)
     private Long clientId;
-    @Setter
     @NotNull(message = "Account type must not be null")
     @Enumerated(EnumType.STRING) // Store as string in the database
     @Column(name = "account_type", nullable = false)
     private AccountType accountType;
-    @Setter
     @NotNull(message = "Account status must not be null")
     @Enumerated(EnumType.STRING) // Store as string in the database
     @Column(name = "account_status", nullable = false)
     private AccountStatus accountStatus;
-    @Setter
     @Temporal(TemporalType.DATE)
     @Column(name = "opening_date")
     private Date openingDate;
-    @Setter
     @NotNull(message = "Currency must not be null")
     @Column(name = "currency", nullable = false, length = 3)
     private String currency;
-    @Setter
     @NotNull(message = "Branch ID must not be null")
     @Column(name = "branch_id", nullable = false, length = 10)
     private String branchId;
@@ -66,6 +56,58 @@ public class ClientAccount {
 
 
     // Getters and setters
+    public Long getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
+    }
+
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
+    }
+
+    public Date getOpeningDate() {
+        return openingDate;
+    }
+
+    public void setOpeningDate(Date openingDate) {
+        this.openingDate = openingDate;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getBranchId() {
+        return branchId;
+    }
+
+    public void setBranchId(String branchId) {
+        this.branchId = branchId;
+    }
+
+    public Double getInitialDeposit() {
+        return initialDeposit;
+    }
+
 
     public void setInitialDeposit(Double initialDeposit) {
         if (initialDeposit == null) {

@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:4566/mock-cognito-idp
+
+aws:
+  endpoint:
+    url: http://localstack:4566
+  region: ap-southeast-1
+  logs:
+    logGroupName: crm-logs
+    logStreamName: crm-log-stream

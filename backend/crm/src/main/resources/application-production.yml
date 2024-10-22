@@ -1,0 +1,15 @@
+spring:
+  profiles: production
+  datasource:
+    url: jdbc:mysql://prod-db-endpoint:3306/proddb
+    username: produser
+    password: prodpass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect

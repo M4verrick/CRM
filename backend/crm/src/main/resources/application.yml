@@ -1,20 +1,15 @@
 spring:
   application:
     name: crm
-    datasource:
-      url: jdbc:postgresql://localhost:5432/crmdatabase
-      username: crmappuser
-      password: crmapppassword
-      driver-class-name: org.postgresql.Driver
-    jpa:
-      database-platform: org.hibernate.dialect.PostgreSQLDialect
-      hibernate:
-        ddl-auto: update
   server:
     port: 8080
-  debug: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: https://idp.example.com/issuer
+  logging:
+    level:
+      root: DEBUG
+      org.springframework: DEBUG
+      com.itsag3t1.crm: DEBUG
+  datasource:
+    url: jdbc:postgresql://localhost:5432/crmdatabase
+    username: crmappuser
+    password: crmapppassword
+    driver-class-name: org.postgresql.Driver

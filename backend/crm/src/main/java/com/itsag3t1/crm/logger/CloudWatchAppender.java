@@ -2,6 +2,8 @@ package com.itsag3t1.crm.logger;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsRequest;
@@ -9,6 +11,7 @@ import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsRe
 import software.amazon.awssdk.services.cloudwatchlogs.model.InputLogEvent;
 import software.amazon.awssdk.services.cloudwatchlogs.model.PutLogEventsRequest;
 
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -20,10 +23,11 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
     private final Queue<InputLogEvent> eventQueue;
 
     public CloudWatchAppender() {
-        logGroupName = "LOG-GROUP-NAME-IN-CLOUDWATCH";
-        logStreamName = "LOG-STREAM-NAME-IN-CLOUDWATCH";
+        logGroupName = "crm-logs";
+        logStreamName = "crm-log-stream";
 
         client = CloudWatchLogsClient.builder()
+               .endpointOverride(URI.create("http://localhost:4566"))
                 .region(Region.AP_SOUTHEAST_1)
                 .build();
         eventQueue = new LinkedList<>();
@@ -56,6 +60,12 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
                 .logGroupName(logGroupName)
                 .logStreamNamePrefix(logStreamName)
                 .build());
+
+        // Check if logStreams list is empty
+        if (describeLogStreamsResponse.logStreams().isEmpty()) {
+            System.out.println("No log streams found.");
+            return;
+        }
 
         String sequenceToken = describeLogStreamsResponse.logStreams().get(0).uploadSequenceToken();
 
