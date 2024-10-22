@@ -9,9 +9,17 @@ LOG_GROUP_NAME="crm-logs"
 LOG_STREAM_NAME="crm-log-stream"
 
 # Create log group
-aws --endpoint-url=$ENDPOINT_URL --region $REGION logs create-log-group --log-group-name $LOG_GROUP_NAME
+awslocal --region $REGION logs create-log-group --log-group-name $LOG_GROUP_NAME
 
 # Create log stream
-aws --endpoint-url=$ENDPOINT_URL --region $REGION logs create-log-stream --log-group-name $LOG_GROUP_NAME --log-stream-name $LOG_STREAM_NAME
+awslocal --region $REGION logs create-log-stream --log-group-name $LOG_GROUP_NAME --log-stream-name $LOG_STREAM_NAME
+
+# Describe log group
+awslocal --region $REGION logs describe-log-groups --log-group-name-prefix $LOG_GROUP_NAME
+
+# Describe log stream
+awslocal --region $REGION logs describe-log-streams --log-group-name $LOG_GROUP_NAME --log-stream-name-prefix $LOG_STREAM_NAME
+
+awslocal --region $REGION logs get-log-events --log-group-name $LOG_GROUP_NAME --log-stream-name $LOG_STREAM_NAME
 
 echo "Log group and log stream created successfully."
