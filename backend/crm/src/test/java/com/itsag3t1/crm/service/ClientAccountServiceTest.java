@@ -27,6 +27,7 @@ class ClientAccountServiceTest {
 
     @BeforeEach
     void setUp() {
+        // Initializes the mocks before each test
         MockitoAnnotations.openMocks(this);
     }
 
@@ -46,7 +47,9 @@ class ClientAccountServiceTest {
         ClientAccount account = createAccount(1L, ClientAccount.AccountType.SAVINGS, ClientAccount.AccountStatus.ACTIVE, "SGD", "B001", 0.0);
         when(accountRepository.save(any(ClientAccount.class))).thenReturn(account);
 
-        ClientAccount createdAccount = accountService.createAccount(account);
+        // Adding agentId to the service method call
+        String agentId = "AGENT123";
+        ClientAccount createdAccount = accountService.createAccount(account, agentId);
 
         assertNotNull(createdAccount);
         assertEquals(account.getClientId(), createdAccount.getClientId());
@@ -57,7 +60,9 @@ class ClientAccountServiceTest {
     void testCreateAccount_WithNullInitialDeposit() {
         ClientAccount account = createAccount(1L, ClientAccount.AccountType.SAVINGS, ClientAccount.AccountStatus.ACTIVE, "SGD", "B001", null);
 
-        ClientAccount createdAccount = accountService.createAccount(account);
+        // Adding agentId to the service method call
+        String agentId = "AGENT123";
+        ClientAccount createdAccount = accountService.createAccount(account, agentId);
 
         assertNotNull(createdAccount);
         assertEquals(0.0, createdAccount.getInitialDeposit());
@@ -68,7 +73,9 @@ class ClientAccountServiceTest {
         ClientAccount account = createAccount(null, ClientAccount.AccountType.SAVINGS, ClientAccount.AccountStatus.ACTIVE, "SGD", "B001", null);
 
         InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
-            accountService.createAccount(account);
+            // Adding agentId to the service method call
+            String agentId = "AGENT123";
+            accountService.createAccount(account, agentId);
         });
 
         assertEquals("Client ID must not be null", exception.getMessage());
@@ -79,20 +86,22 @@ class ClientAccountServiceTest {
         ClientAccount account = createAccount(1L, null, ClientAccount.AccountStatus.ACTIVE, "SGD", "B001", null);
 
         InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
-            accountService.createAccount(account);
+            // Adding agentId to the service method call
+            String agentId = "AGENT123";
+            accountService.createAccount(account, agentId);
         });
 
         assertEquals("Account type must not be null", exception.getMessage());
     }
-
-    // Skipping the invalid enum value test because it's handled at the deserialization level, not service level.
 
     @Test
     void testCreateAccount_WithNullAccountStatus() {
         ClientAccount account = createAccount(1L, ClientAccount.AccountType.SAVINGS, null, "SGD", "B001", null);
 
         InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
-            accountService.createAccount(account);
+            // Adding agentId to the service method call
+            String agentId = "AGENT123";
+            accountService.createAccount(account, agentId);
         });
 
         assertEquals("Account status must not be null", exception.getMessage());
@@ -103,7 +112,9 @@ class ClientAccountServiceTest {
         ClientAccount account = createAccount(1L, ClientAccount.AccountType.SAVINGS, ClientAccount.AccountStatus.ACTIVE, null, "B001", null);
 
         InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
-            accountService.createAccount(account);
+            // Adding agentId to the service method call
+            String agentId = "AGENT123";
+            accountService.createAccount(account, agentId);
         });
 
         assertEquals("Currency must not be null", exception.getMessage());
@@ -114,7 +125,9 @@ class ClientAccountServiceTest {
         ClientAccount account = createAccount(1L, ClientAccount.AccountType.SAVINGS, ClientAccount.AccountStatus.ACTIVE, "SGD", null, null);
 
         InvalidDataException exception = assertThrows(InvalidDataException.class, () -> {
-            accountService.createAccount(account);
+            // Adding agentId to the service method call
+            String agentId = "AGENT123";
+            accountService.createAccount(account, agentId);
         });
 
         assertEquals("Branch ID must not be null", exception.getMessage());
@@ -127,7 +140,9 @@ class ClientAccountServiceTest {
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
 
-        boolean isDeleted = accountService.deleteAccount(1L);
+        // Adding agentId to the service method call
+        String agentId = "AGENT123";
+        boolean isDeleted = accountService.deleteAccount(1L, agentId);
 
         assertTrue(isDeleted);
         verify(accountRepository, times(1)).deleteById(1L);
@@ -138,7 +153,9 @@ class ClientAccountServiceTest {
         when(accountRepository.findById(1L)).thenReturn(Optional.empty());
 
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
-            accountService.deleteAccount(1L);
+            // Adding agentId to the service method call
+            String agentId = "AGENT123";
+            accountService.deleteAccount(1L, agentId);
         });
 
         assertEquals("Account not found with ID: 1", exception.getMessage());
@@ -153,7 +170,9 @@ class ClientAccountServiceTest {
         });
 
         DatabaseException exception = assertThrows(DatabaseException.class, () -> {
-            accountService.createAccount(account);
+            // Adding agentId to the service method call
+            String agentId = "AGENT123";
+            accountService.createAccount(account, agentId);
         });
 
         assertEquals("An error occurred while saving the account: Database error", exception.getMessage());
