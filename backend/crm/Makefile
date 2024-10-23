@@ -2,6 +2,7 @@
 
 # Variables
 DOCKER_COMPOSE_FILE = docker-compose-local.yml
+DOCKER_COMPOSE_FILE_PACKAGE = docker-compose-local-package.yml
 
 # Run the application using Docker Compose
 up:
@@ -17,4 +18,14 @@ start-local: up
 # Stop the application locally and clean the Maven project
 stop-local: down
 
-.PHONY: up down start-local stop-local
+# Build the project and start the application locally using the package Docker Compose file
+start-build-local:
+	mvn clean package -DskipTests
+	docker-compose -f $(DOCKER_COMPOSE_FILE_PACKAGE) up -d
+
+# Stop the application locally and clean the Maven project
+stop-local-clean:
+	docker-compose -f $(DOCKER_COMPOSE_FILE_PACKAGE) down -v
+	mvn clean
+
+.PHONY: up down start-local stop-local start-build-local stop-clean-local
