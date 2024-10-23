@@ -1,34 +1,28 @@
-# Makefile for managing Spring Boot application and LocalStack
+# Makefile
 
 # Variables
-APP_NAME = crm
-JAR_FILE = target/$(APP_NAME).jar
-DOCKER_COMPOSE_FILE = ./localenv/docker-compose.yml
+DOCKER_COMPOSE_FILE = docker-compose-local.yml
 
-.PHONY: build run clean start-localenv stop-localenv start-app stop-app
+# Build the JAR file using Maven
+mvn-build:
+	mvn clean package -DskipTests
 
-# Build the Spring Boot application
-build:
-	mvn clean package
-
-# Run the Spring Boot application
-run: build
-	java -jar $(JAR_FILE)
-
-# Clean the project
+# Clean the Maven project
 clean:
 	mvn clean
 
-# Start LocalStack
-start-localenv:
+# Run the application using Docker Compose
+up:
 	docker-compose -f $(DOCKER_COMPOSE_FILE) up -d
 
-# Stop LocalStack
-stop-localenv:
-	docker-compose -f $(DOCKER_COMPOSE_FILE) down
+# Stop the application and remove containers
+down:
+	docker-compose -f $(DOCKER_COMPOSE_FILE) down -v
 
-# Start the application and LocalStack
-start-app: start-localenv run
+# Start the application locally
+start-local: mvn-build up
 
-# Stop the application and LocalStack
-stop-app: stop-localenv
+# Stop the application locally and clean the Maven project
+stop-local: down clean
+
+.PHONY: mvn-build clean up down start-local stop-local

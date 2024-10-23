@@ -11,3 +11,12 @@ spring:
     username: crmappuser # to update
     password: crmapppassword # to update
     driver-class-name: org.postgresql.Driver
+
+
+aws:
+  endpoint:
+    url: http://localstack:4566
+  region: ap-southeast-1
+  logs:
+    logGroupName: crm-logs
+    logStreamName: crm-log-stream

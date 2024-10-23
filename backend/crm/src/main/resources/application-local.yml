@@ -4,10 +4,11 @@ spring:
       on-profile: local
   server:
     port: 8080
+    address: 127.0.0.1
   logging:
     config: classpath:logback-local.xml
   datasource:
-    url: jdbc:postgresql://localhost:5432/crmdatabase
+    url: jdbc:postgresql://db:5432/crmdatabase
     username: crmappuser
     password: crmapppassword
     driver-class-name: org.postgresql.Driver
@@ -16,11 +17,3 @@ spring:
 #      resourceserver:
 #        jwt:
 #          issuer-uri: http://localhost:4566/mock-cognito-idp
-
-aws:
-  endpoint:
-    url: http://localstack:4566
-  region: ap-southeast-1
-  logs:
-    logGroupName: crm-logs
-    logStreamName: crm-log-stream
