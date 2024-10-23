@@ -1,10 +1,11 @@
 package com.itsag3t1.crm.service;
 
+import org.springframework.stereotype.Service;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
-import org.springframework.stereotype.Service;
+import java.net.URI;
 
 @Service
 public class EmailService {
@@ -14,7 +15,8 @@ public class EmailService {
     // Initialize the SES client
     public EmailService() {
         this.sesClient = SesClient.builder()
-                .region(Region.US_EAST_1)
+                .endpointOverride(URI.create("http://localhost:4566"))
+                .region(Region.AP_SOUTHEAST_1)
                 .build();
     }
 
@@ -42,7 +44,7 @@ public class EmailService {
                                         .build())
                                 .build())
                         .build())
-                .source("tesipo21@gmail.com")
+                .source("a@gmail.com")
                 .build();
 
         try {

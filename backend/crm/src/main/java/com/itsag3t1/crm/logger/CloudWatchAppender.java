@@ -2,6 +2,9 @@ package com.itsag3t1.crm.logger;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsRequest;
@@ -9,6 +12,7 @@ import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsRe
 import software.amazon.awssdk.services.cloudwatchlogs.model.InputLogEvent;
 import software.amazon.awssdk.services.cloudwatchlogs.model.PutLogEventsRequest;
 
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -16,38 +20,57 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
     private final CloudWatchLogsClient client;
     private final String logGroupName;
     private final String logStreamName;
+    private final ObjectMapper objectMapper;
 
     private final Queue<InputLogEvent> eventQueue;
 
     public CloudWatchAppender() {
-        logGroupName = "LOG-GROUP-NAME-IN-CLOUDWATCH";
-        logStreamName = "LOG-STREAM-NAME-IN-CLOUDWATCH";
+        logGroupName = "crm-logs";
+        logStreamName = "crm-log-stream";
 
         client = CloudWatchLogsClient.builder()
+                .endpointOverride(URI.create("http://localhost:4566"))
                 .region(Region.AP_SOUTHEAST_1)
                 .build();
         eventQueue = new LinkedList<>();
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Override
     protected void append(ILoggingEvent event) {
-        // Construct the log message
-        InputLogEvent logEvent = InputLogEvent.builder()
-                .message(event.getLevel().levelStr + " " + event.getFormattedMessage())
-                .timestamp(event.getTimeStamp())
-                .build();
+        try {
+            // Create JSON object with required fields
+            ObjectNode logJson = objectMapper.createObjectNode();
+            logJson.put("loggerName", event.getLoggerName());
+            logJson.put("logLevel", event.getLevel().toString());
+            logJson.put("timestamp", event.getTimeStamp());
+            logJson.put("message", event.getFormattedMessage());
+            logJson.set("mdc", objectMapper.valueToTree(event.getMDCPropertyMap()));
 
-        // Add event to the queue
-        eventQueue.add(logEvent);
+            // Serialize the JSON object to a string
+            String jsonMessage = objectMapper.writeValueAsString(logJson);
 
-        // Flush queue if it has more than 10 events - Prod
-        /*
-        if (eventQueue.size() >= 10) {
+            // Construct the log message
+            InputLogEvent logEvent = InputLogEvent.builder()
+                    .message(jsonMessage)
+                    .timestamp(event.getTimeStamp())
+                    .build();
+
+            // Add event to the queue
+            eventQueue.add(logEvent);
+
+            // Flush queue if it has more than 10 events - Prod
+            /*
+            if (eventQueue.size() >= 10) {
+                flushEvents();
+            }
+            */
+            // Flush queue - Dev
             flushEvents();
+        } catch (Exception e) {
+            System.out.println("Error occurred while appending log event: " + e.getMessage());
         }
-        */
-        // Flush queue - Dev
-        flushEvents();
     }
 
     private void flushEvents() {
@@ -56,6 +79,12 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
                 .logGroupName(logGroupName)
                 .logStreamNamePrefix(logStreamName)
                 .build());
+
+        // Check if logStreams list is empty
+        if (describeLogStreamsResponse.logStreams().isEmpty()) {
+            System.out.println("No log streams found.");
+            return;
+        }
 
         String sequenceToken = describeLogStreamsResponse.logStreams().get(0).uploadSequenceToken();
 

@@ -5,7 +5,7 @@ import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.Optional;
 
 @Service
-@Slf4j
 public class ClientAccountService {
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ClientAccountService.class);
 
     // Assuming this format for ISO 8601 datetime
     private static final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");

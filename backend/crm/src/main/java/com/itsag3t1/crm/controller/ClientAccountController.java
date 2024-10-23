@@ -1,6 +1,7 @@
 package com.itsag3t1.crm.controller;
 
-import com.itsag3t1.crm.auth.CurrentAuthContext;
+//import com.itsag3t1.crm.auth.CurrentAuthContext;
+
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.service.ClientAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,8 @@ public class ClientAccountController {
     // Adding the AgentID as a request header for account creation
     @PostMapping
     public ResponseEntity<ClientAccount> createAccount(@RequestBody ClientAccount account) {
-        String agentId = CurrentAuthContext.getUserId();
+//        String agentId = CurrentAuthContext.getUserId();
+        String agentId = "agent123";
 
         // Convert account type and status to uppercase if they are received as lowercase
         if (account.getAccountType() != null) {

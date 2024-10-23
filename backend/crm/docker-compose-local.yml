@@ -1,0 +1,36 @@
+services:
+  app:
+    image: crm-app
+    container_name: crm_app
+    build:
+      context: .
+      dockerfile: Dockerfile-local
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - localstack
+
+  db:
+    image: postgres:16
+    container_name: crm_db
+    environment:
+      POSTGRES_DB: crmdatabase
+      POSTGRES_USER: crmappuser
+      POSTGRES_PASSWORD: crmapppassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./dbsetup/dbseed.sql:/docker-entrypoint-initdb.d/seed.sql
+
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    environment:
+        - SERVICES=logs,ses
+    ports:
+        - "4566:4566"  # LocalStack Gateway
+
+volumes:
+  db_data:
