@@ -1,15 +1,13 @@
 spring:
-  profiles: production
+  config:
+    activate:
+      on-profile: production
+  server:
+    port: 8080 # to update
+  logging:
+    config: classpath:logback-production.xml
   datasource:
-    url: jdbc:mysql://prod-db-endpoint:3306/proddb
-    username: produser
-    password: prodpass
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
+    url: jdbc:postgresql://localhost:5432/crmdatabase # to update
+    username: crmappuser # to update
+    password: crmapppassword # to update
+    driver-class-name: org.postgresql.Driver

@@ -63,7 +63,7 @@ public class ProfileController {
 
         // Send verification email after profile is created
         String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
+        emailService.sendVerificationEmail("hello@example.com", savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }

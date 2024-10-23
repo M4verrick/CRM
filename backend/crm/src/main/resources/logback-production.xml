@@ -28,7 +28,7 @@
     </appender>
 
     <root level="info">
-        <appender-ref ref="CLOUDWATCH"/>
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="CLOUDWATCH"/>
     </root>
 </configuration>

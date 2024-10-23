@@ -16,12 +16,10 @@ import java.util.Optional;
 
 @Service
 public class ProfileService {
-    private final Logger log = LoggerFactory.getLogger(ProfileService.class);
-
-    private final ProfileRepository profileRepository;
-
     // ISO 8601 format for logging timestamps
     private static final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    private final Logger log = LoggerFactory.getLogger(ProfileService.class);
+    private final ProfileRepository profileRepository;
 
     @Autowired
     public ProfileService(ProfileRepository profileRepository) {

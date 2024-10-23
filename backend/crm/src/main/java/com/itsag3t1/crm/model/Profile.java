@@ -75,6 +75,66 @@ public class Profile {
         this.verificationStatus = builder.verificationStatus;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public String getVerificationStatus() {
+        return verificationStatus;
+    }
+
     public static class Builder {
         private Long id;
         private String firstName;
@@ -93,6 +153,24 @@ public class Profile {
         private String verificationStatus = "PENDING";
 
         public Builder() {
+        }
+
+        public Builder(Profile profile) {
+            this.id = profile.getId();
+            this.firstName = profile.getFirstName();
+            this.lastName = profile.getLastName();
+            this.email = profile.getEmail();
+            this.phone = profile.getPhone();
+            this.address = profile.getAddress();
+            this.city = profile.getCity();
+            this.state = profile.getState();
+            this.zip = profile.getZip();
+            this.country = profile.getCountry();
+            this.dateOfBirth = profile.getDateOfBirth();
+            this.gender = profile.getGender();
+            this.isEmailVerified = profile.isEmailVerified();
+            this.verificationToken = profile.getVerificationToken();
+            this.verificationStatus = profile.getVerificationStatus();
         }
 
         public Builder setId(Long id) {
@@ -173,83 +251,5 @@ public class Profile {
         public Profile build() {
             return new Profile(this);
         }
-
-        public Builder(Profile profile) {
-            this.id = profile.getId();
-            this.firstName = profile.getFirstName();
-            this.lastName = profile.getLastName();
-            this.email = profile.getEmail();
-            this.phone = profile.getPhone();
-            this.address = profile.getAddress();
-            this.city = profile.getCity();
-            this.state = profile.getState();
-            this.zip = profile.getZip();
-            this.country = profile.getCountry();
-            this.dateOfBirth = profile.getDateOfBirth();
-            this.gender = profile.getGender();
-            this.isEmailVerified = profile.isEmailVerified();
-            this.verificationToken = profile.getVerificationToken();
-            this.verificationStatus = profile.getVerificationStatus();
-        }
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public String getZip() {
-        return zip;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public boolean isEmailVerified() {
-        return isEmailVerified;
-    }
-
-    public String getVerificationToken() {
-        return verificationToken;
-    }
-
-    public String getVerificationStatus() {
-        return verificationStatus;
     }
 }

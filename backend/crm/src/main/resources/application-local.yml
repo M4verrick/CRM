@@ -2,6 +2,15 @@ spring:
   config:
     activate:
       on-profile: local
+  server:
+    port: 8080
+  logging:
+    config: classpath:logback-local.xml
+  datasource:
+    url: jdbc:postgresql://localhost:5432/crmdatabase
+    username: crmappuser
+    password: crmapppassword
+    driver-class-name: org.postgresql.Driver
 #  security:
 #    oauth2:
 #      resourceserver:

@@ -29,7 +29,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
         logStreamName = "crm-log-stream";
 
         client = CloudWatchLogsClient.builder()
-               .endpointOverride(URI.create("http://localhost:4566"))
+                .endpointOverride(URI.create("http://localhost:4566"))
                 .region(Region.AP_SOUTHEAST_1)
                 .build();
         eventQueue = new LinkedList<>();
