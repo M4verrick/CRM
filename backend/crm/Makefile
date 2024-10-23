@@ -24,7 +24,7 @@ start-build-local:
 	docker-compose -f $(DOCKER_COMPOSE_FILE_PACKAGE) up -d
 
 # Stop the application locally and clean the Maven project
-stop-clean-local:
+stop-local-clean:
 	docker-compose -f $(DOCKER_COMPOSE_FILE_PACKAGE) down -v
 	mvn clean
 
