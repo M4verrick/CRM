@@ -1,14 +1,24 @@
-# Use the official OpenJDK 23 image as a base image
-FROM openjdk:23-jdk-slim
+# Use the official OpenJDK 21 image as a base image
+FROM openjdk:21-jdk-slim
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the application JAR file to the container
-COPY target/crm-0.0.1-SNAPSHOT.jar app.jar
+# Copy the Maven wrapper and pom.xml to the container
+COPY .mvn/ .mvn
+COPY pom.xml .
+
+# Copy the source code to the container
+COPY src/ src/
+
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
+# Build the application
+RUN mvn clean package -DskipTests
 
 # Expose the port the application will run on
 EXPOSE 8080
 
 # Run the application
-ENTRYPOINT ["java", "-Dspring.profiles.active=local", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=local", "-jar", "target/crm-0.0.1-SNAPSHOT.jar"]
