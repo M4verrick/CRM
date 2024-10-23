@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    image: crm-app
+    container_name: crm_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    container_name: crm_db
+    environment:
+      POSTGRES_DB: crmdatabase
+      POSTGRES_USER: crmappuser
+      POSTGRES_PASSWORD: crmapppassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./dbsetup/dbseed.sql:/docker-entrypoint-initdb.d/seed.sql
+
+volumes:
+  db_data:
