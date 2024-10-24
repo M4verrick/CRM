@@ -1,9 +1,12 @@
 package com.itsag3t1.crm.controller;
 
+import com.itsag3t1.crm.auth.CurrentAuthContext;
 import com.itsag3t1.crm.model.Profile;
 import com.itsag3t1.crm.service.EmailService;
 import com.itsag3t1.crm.service.ProfileService;
 import com.itsag3t1.crm.util.TokenUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,9 @@ public class ProfileController {
 
     @Autowired
     public ProfileController(ProfileService profileService, EmailService emailService) {
+        String agentId = CurrentAuthContext.getUserId();
+        Logger log = LoggerFactory.getLogger(ProfileController.class);
+        log.info("Agent ID: {}", agentId);
         this.profileService = profileService;
         this.emailService = emailService;
     }

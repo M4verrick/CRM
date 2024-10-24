@@ -12,8 +12,8 @@ spring:
     username: crmappuser
     password: crmapppassword
     driver-class-name: org.postgresql.Driver
-#  security:
-#    oauth2:
-#      resourceserver:
-#        jwt:
-#          issuer-uri: http://localhost:4566/mock-cognito-idp
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/
