@@ -4,7 +4,6 @@ import com.itsag3t1.crm.exception.InvalidDataException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
 import java.util.Date;
 
 @Entity
@@ -14,26 +13,34 @@ public class ClientAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
     private Long accountId;
-    @NotNull(message = "Client ID must not be null")
-    @Column(name = "client_id", nullable = false)
-    private Long clientId;
+
+    @NotNull(message = "Profile must not be null")
+    @ManyToOne
+    @JoinColumn(name = "profile_id", nullable = false)
+    private Profile profile;
+
     @NotNull(message = "Account type must not be null")
-    @Enumerated(EnumType.STRING) // Store as string in the database
+    @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
     private AccountType accountType;
+
     @NotNull(message = "Account status must not be null")
-    @Enumerated(EnumType.STRING) // Store as string in the database
+    @Enumerated(EnumType.STRING)
     @Column(name = "account_status", nullable = false)
     private AccountStatus accountStatus;
+
     @Temporal(TemporalType.DATE)
     @Column(name = "opening_date")
     private Date openingDate;
+
     @NotNull(message = "Currency must not be null")
     @Column(name = "currency", nullable = false, length = 3)
     private String currency;
+
     @NotNull(message = "Branch ID must not be null")
     @Column(name = "branch_id", nullable = false, length = 10)
     private String branchId;
+
     @Min(value = 0, message = "Initial deposit must be 0 or higher")
     @Column(name = "initial_deposit", nullable = false)
     private Double initialDeposit;
@@ -42,26 +49,28 @@ public class ClientAccount {
     public ClientAccount() {
     }
 
-    // Constructor for accepting String and converting it to enum
-    private ClientAccount createAccount(Long clientId, AccountType accountType, AccountStatus accountStatus, String currency, String branchId, Double initialDeposit) {
-        ClientAccount account = new ClientAccount();
-        account.setClientId(clientId);
-        account.setAccountType(accountType);
-        account.setAccountStatus(accountStatus);
-        account.setCurrency(currency);
-        account.setBranchId(branchId);
-        account.setInitialDeposit(initialDeposit);
-        return account;
+    // Constructor to initialize fields
+    public ClientAccount(Profile profile, AccountType accountType, AccountStatus accountStatus, String currency, String branchId, Double initialDeposit) {
+        this.profile = profile;
+        this.accountType = accountType;
+        this.accountStatus = accountStatus;
+        this.openingDate = new Date();
+        this.currency = currency;
+        this.branchId = branchId;
+        this.initialDeposit = initialDeposit;
     }
-
 
     // Getters and setters
-    public Long getClientId() {
-        return clientId;
+    public Long getAccountId() {
+        return accountId;
     }
 
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
     }
 
     public AccountType getAccountType() {
@@ -84,10 +93,6 @@ public class ClientAccount {
         return openingDate;
     }
 
-    public void setOpeningDate(Date openingDate) {
-        this.openingDate = openingDate;
-    }
-
     public String getCurrency() {
         return currency;
     }
@@ -108,7 +113,6 @@ public class ClientAccount {
         return initialDeposit;
     }
 
-
     public void setInitialDeposit(Double initialDeposit) {
         if (initialDeposit == null) {
             throw new InvalidDataException("Initial deposit must not be null.");
@@ -116,6 +120,7 @@ public class ClientAccount {
         this.initialDeposit = initialDeposit;
     }
 
+    // Enums
     public enum AccountType {
         SAVINGS,
         CHECKING,

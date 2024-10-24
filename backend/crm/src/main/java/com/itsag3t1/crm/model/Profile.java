@@ -1,8 +1,11 @@
 package com.itsag3t1.crm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "profiles")
@@ -11,38 +14,75 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "first_name", nullable = false, length = 50)
+    @NotNull
+    @Size(min = 2, message = "First name must be at least 2 characters long" )
+    @Size(max = 50, message = "First name cannot exceed 50 characters")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 50)
+    @NotNull
+    @Size(min = 2, message = "Last name must be at least 2 characters long" )
+    @Size(max = 50, message = "Last name cannot exceed 50 characters")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "email", nullable = false, unique = true, length = 100)
+/**
+ * Email field with a custom simplified regular expression for basic validation.
+ * This regex ensures the email:
+ * - Starts with one or more alphanumeric characters, dots, underscores, percents, pluses, or hyphens.
+ * - Contains exactly one "@" symbol.
+ * - Has a valid domain part consisting of letters, numbers, dots, and hyphens.
+ * - Ends with a top-level domain (TLD) of at least two letters.
+ **/
+    @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "Please provide a valid email address")
+    @NotNull
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "phone", length = 15)
+    @NotNull
+    @Size(min = 10, message = "Phone number must be at least 10 digits long" )
+    @Size(max = 15, message = "Phone number cannot exceed 15 digits")
+    @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
-    @Column(name = "address", length = 100)
+    @NotNull
+    @Size(min = 5, message = "Address must be at least 5 characters long" )
+    @Size(max = 100, message = "Address cannot exceed 100 characters")
+    @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "city", length = 50)
+    @NotNull
+    @Size(min = 2, message = "City must be at least 2 characters long" )
+    @Size(max = 50, message = "City cannot exceed 50 characters")
+    @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "state", length = 50)
+    @NotNull
+    @Size(min = 2, message = "State must be at least 2 characters long" )
+    @Size(max = 50, message = "State cannot exceed 50 characters")
+    @Column(name = "state", nullable = false)
     private String state;
 
-    @Column(name = "zip", length = 10)
-    private String zip;
-
-    @Column(name = "country", length = 50)
+    @NotNull
+    @Size(min = 2, message = "Country must be at least 2 characters long" )
+    @Size(max = 50, message = "Country cannot exceed 50 characters")
+    @Column(name = "country", nullable = false)
     private String country;
 
+    @NotNull
+    @Size(min = 4, message = "Postal must be at least 4 characters long" )
+    @Size(max = 10, message = "Postal code cannot exceed 10 characters")
+    @Column(name = "zip", nullable = false)
+    private String zip;
+
+    @Past
+    @NotNull
     @Temporal(TemporalType.DATE)
-    @Column(name = "date_of_birth")
+    @Column(name = "date_of_birth", nullable = false)
     private Date dateOfBirth;
 
-    @Column(name = "gender", length = 10)
+    @NotNull
+    @Column(name = "gender", nullable = false)
     private String gender;
 
     @Column(name = "is_email_verified", nullable = false)
@@ -54,9 +94,14 @@ public class Profile {
     @Column(name = "verification_status", nullable = false, length = 20)
     private String verificationStatus = "PENDING";
 
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClientAccount> clientAccounts = new ArrayList<>();
+
+    // No-argument constructor
     public Profile() {
     }
 
+    // Builder constructor
     private Profile(Builder builder) {
         this.id = builder.id;
         this.firstName = builder.firstName;
@@ -73,8 +118,10 @@ public class Profile {
         this.isEmailVerified = builder.isEmailVerified;
         this.verificationToken = builder.verificationToken;
         this.verificationStatus = builder.verificationStatus;
+        this.clientAccounts = builder.clientAccounts;
     }
 
+    // Getters
     public Long getId() {
         return id;
     }
@@ -135,6 +182,88 @@ public class Profile {
         return verificationStatus;
     }
 
+    public List<ClientAccount> getClientAccounts() {
+        return clientAccounts;
+    }
+
+    // Setters
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        isEmailVerified = emailVerified;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public void setClientAccounts(List<ClientAccount> clientAccounts) {
+        this.clientAccounts = clientAccounts;
+    }
+
+    // Method to add a single ClientAccount
+    public void addClientAccount(ClientAccount account) {
+        clientAccounts.add(account);
+        account.setProfile(this);
+    }
+
+    // Method to remove a single ClientAccount
+    public void removeClientAccount(ClientAccount account) {
+        clientAccounts.remove(account);
+        account.setProfile(null);
+    }
+
+    // Builder class
     public static class Builder {
         private Long id;
         private String firstName;
@@ -151,6 +280,7 @@ public class Profile {
         private boolean isEmailVerified = false;
         private String verificationToken;
         private String verificationStatus = "PENDING";
+        private List<ClientAccount> clientAccounts = new ArrayList<>();
 
         public Builder() {
         }
@@ -171,8 +301,10 @@ public class Profile {
             this.isEmailVerified = profile.isEmailVerified();
             this.verificationToken = profile.getVerificationToken();
             this.verificationStatus = profile.getVerificationStatus();
+            this.clientAccounts = profile.getClientAccounts();
         }
 
+        // Builder methods
         public Builder setId(Long id) {
             this.id = id;
             return this;
@@ -245,6 +377,11 @@ public class Profile {
 
         public Builder setVerificationStatus(String verificationStatus) {
             this.verificationStatus = verificationStatus;
+            return this;
+        }
+
+        public Builder setClientAccounts(List<ClientAccount> clientAccounts) {
+            this.clientAccounts = clientAccounts;
             return this;
         }
 
