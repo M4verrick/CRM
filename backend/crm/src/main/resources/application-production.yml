@@ -11,8 +11,11 @@ spring:
     username: crmappuser # to update
     password: crmapppassword # to update
     driver-class-name: org.postgresql.Driver
-
-
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_ya55bZ0sg
 aws:
   endpoint:
     url: http://localstack:4566
