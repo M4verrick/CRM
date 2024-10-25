@@ -7,10 +7,10 @@ spring:
   logging:
     config: classpath:logback-production.xml
   datasource:
-    url: jdbc:postgresql://localhost:5432/crmdatabase # to update
+    url: jdbc-secretsmanager:mysql://db-1.cwhqvgjbpgfw.eu-central-1.rds.amazonaws.com:3306
     username: crmappuser # to update
-    password: crmapppassword # to update
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: com.amazonaws.secretsmanager.sql.AWSSecretsManagerMySQLDriver
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   security:
     oauth2:
       resourceserver:
