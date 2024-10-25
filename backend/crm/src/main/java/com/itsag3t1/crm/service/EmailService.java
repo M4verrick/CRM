@@ -15,7 +15,6 @@ public class EmailService {
     // Initialize the SES client
     public EmailService() {
         this.sesClient = SesClient.builder()
-                .endpointOverride(URI.create("http://localhost:4566"))
                 .region(Region.AP_SOUTHEAST_1)
                 .build();
     }

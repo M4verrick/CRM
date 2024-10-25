@@ -9,7 +9,9 @@ services:
       - "8080:8080"
     depends_on:
       - db
-      - localstack
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+      - CLOUDWATCH_URI=http://localstack:4566
 
   db:
     image: postgres:16
@@ -22,15 +24,6 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./dbsetup/dbseed.sql:/docker-entrypoint-initdb.d/seed.sql
-
-  localstack:
-    image: localstack/localstack
-    container_name: localstack
-    environment:
-      - SERVICES=logs,ses
-    ports:
-      - "4566:4566"  # LocalStack Gateway
 
 volumes:
   db_data:
