@@ -105,6 +105,22 @@ const NewUser = () => {
             <Input placeholder="Email" />
           </Form.Item>
 
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[
+              {
+                required: true,
+                message: "Please enter password",
+              },
+              { whitespace: false },
+              { min: 3 },
+            ]}
+            hasFeedback
+          >
+            <Input placeholder="Password" />
+          </Form.Item>
+
           <Form.Item 
             name="type"
             label="Account Type"

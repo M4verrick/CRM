@@ -6,17 +6,17 @@ import ThemeCustomization from 'themes';
 
 import ScrollTop from 'components/ScrollTop';
 
-// import awsConfig from './aws-exports';  // Import AWS configuration
+import { Account } from './Account.jsx';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
-
-// Amplify.configure(awsConfig);
 
 export default function App() {
   return (
     <ThemeCustomization>
       <ScrollTop>
-        <RouterProvider router={router} />
+        <Account>
+          <RouterProvider router={router} />
+        </Account>
       </ScrollTop>
     </ThemeCustomization>
   );

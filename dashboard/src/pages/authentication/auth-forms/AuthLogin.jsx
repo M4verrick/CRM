@@ -1,8 +1,7 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useContext } from 'react';
+import { AccountContext } from 'Account.jsx';  // Add .jsx extension
+
 import { Link as RouterLink } from 'react-router-dom';
-import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
-import UserPool from "UserPool"
 
 // material-ui
 import Button from '@mui/material/Button';
@@ -42,6 +41,8 @@ export default function AuthLogin() {
     event.preventDefault();
   };
 
+  const { authenticate } = useContext(AccountContext);
+
   return (
     <>
       <Formik
@@ -57,34 +58,9 @@ export default function AuthLogin() {
         onSubmit={async (values, { setSubmitting, setErrors, resetForm }) => {
           // Example custom submit logic
           try {
-            // Your form submission logic, e.g., API call
-            const user = new CognitoUser({
-              Username: values.email,
-              Pool: UserPool,
-            });
-          
-            const authDetails = new AuthenticationDetails({
-              Username: values.email,
-              Password: values.password,
-            });
+            // Your form submission logic
 
-            // Convert the callback-based authentication to a Promise
-            await new Promise((resolve, reject) => {
-              user.authenticateUser(authDetails, {
-                onSuccess: (data) => {
-                  console.log("onSuccess:", data);
-                  resolve(data);
-                },
-                onFailure: (err) => {
-                  console.error("onFailure:", err);
-                  reject(new Error(err.message || "Invalid login credentials"));
-                },
-                newPasswordRequired: (data) => {
-                  console.error("newPasswordRequired:", data);
-                  reject(new Error("New password required"));
-                }
-              });
-            });
+            await authenticate(values.email, values.password);
 
           } catch (error) {
             // Handle error case by setting form errors if needed
