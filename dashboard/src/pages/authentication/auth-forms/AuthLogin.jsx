@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
+import UserPool from "UserPool"
 
 // material-ui
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
-import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
@@ -27,11 +28,9 @@ import AnimateButton from 'components/@extended/AnimateButton';
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
-import FirebaseSocial from './FirebaseSocial';
 
-// ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthLogin({ isDemo = true }) {
+export default function AuthLogin() {
   const [checked, setChecked] = React.useState(false);
 
   const [showPassword, setShowPassword] = React.useState(false);
@@ -55,6 +54,46 @@ export default function AuthLogin({ isDemo = true }) {
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
+        onSubmit={async (values, { setSubmitting, setErrors, resetForm }) => {
+          // Example custom submit logic
+          try {
+            // Your form submission logic, e.g., API call
+            const user = new CognitoUser({
+              Username: values.email,
+              Pool: UserPool,
+            });
+          
+            const authDetails = new AuthenticationDetails({
+              Username: values.email,
+              Password: values.password,
+            });
+
+            // Convert the callback-based authentication to a Promise
+            await new Promise((resolve, reject) => {
+              user.authenticateUser(authDetails, {
+                onSuccess: (data) => {
+                  console.log("onSuccess:", data);
+                  resolve(data);
+                },
+                onFailure: (err) => {
+                  console.error("onFailure:", err);
+                  reject(new Error(err.message || "Invalid login credentials"));
+                },
+                newPasswordRequired: (data) => {
+                  console.error("newPasswordRequired:", data);
+                  reject(new Error("New password required"));
+                }
+              });
+            });
+
+          } catch (error) {
+            // Handle error case by setting form errors if needed
+            setErrors({ submit: error.message || "Something went wrong" });
+          } finally {
+            // End the submitting state
+            setSubmitting(false);
+          }
+        }}
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
@@ -146,14 +185,6 @@ export default function AuthLogin({ isDemo = true }) {
                   </Button>
                 </AnimateButton>
               </Grid>
-              {/* <Grid item xs={12}>
-                <Divider>
-                  <Typography variant="caption"> Login with</Typography>
-                </Divider>
-              </Grid>
-              <Grid item xs={12}>
-                <FirebaseSocial />
-              </Grid> */}
             </Grid>
           </form>
         )}
@@ -161,5 +192,3 @@ export default function AuthLogin({ isDemo = true }) {
     </>
   );
 }
-
-AuthLogin.propTypes = { isDemo: PropTypes.bool };
