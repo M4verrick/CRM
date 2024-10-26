@@ -2,6 +2,7 @@ spring:
   config:
     activate:
       on-profile: production
+    import: aws-secretsmanager
   server:
     port: 8080 # to update
   logging:

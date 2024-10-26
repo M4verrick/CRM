@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     image: crm-app
@@ -12,8 +10,9 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_PROFILES_ACTIVE=local
       - CLOUDWATCH_URI=http://localstack:4566
+      - AWS_ACCESS_KEY=test
+      - AWS_KEY_ID=test
 
   db:
     image: postgres:16
@@ -23,7 +22,7 @@ services:
       POSTGRES_USER: crmappuser
       POSTGRES_PASSWORD: crmapppassword
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
