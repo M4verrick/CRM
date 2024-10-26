@@ -52,7 +52,6 @@ public class ClientAccountService {
         } finally {
             MDC.clear(); // Clear MDC after logging
         }
-
     }
 
     public boolean deleteAccount(Long accountId, String agentId) {
