@@ -5,6 +5,7 @@ import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
+import com.itsag3t1.crm.repository.AgentProfileRepository;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class ClientAccountService {
     private static final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     @Autowired
     private ClientAccountRepository accountRepository;
+    private AgentProfileRepository agentProfileRepository;
 
     public ClientAccount createAccount(ClientAccount account, String agentId) {
         validateAccountData(account);
@@ -61,12 +63,12 @@ public class ClientAccountService {
     public boolean deleteAccount(Long accountId, String agentId) {
         Optional<ClientAccount> account;
         // Check if the clientId is associated with the agentId
-        if (!isClientAssociatedWithAgent(account.getClientId(), agentId)) {
-            throw new InvalidDataException("Agent is not authorized to create an account for this client");
-        }
         try {
             account = accountRepository.findById(accountId);
             if (account.isPresent()) {
+                if (!isClientAssociatedWithAgent(account.get().getClientId(), agentId)) {
+                    throw new InvalidDataException("Agent is not authorized to create an account for this client");
+                }
                 accountRepository.deleteById(accountId);
                 // Log the deletion after the account is deleted
                 MDC.put("agent_id", agentId);

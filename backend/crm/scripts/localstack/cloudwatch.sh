@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Set AWS CLI endpoint for LocalStack
-ENDPOINT_URL="http://localhost:4566"
 REGION="ap-southeast-1"  # Specify your desired region
 
 # Log group and stream names

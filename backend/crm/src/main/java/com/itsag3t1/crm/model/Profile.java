@@ -1,62 +1,138 @@
 package com.itsag3t1.crm.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "profiles")
 public class Profile {
+    // Setters
+    // Getters
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "first_name", nullable = false, length = 50)
+    @Setter
+    @Getter
+    @NotNull
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters long")
+    @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "First name must contain only alphabetic characters and spaces")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 50)
+    @Setter
+    @Getter
+    @NotNull
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters long")
+    @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "Last name must contain only alphabetic characters and spaces")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "email", nullable = false, unique = true, length = 100)
+    /**
+     * Email field with a custom simplified regular expression for basic validation.
+     * This regex ensures the email:
+     * - Starts with one or more alphanumeric characters, dots, underscores, percents, pluses, or hyphens.
+     * - Contains exactly one "@" symbol.
+     * - Has a valid domain part consisting of letters, numbers, dots, and hyphens.
+     * - Ends with a top-level domain (TLD) of at least two letters.
+     **/
+    @Setter
+    @Getter
+    @NotNull
+    @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "Please provide a valid email address")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "phone", length = 15)
+    @Setter
+    @Getter
+    @NotNull
+    @Pattern(regexp = "\\+?[0-9]{10,15}", message = "Phone number must be between 10 and 15 digits, and may include an optional '+' prefix")
+    @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
-    @Column(name = "address", length = 100)
+    @Setter
+    @Getter
+    @NotNull
+    @Size(min = 5, max = 100, message = "Address must be between 5 and 100 characters long")
+    @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "city", length = 50)
+    @Setter
+    @Getter
+    @NotNull
+    @Size(min = 2, max = 50, message = "City must be between 2 and 50 characters long")
+    @Column(name = "city", nullable = false)
     private String city;
 
-    @Column(name = "state", length = 50)
+    @Setter
+    @Getter
+    @NotNull
+    @Size(min = 2, max = 50, message = "State must be between 2 and 50 characters long")
+    @Column(name = "state", nullable = false)
     private String state;
 
-    @Column(name = "zip", length = 10)
-    private String zip;
-
-    @Column(name = "country", length = 50)
+    @Setter
+    @Getter
+    @NotNull
+    @Size(min = 2, max = 50, message = "Country must be between 2 and 50 characters long")
+    @Column(name = "country", nullable = false)
     private String country;
 
+    @Setter
+    @Getter
+    @NotNull
+    @Size(min = 4, max = 10, message = "Postal code must be between 4 and 10 characters long")
+    @Pattern(regexp = "^[0-9A-Za-z-]+$", message = "Postal code must match the country's postal code format")
+    @Column(name = "zip", nullable = false)
+    private String zip;
+
+    @Setter
+    @Getter
+    @Past
+    @NotNull
     @Temporal(TemporalType.DATE)
-    @Column(name = "date_of_birth")
+    @Column(name = "date_of_birth", nullable = false)
     private Date dateOfBirth;
 
-    @Column(name = "gender", length = 10)
-    private String gender;
+    @Setter
+    @Getter
+    @NotNull(message = "Gender is required")
+    @Enumerated(EnumType.STRING)  // Stores the string representation of the enum in the database
+    @Column(name = "gender", nullable = false)
+    private Gender gender;
 
     @Column(name = "is_email_verified", nullable = false)
     private boolean isEmailVerified = false;
 
+    @Setter
+    @Getter
     @Column(name = "verification_token", length = 64)
     private String verificationToken;
 
+    @Setter
+    @Getter
     @Column(name = "verification_status", nullable = false, length = 20)
     private String verificationStatus = "PENDING";
 
+    @Setter
+    @Getter
+    @JsonManagedReference
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ClientAccount> clientAccounts = new ArrayList<>();
+    // No-argument constructor
     public Profile() {
     }
 
+    // Builder constructor
     private Profile(Builder builder) {
         this.id = builder.id;
         this.firstName = builder.firstName;
@@ -73,68 +149,30 @@ public class Profile {
         this.isEmailVerified = builder.isEmailVerified;
         this.verificationToken = builder.verificationToken;
         this.verificationStatus = builder.verificationStatus;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public String getZip() {
-        return zip;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public String getGender() {
-        return gender;
+        this.clientAccounts = builder.clientAccounts;
     }
 
     public boolean isEmailVerified() {
         return isEmailVerified;
     }
 
-    public String getVerificationToken() {
-        return verificationToken;
+    public void setEmailVerified(boolean emailVerified) {
+        isEmailVerified = emailVerified;
     }
 
-    public String getVerificationStatus() {
-        return verificationStatus;
+    // Method to add a single ClientAccount
+    public void addClientAccount(ClientAccount account) {
+        clientAccounts.add(account);
+        account.setProfile(this);
     }
 
+    // Method to remove a single ClientAccount
+    public void removeClientAccount(ClientAccount account) {
+        clientAccounts.remove(account);
+        account.setProfile(null);
+    }
+
+    // Builder class
     public static class Builder {
         private Long id;
         private String firstName;
@@ -147,10 +185,11 @@ public class Profile {
         private String zip;
         private String country;
         private Date dateOfBirth;
-        private String gender;
+        private Gender gender;
         private boolean isEmailVerified = false;
         private String verificationToken;
         private String verificationStatus = "PENDING";
+        private List<ClientAccount> clientAccounts = new ArrayList<>();
 
         public Builder() {
         }
@@ -171,8 +210,10 @@ public class Profile {
             this.isEmailVerified = profile.isEmailVerified();
             this.verificationToken = profile.getVerificationToken();
             this.verificationStatus = profile.getVerificationStatus();
+            this.clientAccounts = profile.getClientAccounts();
         }
 
+        // Builder methods
         public Builder setId(Long id) {
             this.id = id;
             return this;
@@ -228,7 +269,7 @@ public class Profile {
             return this;
         }
 
-        public Builder setGender(String gender) {
+        public Builder setGender(Gender gender) {
             this.gender = gender;
             return this;
         }
@@ -248,8 +289,30 @@ public class Profile {
             return this;
         }
 
+        public Builder setClientAccounts(List<ClientAccount> clientAccounts) {
+            this.clientAccounts = clientAccounts;
+            return this;
+        }
+
         public Profile build() {
             return new Profile(this);
         }
+
+
     }
+    @Getter
+    public enum Gender {
+        MALE("Male"),
+        FEMALE("Female"),
+        NON_BINARY("Non-binary"),
+        PREFER_NOT_TO_SAY("Prefer not to say");
+
+        private final String displayName;
+
+        Gender(String displayName) {
+            this.displayName = displayName;
+        }
+
+    }
+
 }
