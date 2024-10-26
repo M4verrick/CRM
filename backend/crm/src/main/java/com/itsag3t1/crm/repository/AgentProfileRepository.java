@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AgentProfileRepository extends JpaRepository<AgentProfile, Long> {
+    boolean existsByAgentIdAndClientId(String agentId, Long clientId);
 }
