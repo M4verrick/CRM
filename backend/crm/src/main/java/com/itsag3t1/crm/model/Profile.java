@@ -1,5 +1,6 @@
 package com.itsag3t1.crm.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -15,63 +16,58 @@ public class Profile {
     private Long id;
 
     @NotNull
-    @Size(min = 2, message = "First name must be at least 2 characters long" )
-    @Size(max = 50, message = "First name cannot exceed 50 characters")
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters long")
+    @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "First name must contain only alphabetic characters and spaces")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
     @NotNull
-    @Size(min = 2, message = "Last name must be at least 2 characters long" )
-    @Size(max = 50, message = "Last name cannot exceed 50 characters")
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters long")
+    @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "Last name must contain only alphabetic characters and spaces")
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-/**
- * Email field with a custom simplified regular expression for basic validation.
- * This regex ensures the email:
- * - Starts with one or more alphanumeric characters, dots, underscores, percents, pluses, or hyphens.
- * - Contains exactly one "@" symbol.
- * - Has a valid domain part consisting of letters, numbers, dots, and hyphens.
- * - Ends with a top-level domain (TLD) of at least two letters.
- **/
-    @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "Please provide a valid email address")
+    /**
+     * Email field with a custom simplified regular expression for basic validation.
+     * This regex ensures the email:
+     * - Starts with one or more alphanumeric characters, dots, underscores, percents, pluses, or hyphens.
+     * - Contains exactly one "@" symbol.
+     * - Has a valid domain part consisting of letters, numbers, dots, and hyphens.
+     * - Ends with a top-level domain (TLD) of at least two letters.
+     **/
     @NotNull
+    @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "Please provide a valid email address")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @NotNull
-    @Size(min = 10, message = "Phone number must be at least 10 digits long" )
-    @Size(max = 15, message = "Phone number cannot exceed 15 digits")
+    @Pattern(regexp = "\\+?[0-9]{10,15}", message = "Phone number must be between 10 and 15 digits, and may include an optional '+' prefix")
     @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
     @NotNull
-    @Size(min = 5, message = "Address must be at least 5 characters long" )
-    @Size(max = 100, message = "Address cannot exceed 100 characters")
+    @Size(min = 5, max = 100, message = "Address must be between 5 and 100 characters long")
     @Column(name = "address", nullable = false)
     private String address;
 
     @NotNull
-    @Size(min = 2, message = "City must be at least 2 characters long" )
-    @Size(max = 50, message = "City cannot exceed 50 characters")
+    @Size(min = 2, max = 50, message = "City must be between 2 and 50 characters long")
     @Column(name = "city", nullable = false)
     private String city;
 
     @NotNull
-    @Size(min = 2, message = "State must be at least 2 characters long" )
-    @Size(max = 50, message = "State cannot exceed 50 characters")
+    @Size(min = 2, max = 50, message = "State must be between 2 and 50 characters long")
     @Column(name = "state", nullable = false)
     private String state;
 
     @NotNull
-    @Size(min = 2, message = "Country must be at least 2 characters long" )
-    @Size(max = 50, message = "Country cannot exceed 50 characters")
+    @Size(min = 2, max = 50, message = "Country must be between 2 and 50 characters long")
     @Column(name = "country", nullable = false)
     private String country;
 
     @NotNull
-    @Size(min = 4, message = "Postal must be at least 4 characters long" )
-    @Size(max = 10, message = "Postal code cannot exceed 10 characters")
+    @Size(min = 4, max = 10, message = "Postal code must be between 4 and 10 characters long")
+    @Pattern(regexp = "^[0-9A-Za-z-]+$", message = "Postal code must match the country's postal code format")
     @Column(name = "zip", nullable = false)
     private String zip;
 
@@ -81,9 +77,10 @@ public class Profile {
     @Column(name = "date_of_birth", nullable = false)
     private Date dateOfBirth;
 
-    @NotNull
+    @NotNull(message = "Gender is required")
+    @Enumerated(EnumType.STRING)  // Stores the string representation of the enum in the database
     @Column(name = "gender", nullable = false)
-    private String gender;
+    private Gender gender;
 
     @Column(name = "is_email_verified", nullable = false)
     private boolean isEmailVerified = false;
@@ -94,9 +91,9 @@ public class Profile {
     @Column(name = "verification_status", nullable = false, length = 20)
     private String verificationStatus = "PENDING";
 
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ClientAccount> clientAccounts = new ArrayList<>();
-
     // No-argument constructor
     public Profile() {
     }
@@ -166,7 +163,7 @@ public class Profile {
         return dateOfBirth;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
@@ -231,7 +228,7 @@ public class Profile {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
@@ -276,7 +273,7 @@ public class Profile {
         private String zip;
         private String country;
         private Date dateOfBirth;
-        private String gender;
+        private Gender gender;
         private boolean isEmailVerified = false;
         private String verificationToken;
         private String verificationStatus = "PENDING";
@@ -360,7 +357,7 @@ public class Profile {
             return this;
         }
 
-        public Builder setGender(String gender) {
+        public Builder setGender(Gender gender) {
             this.gender = gender;
             return this;
         }
@@ -388,5 +385,24 @@ public class Profile {
         public Profile build() {
             return new Profile(this);
         }
+
+
     }
+    public enum Gender {
+        MALE("Male"),
+        FEMALE("Female"),
+        NON_BINARY("Non-binary"),
+        PREFER_NOT_TO_SAY("Prefer not to say");
+
+        private final String displayName;
+
+        Gender(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+    }
+
 }

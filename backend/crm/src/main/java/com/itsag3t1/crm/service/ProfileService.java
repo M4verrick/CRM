@@ -26,12 +26,12 @@ public class ProfileService {
         this.profileRepository = profileRepository;
     }
 
-    public List<Profile> getAllProfiles(String agentId) {
+    public List<Profile> getAllProfiles() {
         try {
             List<Profile> profiles = profileRepository.findAll();
 
             // Log the action of retrieving all profiles
-            MDC.put("agent_id", agentId);
+//            MDC.put("agent_id", agentId);
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
             log.info("{} retrieved all profiles at {}", MDC.get("agent_id"), MDC.get("date_time"));

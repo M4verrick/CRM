@@ -26,9 +26,9 @@ public class ProfileController {
     }
 
     @GetMapping
-    public List<Profile> getAllProfiles(@RequestParam String agentId) {
+    public List<Profile> getAllProfiles() {
         // Pass agentId to ProfileService to allow logging inside ProfileService
-        return profileService.getAllProfiles(agentId);
+        return profileService.getAllProfiles();
     }
 
     @GetMapping("/{id}")
