@@ -80,6 +80,18 @@ public class ProfileService {
         try {
             Profile savedProfile = profileRepository.save(profile);
 
+
+            // Check if the client already has an agent
+            if (!agentProfileRepository.existsByClient(savedProfile)) {
+                AgentProfile agentProfile = new AgentProfile();
+                agentProfile.setAgentId(agentId);
+                agentProfile.setClient(savedProfile);
+
+                agentProfileRepository.save(agentProfile);
+            } else {
+                log.info("Client {} already has an assigned agent.", savedProfile.getId());
+            }
+
             // Log the action of saving the profile
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", savedProfile.getId().toString());

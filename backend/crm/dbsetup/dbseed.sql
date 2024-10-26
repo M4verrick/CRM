@@ -54,3 +54,13 @@ VALUES
     ('John', 'Doe', 'john.doe@example.com', '1234567890', '123 Main St', 'Anytown', 'Anystate', '12345', 'USA', '1980-01-01', 'Male', FALSE, 'token123', 'PENDING'),
     ('Jane', 'Smith', 'jane.smith@example.com', '0987654321', '456 Elm St', 'Othertown', 'Otherstate', '67890', 'USA', '1990-02-02', 'Female', TRUE, 'token456', 'VERIFIED'),
     ('Alice', 'Johnson', 'alice.johnson@example.com', '5555555555', '789 Oak St', 'Sometown', 'Somestate', '11223', 'USA', '2000-03-03', 'Female', FALSE, 'token789', 'PENDING');
+
+-- Create the agent_profile table to establish a one-to-many relationship between agents and profiles
+DROP TABLE IF EXISTS agent_profile;
+CREATE TABLE agent_profile
+(
+    id         SERIAL PRIMARY KEY,
+    agent_id   VARCHAR(36) NOT NULL,
+    client_id  BIGINT NOT NULL UNIQUE,
+    FOREIGN KEY (client_id) REFERENCES profiles(id) ON DELETE CASCADE
+);
