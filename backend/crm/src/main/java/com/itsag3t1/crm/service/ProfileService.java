@@ -3,6 +3,8 @@ package com.itsag3t1.crm.service;
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.model.Profile;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
+import com.itsag3t1.crm.model.AgentProfile;
+import com.itsag3t1.crm.repository.AgentProfileRepository;
 import com.itsag3t1.crm.repository.ProfileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +27,14 @@ public class ProfileService {
     private final Logger log = LoggerFactory.getLogger(ProfileService.class);
     private final ProfileRepository profileRepository;
     private final ClientAccountRepository clientAccountRepository;
+    private final AgentProfileRepository agentProfileRepository;
 
     @Autowired
-    public ProfileService(ProfileRepository profileRepository, ClientAccountRepository clientAccountRepository) {
+    public ProfileService(ProfileRepository profileRepository, ClientAccountRepository clientAccountRepository, AgentProfileRepository agentProfileRepository) {
         this.profileRepository = profileRepository;
         this.clientAccountRepository = clientAccountRepository;
+        this.agentProfileRepository = agentProfileRepository;
+
     }
 
     public List<Profile> getAllProfiles() {
@@ -85,6 +90,13 @@ public class ProfileService {
     public Profile saveProfile(Profile profile, String agentId) {
         try {
             Profile savedProfile = profileRepository.save(profile);
+            
+            //add into Agent-ClientProfile
+            AgentProfile agentProfile = new AgentProfile();
+            agentProfile.setAgentId(agentId);
+            agentProfile.setClient(savedProfile);
+
+            agentProfileRepository.save(agentProfile);
 
             // Log the action of saving the profile
             MDC.put("agent_id", agentId);
