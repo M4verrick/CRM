@@ -13,8 +13,8 @@ const Unauthorized = () => <div>You are not authorized to view this page</div>;
 // render pages
 const ProfileTable = Loadable(lazy(() => import('pages/tables/profile-table')));
 const UserTable = Loadable(lazy(() => import('pages/tables/user-table')));
-const ClientTransactionTable = Loadable(lazy(() => import('pages/tables/profile-table')));
-const UserTransactionTable = Loadable(lazy(() => import('pages/tables/profile-table')));
+const ClientTransactionTable = Loadable(lazy(() => import('pages/tables/client-transaction-table')));
+const UserTransactionTable = Loadable(lazy(() => import('pages/tables/user-transaction-table')));
 const AccountForm = Loadable(lazy(() => import('pages/forms/NewAccount')));
 const ClientForm = Loadable(lazy(() => import('pages/forms/NewClient')));
 const UserForm = Loadable(lazy(() => import('pages/forms/NewUser')));

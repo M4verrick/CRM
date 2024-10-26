@@ -19,7 +19,7 @@ export const waitTime = async (time: number = 100) => {
 };
 
 // Define table items
-type CloudWatchLogItem = {
+type GithubIssueItem = {
   url: string;
   id: number;
   number: number;
@@ -35,33 +35,18 @@ type CloudWatchLogItem = {
   closed_at?: string;
 };
 
-const columns: ProColumns<CloudWatchLogItem>[] = [
+const columns: ProColumns<GithubIssueItem>[] = [
   {
     dataIndex: 'index',
     valueType: 'indexBorder',
     width: 48,
   },
   {
-    title: 'Action',
+    title: '标题',
     dataIndex: 'title',
     copyable: true,
     ellipsis: true,
-    tooltip: 'actions performed by system users',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
-  },
-  {
-    title: 'User ID',
-    dataIndex: 'title',
-    copyable: true,
-    ellipsis: true,
-    tooltip: 'responsible system user',
+    tooltip: '标题过长会自动收缩',
     formItemProps: {
       rules: [
         {
@@ -73,7 +58,7 @@ const columns: ProColumns<CloudWatchLogItem>[] = [
   },
   {
     disable: true,
-    title: 'User Role',
+    title: '状态',
     dataIndex: 'state',
     filters: true,
     onFilter: true,
@@ -82,23 +67,23 @@ const columns: ProColumns<CloudWatchLogItem>[] = [
     valueEnum: {
       all: { text: '超长'.repeat(50) },
       open: {
-        text: 'admin',
+        text: '未解决',
         status: 'Error',
       },
       closed: {
-        text: 'agent',
+        text: '已解决',
         status: 'Success',
         disabled: true,
       },
-      // processing: {
-      //   text: '解决中',
-      //   status: 'Processing',
-      // },
+      processing: {
+        text: '解决中',
+        status: 'Processing',
+      },
     },
   },
   {
     disable: true,
-    title: 'Labels',
+    title: '标签',
     dataIndex: 'labels',
     search: false,
     renderFormItem: (_, { defaultRender }) => {
@@ -115,7 +100,7 @@ const columns: ProColumns<CloudWatchLogItem>[] = [
     ),
   },
   {
-    title: 'created at',
+    title: '创建时间',
     key: 'showTime',
     dataIndex: 'created_at',
     valueType: 'date',
@@ -123,7 +108,7 @@ const columns: ProColumns<CloudWatchLogItem>[] = [
     hideInSearch: true,
   },
   {
-    title: 'created at',
+    title: '创建时间',
     dataIndex: 'created_at',
     valueType: 'dateRange',
     hideInTable: true,
@@ -136,12 +121,38 @@ const columns: ProColumns<CloudWatchLogItem>[] = [
       },
     },
   },
+  {
+    title: '操作',
+    valueType: 'option',
+    key: 'option',
+    render: (text, record, _, action) => [
+      <a
+        key="editable"
+        onClick={() => {
+          action?.startEditable?.(record.id);
+        }}
+      >
+        编辑
+      </a>,
+      <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
+        查看
+      </a>,
+      <TableDropdown
+        key="actionGroup"
+        onSelect={() => action?.reload()}
+        menus={[
+          { key: 'copy', name: '复制' },
+          { key: 'delete', name: '删除' },
+        ]}
+      />,
+    ],
+  },
 ];
 
 export default () => {
   const actionRef = useRef<ActionType>();
   return (
-    <ProTable<CloudWatchLogItem>
+    <ProTable<GithubIssueItem>
       columns={columns}
       actionRef={actionRef}
       cardBordered
@@ -149,7 +160,7 @@ export default () => {
         console.log(sort, filter);
         await waitTime(2000);
         return request<{
-          data: CloudWatchLogItem[];
+          data: GithubIssueItem[];
         }>('https://proapi.azurewebsites.net/github/issues', {
           params,
         });
@@ -193,41 +204,41 @@ export default () => {
         onChange: (page) => console.log(page),
       }}
       dateFormatter="string"
-      headerTitle="CloudWatch user logs"
+      headerTitle="高级表格"
       toolBarRender={() => [
-        // <Button
-        //   key="button"
-        //   icon={<PlusOutlined />}
-        //   onClick={() => {
-        //     actionRef.current?.reload();
-        //   }}
-        //   type="primary"
-        // >
-        //   新建
-        // </Button>,
-        // <Dropdown
-        //   key="menu"
-        //   menu={{
-        //     items: [
-        //       {
-        //         label: '1st item',
-        //         key: '1',
-        //       },
-        //       {
-        //         label: '2nd item',
-        //         key: '2',
-        //       },
-        //       {
-        //         label: '3rd item',
-        //         key: '3',
-        //       },
-        //     ],
-        //   }}
-        // >
-        //   <Button>
-        //     <EllipsisOutlined />
-        //   </Button>
-        // </Dropdown>,
+        <Button
+          key="button"
+          icon={<PlusOutlined />}
+          onClick={() => {
+            actionRef.current?.reload();
+          }}
+          type="primary"
+        >
+          新建
+        </Button>,
+        <Dropdown
+          key="menu"
+          menu={{
+            items: [
+              {
+                label: '1st item',
+                key: '1',
+              },
+              {
+                label: '2nd item',
+                key: '2',
+              },
+              {
+                label: '3rd item',
+                key: '3',
+              },
+            ],
+          }}
+        >
+          <Button>
+            <EllipsisOutlined />
+          </Button>
+        </Dropdown>,
       ]}
     />
   );
