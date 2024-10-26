@@ -3,6 +3,8 @@ package com.itsag3t1.crm.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,16 +13,24 @@ import java.util.List;
 @Entity
 @Table(name = "profiles")
 public class Profile {
+    // Setters
+    // Getters
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Setter
+    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters long")
     @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "First name must contain only alphabetic characters and spaces")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    @Setter
+    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters long")
     @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "Last name must contain only alphabetic characters and spaces")
@@ -35,48 +45,66 @@ public class Profile {
      * - Has a valid domain part consisting of letters, numbers, dots, and hyphens.
      * - Ends with a top-level domain (TLD) of at least two letters.
      **/
+    @Setter
+    @Getter
     @NotNull
     @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "Please provide a valid email address")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Setter
+    @Getter
     @NotNull
     @Pattern(regexp = "\\+?[0-9]{10,15}", message = "Phone number must be between 10 and 15 digits, and may include an optional '+' prefix")
     @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
+    @Setter
+    @Getter
     @NotNull
     @Size(min = 5, max = 100, message = "Address must be between 5 and 100 characters long")
     @Column(name = "address", nullable = false)
     private String address;
 
+    @Setter
+    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "City must be between 2 and 50 characters long")
     @Column(name = "city", nullable = false)
     private String city;
 
+    @Setter
+    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "State must be between 2 and 50 characters long")
     @Column(name = "state", nullable = false)
     private String state;
 
+    @Setter
+    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "Country must be between 2 and 50 characters long")
     @Column(name = "country", nullable = false)
     private String country;
 
+    @Setter
+    @Getter
     @NotNull
     @Size(min = 4, max = 10, message = "Postal code must be between 4 and 10 characters long")
     @Pattern(regexp = "^[0-9A-Za-z-]+$", message = "Postal code must match the country's postal code format")
     @Column(name = "zip", nullable = false)
     private String zip;
 
+    @Setter
+    @Getter
     @Past
     @NotNull
     @Temporal(TemporalType.DATE)
     @Column(name = "date_of_birth", nullable = false)
     private Date dateOfBirth;
 
+    @Setter
+    @Getter
     @NotNull(message = "Gender is required")
     @Enumerated(EnumType.STRING)  // Stores the string representation of the enum in the database
     @Column(name = "gender", nullable = false)
@@ -85,12 +113,18 @@ public class Profile {
     @Column(name = "is_email_verified", nullable = false)
     private boolean isEmailVerified = false;
 
+    @Setter
+    @Getter
     @Column(name = "verification_token", length = 64)
     private String verificationToken;
 
+    @Setter
+    @Getter
     @Column(name = "verification_status", nullable = false, length = 20)
     private String verificationStatus = "PENDING";
 
+    @Setter
+    @Getter
     @JsonManagedReference
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ClientAccount> clientAccounts = new ArrayList<>();
@@ -118,134 +152,12 @@ public class Profile {
         this.clientAccounts = builder.clientAccounts;
     }
 
-    // Getters
-    public Long getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public String getZip() {
-        return zip;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public Date getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
     public boolean isEmailVerified() {
         return isEmailVerified;
     }
 
-    public String getVerificationToken() {
-        return verificationToken;
-    }
-
-    public String getVerificationStatus() {
-        return verificationStatus;
-    }
-
-    public List<ClientAccount> getClientAccounts() {
-        return clientAccounts;
-    }
-
-    // Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public void setZip(String zip) {
-        this.zip = zip;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public void setDateOfBirth(Date dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
     public void setEmailVerified(boolean emailVerified) {
         isEmailVerified = emailVerified;
-    }
-
-    public void setVerificationToken(String verificationToken) {
-        this.verificationToken = verificationToken;
-    }
-
-    public void setVerificationStatus(String verificationStatus) {
-        this.verificationStatus = verificationStatus;
-    }
-
-    public void setClientAccounts(List<ClientAccount> clientAccounts) {
-        this.clientAccounts = clientAccounts;
     }
 
     // Method to add a single ClientAccount
@@ -388,6 +300,7 @@ public class Profile {
 
 
     }
+    @Getter
     public enum Gender {
         MALE("Male"),
         FEMALE("Female"),
@@ -400,9 +313,6 @@ public class Profile {
             this.displayName = displayName;
         }
 
-        public String getDisplayName() {
-            return displayName;
-        }
     }
 
 }
