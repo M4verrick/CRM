@@ -7,6 +7,7 @@ import com.itsag3t1.crm.util.TokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -96,15 +97,16 @@ public class ProfileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProfile(@PathVariable Long id, @RequestParam String agentId) {
-        if (profileService.getProfileById(id, agentId).isPresent()) {
-            // Pass agentId to ProfileService to allow logging inside ProfileService
+    public ResponseEntity<String> deleteProfile(@PathVariable Long id, @RequestParam String agentId) {
+        try {
             profileService.deleteProfile(id, agentId);
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+        } catch (ResponseStatusException ex) {
+            // Return a conflict response if profile cannot be deleted due to active accounts
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
         }
     }
+
 
     @GetMapping("/verify")
     public ResponseEntity<String> verifyEmail(@RequestParam("token") String token, @RequestParam String agentId) {
