@@ -1,16 +1,15 @@
 # Use an official Maven image to build the application with Java 21
-FROM maven:3.8.4-openjdk-21 AS build
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 # Set the working directory in the container
 WORKDIR /app
 
 # Copy the pom.xml file and download dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline
+COPY pom.xml /app/
+COPY src /app/src
 
-# Copy the source code and build the application
-COPY src ./src
-RUN mvn clean package -DskipTests
+# Build the application
+RUN mvn -f /app/pom.xml clean package -DskipTests
 
 # Use an official OpenJDK runtime as a parent image with Java 21
 FROM openjdk:21-jdk-slim
@@ -19,7 +18,7 @@ FROM openjdk:21-jdk-slim
 WORKDIR /app
 
 # Copy the packaged jar file from the build stage
-COPY --from=build /app/target/crm-app.jar crm-app.jar
+COPY --from=build /app/target/crm-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port the application runs on
 EXPOSE 8080
