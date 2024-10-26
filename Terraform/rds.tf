@@ -9,22 +9,33 @@ resource "aws_db_subnet_group" "main" {
   }
 }
 
+data "aws_secretsmanager_secret" "password" {
+  name = "crm_db_password"
+  depends_on = [aws_secretsmanager_secret.password]
+}
+
+data "aws_secretsmanager_secret_version" "password" {
+  secret_id = data.aws_secretsmanager_secret.password.id
+    depends_on = [aws_secretsmanager_secret_version.password]
+}
+
 # Primary RDS Instance (with Multi-AZ for automatic failover)
 resource "aws_db_instance" "primary_rds" {
   identifier         = "my-primary-db"
   allocated_storage  = 50
   storage_type       = "gp2"
   engine             = "postgres"
-  engine_version     = "13"
+  engine_version     = "16"
   instance_class     = "db.t3.micro"
-  username           = "admin"
-  password           = "yourpassword"  # Use secrets management in production
+  storage_encrypted  = true
+  username           = "crmdbadmin"
+  password           = data.aws_secretsmanager_secret_version.password.secret_string # Use secrets management in production
   db_subnet_group_name = aws_db_subnet_group.main.name
   multi_az           = true  # Enable Multi-AZ for high availability
   publicly_accessible = false
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  availability_zone  = "ap-southeast-1a"
-
+  backup_retention_period = 7  # Enable automated backups with a retention period of 7 days
+  final_snapshot_identifier = "my-primary-db-final-snapshot"
   tags = {
     Name = "Primary-RDS"
   }
@@ -33,17 +44,15 @@ resource "aws_db_instance" "primary_rds" {
 # Read Replica for read scaling (asynchronously replicates data from primary)
 resource "aws_db_instance" "read_replica_rds" {
   identifier          = "my-read-replica"
-  allocated_storage   = 50
   storage_type        = "gp2"
-  engine              = "postgres"
   instance_class      = "db.t3.micro"
-  username            = "admin"
-  password            = "yourpassword"
-  db_subnet_group_name = aws_db_subnet_group.main.name
+  storage_encrypted  = true
   publicly_accessible = false
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  availability_zone   = "ap-southeast-1b"  # Different AZ for high availability
-  replicate_source_db = aws_db_instance.primary_rds.id  # Replicate from primary
+  replicate_source_db = aws_db_instance.primary_rds.identifier # Replicate from primary
+  final_snapshot_identifier = "my-read-replica-final-snapshot"  # Create a final snapshot when the instance is deleted
+  backup_retention_period = 7  # Enable automated backups with a retention period of 7 days
+  depends_on = [aws_db_instance.primary_rds]  # Ensure primary instance is created first
 
   tags = {
     Name = "Read-Replica-RDS"
