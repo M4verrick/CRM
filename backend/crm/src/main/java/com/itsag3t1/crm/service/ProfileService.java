@@ -1,6 +1,8 @@
 package com.itsag3t1.crm.service;
 
 import com.itsag3t1.crm.model.Profile;
+import com.itsag3t1.crm.model.AgentProfile;
+import com.itsag3t1.crm.repository.AgentProfileRepository;
 import com.itsag3t1.crm.repository.ProfileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +22,12 @@ public class ProfileService {
     private static final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     private final Logger log = LoggerFactory.getLogger(ProfileService.class);
     private final ProfileRepository profileRepository;
+    private final AgentProfileRepository agentProfileRepository;
 
     @Autowired
-    public ProfileService(ProfileRepository profileRepository) {
+    public ProfileService(ProfileRepository profileRepository, AgentProfileRepository agentProfileRepository) {
         this.profileRepository = profileRepository;
+        this.agentProfileRepository = agentProfileRepository;
     }
 
     public List<Profile> getAllProfiles(String agentId) {
@@ -79,6 +83,13 @@ public class ProfileService {
     public Profile saveProfile(Profile profile, String agentId) {
         try {
             Profile savedProfile = profileRepository.save(profile);
+            
+            //add into Agent-ClientProfile
+            AgentProfile agentProfile = new AgentProfile();
+            agentProfile.setAgentId(agentId);
+            agentProfile.setClient(savedProfile);
+
+            agentProfileRepository.save(agentProfile);
 
             // Log the action of saving the profile
             MDC.put("agent_id", agentId);
