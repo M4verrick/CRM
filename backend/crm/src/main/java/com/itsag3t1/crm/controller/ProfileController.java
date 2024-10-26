@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.oauth2.jwt.Jwt;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +39,7 @@ public class ProfileController {
         String agentId = ClaimsUtil.getAgentId(authentication);
         log.info("Agent ID: {}", agentId);
         // Pass agentId to ProfileService to allow logging inside ProfileService
-        return profileService.getAllProfiles(agentId);
+        return profileService.getAllProfiles();
     }
 
     @GetMapping("/{id}")
@@ -105,15 +107,16 @@ public class ProfileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProfile(@PathVariable Long id, @RequestParam String agentId) {
-        if (profileService.getProfileById(id, agentId).isPresent()) {
-            // Pass agentId to ProfileService to allow logging inside ProfileService
+    public ResponseEntity<String> deleteProfile(@PathVariable Long id, @RequestParam String agentId) {
+        try {
             profileService.deleteProfile(id, agentId);
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
+        } catch (ResponseStatusException ex) {
+            // Return a conflict response if profile cannot be deleted due to active accounts
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
         }
     }
+
 
     @GetMapping("/verify")
     public ResponseEntity<String> verifyEmail(@RequestParam("token") String token, @RequestParam String agentId) {
