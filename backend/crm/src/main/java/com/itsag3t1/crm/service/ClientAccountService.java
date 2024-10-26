@@ -27,6 +27,10 @@ public class ClientAccountService {
     public ClientAccount createAccount(ClientAccount account, String agentId) {
         validateAccountData(account);
 
+        // Check if the clientId is associated with the agentId
+        if (!isClientAssociatedWithAgent(account.getClientId(), agentId)) {
+            throw new InvalidDataException("Agent is not authorized to create an account for this client");
+        }
         // Set initial deposit to 0.0 if it's null
         if (account.getInitialDeposit() == null) {
             account.setInitialDeposit(0.0);
@@ -52,12 +56,14 @@ public class ClientAccountService {
         } finally {
             MDC.clear(); // Clear MDC after logging
         }
-
     }
 
     public boolean deleteAccount(Long accountId, String agentId) {
         Optional<ClientAccount> account;
-
+        // Check if the clientId is associated with the agentId
+        if (!isClientAssociatedWithAgent(account.getClientId(), agentId)) {
+            throw new InvalidDataException("Agent is not authorized to create an account for this client");
+        }
         try {
             account = accountRepository.findById(accountId);
             if (account.isPresent()) {
@@ -97,4 +103,10 @@ public class ClientAccountService {
             throw new InvalidDataException("Branch ID must not be null");
         }
     }
+
+    private boolean isClientAssociatedWithAgent(Long clientId, String agentId) {
+        // Check if the clientId exists in the agent's profile mapping
+        return agentProfileRepository.existsByAgentIdAndClientId(agentId, clientId);
+    }
+
 }

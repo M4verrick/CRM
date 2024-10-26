@@ -5,6 +5,8 @@ import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogStreamsRequest;
@@ -18,20 +20,37 @@ import java.util.Queue;
 
 public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
     private final CloudWatchLogsClient client;
+
     private final String logGroupName;
+
     private final String logStreamName;
+
     private final ObjectMapper objectMapper;
 
     private final Queue<InputLogEvent> eventQueue;
 
     public CloudWatchAppender() {
+        String uri = System.getenv("CLOUDWATCH_URI");
+        String awsAccessKey = System.getenv("AWS_ACCESS_KEY");
+        String awsKeyId = System.getenv("AWS_KEY_ID");
         logGroupName = "crm-logs";
         logStreamName = "crm-log-stream";
+        StaticCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(AwsBasicCredentials.create(awsKeyId, awsAccessKey));
 
-        client = CloudWatchLogsClient.builder()
-                .endpointOverride(URI.create("http://localhost:4566"))
-                .region(Region.AP_SOUTHEAST_1)
-                .build();
+        if (uri.isEmpty()) {
+            client = CloudWatchLogsClient.builder()
+                    .credentialsProvider(awsCredentialsProvider)
+                    .region(Region.AP_SOUTHEAST_1)
+                    .build();
+
+        } else {
+            client = CloudWatchLogsClient.builder()
+                    .endpointOverride(URI.create(uri))
+                    .credentialsProvider(awsCredentialsProvider)
+                    .region(Region.AP_SOUTHEAST_1)
+                    .build();
+        }
+
         eventQueue = new LinkedList<>();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());

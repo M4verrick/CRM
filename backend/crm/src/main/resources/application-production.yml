@@ -2,21 +2,18 @@ spring:
   config:
     activate:
       on-profile: production
+    import: aws-secretsmanager
   server:
     port: 8080 # to update
   logging:
     config: classpath:logback-production.xml
   datasource:
-    url: jdbc:postgresql://localhost:5432/crmdatabase # to update
+    url: jdbc-secretsmanager:mysql://db-1.cwhqvgjbpgfw.eu-central-1.rds.amazonaws.com:3306
     username: crmappuser # to update
-    password: crmapppassword # to update
-    driver-class-name: org.postgresql.Driver
-
-
-aws:
-  endpoint:
-    url: http://localstack:4566
-  region: ap-southeast-1
-  logs:
-    logGroupName: crm-logs
-    logStreamName: crm-log-stream
+    driver-class-name: com.amazonaws.secretsmanager.sql.AWSSecretsManagerMySQLDriver
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_ya55bZ0sg
