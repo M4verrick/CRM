@@ -6,7 +6,7 @@ import ThemeCustomization from 'themes';
 
 import ScrollTop from 'components/ScrollTop';
 
-import { Account } from './Account.jsx';
+import { Account } from './contexts/Account.jsx';
 
 // ==============================|| APP - THEME, ROUTER, LOCAL ||============================== //
 

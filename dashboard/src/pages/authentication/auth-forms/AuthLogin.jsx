@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { AccountContext } from 'Account.jsx';  // Add .jsx extension
+import { AccountContext } from 'contexts/Account.jsx';  // Add .jsx extension
 
 import { Link as RouterLink } from 'react-router-dom';
 
