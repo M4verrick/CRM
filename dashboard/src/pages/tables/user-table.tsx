@@ -141,6 +141,7 @@ const columns: ProColumns<GithubIssueItem>[] = [
         key="actionGroup"
         onSelect={() => action?.reload()}
         menus={[
+          { key: 'copy', name: '复制' },
           { key: 'delete', name: '删除' },
         ]}
       />,
