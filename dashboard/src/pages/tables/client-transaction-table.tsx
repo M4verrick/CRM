@@ -150,6 +150,25 @@ const columns: ProColumns<GithubIssueItem>[] = [
 ];
 
 export default () => {
+
+  // const { getValidToken } = useTokenManagement();
+    
+  // const makeApiCall = async () => {
+  //     try {
+  //         const token = await getValidToken();
+          
+  //         const response = await fetch('your-api-endpoint', {
+  //             headers: {
+  //                 'Authorization': `Bearer ${token}`
+  //             }
+  //         });
+          
+  //         // Handle response
+  //     } catch (error) {
+  //         // Handle error
+  //     }
+  // };
+
   const actionRef = useRef<ActionType>();
   return (
     <ProTable<GithubIssueItem>

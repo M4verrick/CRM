@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { AccountContext } from 'contexts/Account.jsx';  // Add .jsx extension
 
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
 
 // material-ui
 import Button from '@mui/material/Button';
@@ -41,6 +41,7 @@ export default function AuthLogin() {
     event.preventDefault();
   };
 
+  // used to handle login
   const { authenticate } = useContext(AccountContext);
   const navigate = useNavigate();
 
@@ -56,14 +57,14 @@ export default function AuthLogin() {
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
-        onSubmit={async (values, { setSubmitting, setErrors, resetForm }) => {
-          // Example custom submit logic
+        onSubmit={async (values, { setSubmitting, setErrors }) => {
+          // Submit logic
           try {
-            // Your form submission logic
-
+            // form submission logic
             await authenticate(values.email, values.password);
-            navigate('/');
 
+            // Redirect to dashboard
+            navigate('/');
           } catch (error) {
             // Handle error case by setting form errors if needed
             setErrors({ submit: error.message || "Something went wrong" });
