@@ -50,8 +50,6 @@ resource "aws_db_instance" "read_replica_rds" {
   publicly_accessible = false
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   replicate_source_db = aws_db_instance.primary_rds.identifier # Replicate from primary
-  final_snapshot_identifier = "my-read-replica-final-snapshot"  # Create a final snapshot when the instance is deleted
-  backup_retention_period = 7  # Enable automated backups with a retention period of 7 days
   depends_on = [aws_db_instance.primary_rds]  # Ensure primary instance is created first
 
   tags = {
