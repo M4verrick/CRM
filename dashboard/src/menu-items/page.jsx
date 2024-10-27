@@ -22,13 +22,13 @@ const pages = {
       icon: icons.LoginOutlined,
       target: true
     },
-    {
-      id: 'logout',
-      title: 'Logout',
-      type: 'item',
-      icon: icons.LogoutOutlined,
-      target: true
-    },
+    // {
+    //   id: 'logout',
+    //   title: 'Logout',
+    //   type: 'item',
+    //   icon: icons.LogoutOutlined,
+    //   target: true
+    // },
   ]
 };
 

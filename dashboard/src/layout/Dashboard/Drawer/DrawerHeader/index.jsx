@@ -5,16 +5,28 @@ import { useTheme } from '@mui/material/styles';
 
 // project import
 import DrawerHeaderStyled from './DrawerHeaderStyled';
-import Logo from 'components/logo';
+
+import Button from '@mui/material/Button';
+
+// project import
+import { LogoutOutlined } from '@ant-design/icons';
+
+import { useContext } from 'react';
+
+import { AccountContext } from 'contexts/Account';
 
 // ==============================|| DRAWER HEADER ||============================== //
 
 export default function DrawerHeader({ open }) {
   const theme = useTheme();
 
+  const { logout } = useContext(AccountContext);
+
   return (
     <DrawerHeaderStyled theme={theme} open={!!open}>
-      <Logo isIcon={!open} sx={{ width: open ? 'auto' : 35, height: 35 }} />
+      <Button onClick={logout} variant="outlined" startIcon={<LogoutOutlined sx={{ width: open ? 'auto' : 35, height: 35 }}/>}>
+        Logout
+      </Button>
     </DrawerHeaderStyled>
   );
 }

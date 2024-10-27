@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { forwardRef, useEffect, useContext } from 'react';
+import { forwardRef, useEffect } from 'react';
 import { Link, useLocation, matchPath } from 'react-router-dom';
 
 // material-ui
@@ -14,12 +14,7 @@ import Typography from '@mui/material/Typography';
 // project import
 import { handlerActiveItem, useGetMenuMaster } from 'api/menu';
 
-import { AccountContext } from 'contexts/Account.jsx';
-
 export default function NavItem({ item, level }) {
-  // logout
-  const { logout } = useContext(AccountContext);
-
   const theme = useTheme();
 
   const { menuMaster } = useGetMenuMaster();
@@ -33,15 +28,13 @@ export default function NavItem({ item, level }) {
 
   // Determine if this is a function-based item or a link
   let listItemProps = {};
-  // hard code logout
-  if (item.id == 'logout') {
+  if (item.onClick) {
     // For function-based items like logout
     listItemProps = {
       onClick: (e) => {
         e.preventDefault();
         handlerActiveItem(item.id);
-        // item.onClick();
-        logout();
+        item.onClick();
       }
     };
   } else if (item.external) {
