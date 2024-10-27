@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { AccountContext } from 'contexts/Account.jsx';  // Add .jsx extension
 
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
 // material-ui
 import Button from '@mui/material/Button';
@@ -42,6 +42,7 @@ export default function AuthLogin() {
   };
 
   const { authenticate } = useContext(AccountContext);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -61,6 +62,7 @@ export default function AuthLogin() {
             // Your form submission logic
 
             await authenticate(values.email, values.password);
+            navigate('/');
 
           } catch (error) {
             // Handle error case by setting form errors if needed

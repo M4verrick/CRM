@@ -5,7 +5,6 @@ import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
 
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
-const AdminDashboard = Loadable(lazy(() => import('pages/dashboard-admin/index')));
 
 // Placeholder components (replace with your actual components)
 const Unauthorized = () => <div>You are not authorized to view this page</div>;
@@ -55,15 +54,6 @@ const MainRoutes = {
     {
       path: 'unauthorized',
       element: <Unauthorized />,
-    },
-    {
-      path: 'admin',
-      children: [
-        {
-          path: 'default',
-          element: <ProtectedRoute element={<AdminDashboard />} allowedRoles={['admin']} />,
-        }
-      ]
     },
     {
       path: 'agent',
