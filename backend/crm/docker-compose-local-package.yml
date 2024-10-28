@@ -1,0 +1,30 @@
+services:
+  app:
+    image: crm-app
+    container_name: crm_app
+    build:
+      context: .
+      dockerfile: Dockerfile-local-package
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - CLOUDWATCH_URI=http://localstack:4566
+      - AWS_ACCESS_KEY=test
+      - AWS_KEY_ID=test
+
+  db:
+    image: postgres:16
+    container_name: crm_db
+    environment:
+      POSTGRES_DB: crmdatabase
+      POSTGRES_USER: crmappuser
+      POSTGRES_PASSWORD: crmapppassword
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

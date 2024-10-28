@@ -1,0 +1,19 @@
+spring:
+  config:
+    activate:
+      on-profile: production
+    import: aws-secretsmanager
+  server:
+    port: 8080 # to update
+  logging:
+    config: classpath:logback-production.xml
+  datasource:
+    url: jdbc-secretsmanager:mysql://db-1.cwhqvgjbpgfw.eu-central-1.rds.amazonaws.com:3306
+    username: crmappuser # to update
+    driver-class-name: com.amazonaws.secretsmanager.sql.AWSSecretsManagerMySQLDriver
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_ya55bZ0sg

@@ -1,38 +1,58 @@
 package com.itsag3t1.crm.controller;
 
 import com.itsag3t1.crm.model.Profile;
+import com.itsag3t1.crm.service.EmailService;
 import com.itsag3t1.crm.service.ProfileService;
+import com.itsag3t1.crm.util.ClaimsUtil;
+import com.itsag3t1.crm.util.TokenUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.oauth2.jwt.Jwt;
+
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @RestController
-@RequestMapping("/api/profiles")
+@RequestMapping("/api/clients")
 public class ProfileController {
+    private static final Logger log = LoggerFactory.getLogger(ProfileController.class);
 
     private final ProfileService profileService;
+    private final EmailService emailService;
 
     @Autowired
-    public ProfileController(ProfileService profileService) {
+    public ProfileController(ProfileService profileService, EmailService emailService) {
         this.profileService = profileService;
+        this.emailService = emailService;
     }
 
     @GetMapping
-    public List<Profile> getAllProfiles() {
+    public List<Profile> getAllProfiles(Authentication authentication) {
+        // Get agentId
+        String agentId = ClaimsUtil.getAgentId(authentication);
+        log.info("Agent ID: {}", agentId);
+        // Pass agentId to ProfileService to allow logging inside ProfileService
         return profileService.getAllProfiles();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Profile> getProfileById(@PathVariable Long id) {
-        Optional<Profile> profile = profileService.getProfileById(id);
+    public ResponseEntity<Profile> getProfileById(@PathVariable Long id, @RequestParam String agentId) {
+        // Pass agentId to ProfileService to allow logging inside ProfileService
+        Optional<Profile> profile = profileService.getProfileById(id, agentId);
         return profile.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Profile createProfile(@RequestBody Profile profile) {
+    public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, @RequestParam String agentId) {
+        // Generate unique verification token
+        String token = TokenUtil.generateVerificationToken();
         Profile newProfile = new Profile.Builder()
                 .setFirstName(profile.getFirstName())
                 .setLastName(profile.getLastName())
@@ -45,15 +65,25 @@ public class ProfileController {
                 .setCountry(profile.getCountry())
                 .setDateOfBirth(profile.getDateOfBirth())
                 .setGender(profile.getGender())
+                .setVerificationToken(token)
+                .setEmailVerified(false)
                 .build();
-        return profileService.saveProfile(newProfile);
+
+        // Pass agentId to ProfileService to allow logging inside ProfileService
+        Profile savedProfile = profileService.saveProfile(newProfile, agentId);
+
+        // Send verification email after profile is created
+        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
+        emailService.sendVerificationEmail("hello@example.com", savedProfile.getFirstName(), verificationLink);
+
+        return ResponseEntity.ok(savedProfile);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails) {
-        Optional<Profile> profile = profileService.getProfileById(id);
+    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails, @RequestParam String agentId) {
+        Optional<Profile> profile = profileService.getProfileById(id, agentId);
         if (profile.isPresent()) {
-            Profile updatedProfile = new Profile.Builder()
+            Profile updatedProfile = new Profile.Builder(profile.get())
                     .setId(id)
                     .setFirstName(profileDetails.getFirstName())
                     .setLastName(profileDetails.getLastName())
@@ -67,7 +97,9 @@ public class ProfileController {
                     .setDateOfBirth(profileDetails.getDateOfBirth())
                     .setGender(profileDetails.getGender())
                     .build();
-            profileService.saveProfile(updatedProfile);
+
+            // Pass agentId to ProfileService to allow logging inside ProfileService
+            profileService.saveProfile(updatedProfile, agentId);
             return ResponseEntity.ok(updatedProfile);
         } else {
             return ResponseEntity.notFound().build();
@@ -75,12 +107,72 @@ public class ProfileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
-        if (profileService.getProfileById(id).isPresent()) {
-            profileService.deleteProfile(id);
+    public ResponseEntity<String> deleteProfile(@PathVariable Long id, @RequestParam String agentId) {
+        try {
+            profileService.deleteProfile(id, agentId);
             return ResponseEntity.noContent().build();
-        } else {
+        } catch (ResponseStatusException ex) {
+            // Return a conflict response if profile cannot be deleted due to active accounts
+            return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+        }
+    }
+
+
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token, @RequestParam String agentId) {
+        // Pass agentId to ProfileService to allow logging inside ProfileService
+        Optional<Profile> optionalProfile = profileService.getProfileByVerificationToken(token, agentId);
+        if (optionalProfile.isEmpty()) {
+            return ResponseEntity.badRequest().body("Invalid verification token");
+        }
+
+        Profile profile = optionalProfile.get();
+        Profile verifiedProfile = new Profile.Builder(profile)
+                .setVerificationToken(null)
+                .setEmailVerified(true)
+                .build();
+
+        // Pass agentId to ProfileService to allow logging inside ProfileService
+        profileService.saveProfile(verifiedProfile, agentId);
+
+        return ResponseEntity.ok("Email successfully verified.");
+    }
+
+    @PostMapping("/{clientId}/verify")
+    public ResponseEntity<String> verifyClientIdentity(
+            @PathVariable Long clientId,
+            @RequestParam("nricNumber") String nricNumber,
+            @RequestParam String agentId) {
+
+        // Pass agentId to ProfileService to allow logging inside ProfileService
+        Optional<Profile> optionalProfile = profileService.getProfileById(clientId, agentId);
+        if (optionalProfile.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        Profile profile = optionalProfile.get();
+
+        // Validate the NRIC number
+        if (isValidNric(nricNumber)) {
+            Profile updatedProfile = new Profile.Builder(profile)
+                    .setVerificationStatus("VERIFIED")
+                    .build();
+            // Pass agentId to ProfileService to allow logging inside ProfileService
+            profileService.saveProfile(updatedProfile, agentId);
+            return ResponseEntity.ok("Your identity has been verified.");
+        } else {
+            Profile updatedProfile = new Profile.Builder(profile)
+                    .setVerificationStatus("PENDING")
+                    .build();
+            // Pass agentId to ProfileService to allow logging inside ProfileService
+            profileService.saveProfile(updatedProfile, agentId);
+            return ResponseEntity.badRequest().body("Invalid NRIC number provided. Verification status is set to PENDING.");
+        }
+    }
+
+    // NRIC validation method
+    private boolean isValidNric(String nricNumber) {
+        String nricPattern = "^[STFGM]\\d{7}[A-Z]$";
+        return Pattern.matches(nricPattern, nricNumber);
     }
 }

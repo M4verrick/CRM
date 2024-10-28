@@ -1,20 +1,71 @@
 <configuration>
-    <appender name="CLOUDWATCH" class="com.itsag3t1.crm.logger.CloudWatchAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp/>
-                <loggerName/>
-                <logLevel/>
-                <message/>
-                <mdc/>
-            </providers>
-        </encoder>
-    </appender>
+    <!-- Console Appender -->\
+    <springProfile name="local">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp/>
+                    <loggerName/>
+                    <logLevel/>
+                    <message/>
+                    <mdc/>
+                </providers>
+            </encoder>
+        </appender>
 
-    <root level="info">
-        <appender-ref ref="CLOUDWATCH"/>
-    </root>
+        <appender name="CLOUDWATCH" class="com.itsag3t1.crm.logger.CloudWatchAppender">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+            </filter>
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp/>
+                    <loggerName/>
+                    <logLevel/>
+                    <message/>
+                    <mdc/>
+                </providers>
+            </encoder>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="CLOUDWATCH"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="production">
+            <!-- Console Appender -->
+            <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp/>
+                        <loggerName/>
+                        <logLevel/>
+                        <message/>
+                        <mdc/>
+                    </providers>
+                </encoder>
+            </appender>
+
+            <appender name="CLOUDWATCH" class="com.itsag3t1.crm.logger.CloudWatchAppender">
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>INFO</level>
+                </filter>
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp/>
+                        <loggerName/>
+                        <logLevel/>
+                        <message/>
+                        <mdc/>
+                    </providers>
+                </encoder>
+            </appender>
+
+            <root level="info">
+                <appender-ref ref="CONSOLE"/>
+                <appender-ref ref="CLOUDWATCH"/>
+            </root>
+    </springProfile>
 </configuration>
