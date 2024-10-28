@@ -5,7 +5,7 @@ import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
-import org.slf4j.Logger;
+import com.itsag3t1.crm.repository.AgentProfileRepository;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +18,21 @@ import java.util.Optional;
 
 @Service
 public class ClientAccountService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ClientAccountService.class);
-    @Autowired
-    private ClientAccountRepository accountRepository;
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ClientAccountService.class);
 
     // Assuming this format for ISO 8601 datetime
     private static final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    @Autowired
+    private ClientAccountRepository accountRepository;
+    private AgentProfileRepository agentProfileRepository;
 
     public ClientAccount createAccount(ClientAccount account, String agentId) {
         validateAccountData(account);
 
+        // Check if the clientId is associated with the agentId
+        if (!isClientAssociatedWithAgent(account.getClientId(), agentId)) {
+            throw new InvalidDataException("Agent is not authorized to create an account for this client");
+        }
         // Set initial deposit to 0.0 if it's null
         if (account.getInitialDeposit() == null) {
             account.setInitialDeposit(0.0);
@@ -46,7 +50,7 @@ public class ClientAccountService {
             MDC.put("client_id", savedAccount.getClientId().toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
-            logger.info("{} created {} account at {}", MDC.get("agent_id"), MDC.get("client_id"), MDC.get("date_time"));
+            log.info("{} created {} account at {}", MDC.get("agent_id"), MDC.get("client_id"), MDC.get("date_time"));
 
             return savedAccount;
         } catch (DataAccessException e) {
@@ -54,22 +58,24 @@ public class ClientAccountService {
         } finally {
             MDC.clear(); // Clear MDC after logging
         }
-
     }
 
     public boolean deleteAccount(Long accountId, String agentId) {
         Optional<ClientAccount> account;
-
+        // Check if the clientId is associated with the agentId
         try {
             account = accountRepository.findById(accountId);
             if (account.isPresent()) {
+                if (!isClientAssociatedWithAgent(account.get().getClientId(), agentId)) {
+                    throw new InvalidDataException("Agent is not authorized to create an account for this client");
+                }
                 accountRepository.deleteById(accountId);
                 // Log the deletion after the account is deleted
                 MDC.put("agent_id", agentId);
                 MDC.put("client_id", account.get().getClientId().toString());
                 MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
-                logger.info("{} deleted {} account at {}", MDC.get("agent_id"), MDC.get("client_id"),
+                log.info("{} deleted {} account at {}", MDC.get("agent_id"), MDC.get("client_id"),
                         MDC.get("date_time"));
 
                 return true;
@@ -99,4 +105,10 @@ public class ClientAccountService {
             throw new InvalidDataException("Branch ID must not be null");
         }
     }
+
+    private boolean isClientAssociatedWithAgent(Long clientId, String agentId) {
+        // Check if the clientId exists in the agent's profile mapping
+        return agentProfileRepository.existsByAgentIdAndClientId(agentId, clientId);
+    }
+
 }

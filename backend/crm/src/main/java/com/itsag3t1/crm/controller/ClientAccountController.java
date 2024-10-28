@@ -1,5 +1,7 @@
 package com.itsag3t1.crm.controller;
 
+//import com.itsag3t1.crm.auth.CurrentAuthContext;
+
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.service.ClientAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,9 @@ public class ClientAccountController {
 
     // Adding the AgentID as a request header for account creation
     @PostMapping
-    public ResponseEntity<ClientAccount> createAccount(
-        @RequestHeader("AgentID") String agentId, // AgentID from request header
-        @RequestBody ClientAccount account) {
+    public ResponseEntity<ClientAccount> createAccount(@RequestBody ClientAccount account) {
+//        String agentId = CurrentAuthContext.getUserId();
+        String agentId = "agent123";
 
         // Convert account type and status to uppercase if they are received as lowercase
         if (account.getAccountType() != null) {
@@ -35,12 +37,12 @@ public class ClientAccountController {
     // Adding the AgentID as a request header for account deletion
     @DeleteMapping("/{accountId}")
     public ResponseEntity<String> deleteAccount(
-        @RequestHeader("AgentID") String agentId, // AgentID from request header
-        @PathVariable Long accountId) {
+            @RequestHeader("AgentID") String agentId, // AgentID from request header
+            @PathVariable Long accountId) {
 
         boolean isDeleted = accountService.deleteAccount(accountId, agentId);
-        return isDeleted 
-            ? ResponseEntity.noContent().build()  // 204 No Content for successful deletion
-            : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");  // 404 Not Found
+        return isDeleted
+                ? ResponseEntity.noContent().build()  // 204 No Content for successful deletion
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found.");  // 404 Not Found
     }
 }
