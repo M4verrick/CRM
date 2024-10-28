@@ -10,27 +10,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "profiles")
 public class Profile {
     // Setters
     // Getters
-    @Setter
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Setter
-    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters long")
     @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "First name must contain only alphabetic characters and spaces")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Setter
-    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters long")
     @Pattern(regexp = "^[a-zA-Z\\s]*$", message = "Last name must contain only alphabetic characters and spaces")
@@ -45,66 +41,48 @@ public class Profile {
      * - Has a valid domain part consisting of letters, numbers, dots, and hyphens.
      * - Ends with a top-level domain (TLD) of at least two letters.
      **/
-    @Setter
-    @Getter
     @NotNull
     @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", message = "Please provide a valid email address")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Setter
-    @Getter
     @NotNull
     @Pattern(regexp = "\\+?[0-9]{10,15}", message = "Phone number must be between 10 and 15 digits, and may include an optional '+' prefix")
     @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
-    @Setter
-    @Getter
     @NotNull
     @Size(min = 5, max = 100, message = "Address must be between 5 and 100 characters long")
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Setter
-    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "City must be between 2 and 50 characters long")
     @Column(name = "city", nullable = false)
     private String city;
 
-    @Setter
-    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "State must be between 2 and 50 characters long")
     @Column(name = "state", nullable = false)
     private String state;
 
-    @Setter
-    @Getter
     @NotNull
     @Size(min = 2, max = 50, message = "Country must be between 2 and 50 characters long")
     @Column(name = "country", nullable = false)
     private String country;
 
-    @Setter
-    @Getter
     @NotNull
     @Size(min = 4, max = 10, message = "Postal code must be between 4 and 10 characters long")
     @Pattern(regexp = "^[0-9A-Za-z-]+$", message = "Postal code must match the country's postal code format")
     @Column(name = "zip", nullable = false)
     private String zip;
 
-    @Setter
-    @Getter
     @Past
     @NotNull
     @Temporal(TemporalType.DATE)
     @Column(name = "date_of_birth", nullable = false)
     private Date dateOfBirth;
 
-    @Setter
-    @Getter
     @NotNull(message = "Gender is required")
     @Enumerated(EnumType.STRING)  // Stores the string representation of the enum in the database
     @Column(name = "gender", nullable = false)
@@ -113,18 +91,12 @@ public class Profile {
     @Column(name = "is_email_verified", nullable = false)
     private boolean isEmailVerified = false;
 
-    @Setter
-    @Getter
     @Column(name = "verification_token", length = 64)
     private String verificationToken;
 
-    @Setter
-    @Getter
     @Column(name = "verification_status", nullable = false, length = 20)
     private String verificationStatus = "PENDING";
 
-    @Setter
-    @Getter
     @JsonManagedReference
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ClientAccount> clientAccounts = new ArrayList<>();

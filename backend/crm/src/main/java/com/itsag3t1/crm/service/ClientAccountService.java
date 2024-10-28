@@ -30,7 +30,7 @@ public class ClientAccountService {
         validateAccountData(account);
 
         // Check if the clientId is associated with the agentId
-        if (!isClientAssociatedWithAgent(account.getClientId(), agentId)) {
+        if (!isClientAssociatedWithAgent(account.getAccountId(), agentId)) {
             throw new InvalidDataException("Agent is not authorized to create an account for this client");
         }
         // Set initial deposit to 0.0 if it's null
@@ -47,7 +47,7 @@ public class ClientAccountService {
             savedAccount = accountRepository.save(account);
             // Log the creation after the account is saved
             MDC.put("agent_id", agentId);
-            MDC.put("client_id", savedAccount.getClientId().toString());
+            MDC.put("client_id", savedAccount.getAccountId().toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
             log.info("{} created {} account at {}", MDC.get("agent_id"), MDC.get("client_id"), MDC.get("date_time"));
@@ -66,13 +66,13 @@ public class ClientAccountService {
         try {
             account = accountRepository.findById(accountId);
             if (account.isPresent()) {
-                if (!isClientAssociatedWithAgent(account.get().getClientId(), agentId)) {
+                if (!isClientAssociatedWithAgent(account.get().getAccountId(), agentId)) {
                     throw new InvalidDataException("Agent is not authorized to create an account for this client");
                 }
                 accountRepository.deleteById(accountId);
                 // Log the deletion after the account is deleted
                 MDC.put("agent_id", agentId);
-                MDC.put("client_id", account.get().getClientId().toString());
+                MDC.put("client_id", account.get().getAccountId().toString());
                 MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
                 log.info("{} deleted {} account at {}", MDC.get("agent_id"), MDC.get("client_id"),
@@ -89,7 +89,7 @@ public class ClientAccountService {
     }
 
     private void validateAccountData(ClientAccount account) {
-        if (account.getClientId() == null) {
+        if (account.getAccountId() == null) {
             throw new InvalidDataException("Client ID must not be null");
         }
         if (account.getAccountType() == null) {

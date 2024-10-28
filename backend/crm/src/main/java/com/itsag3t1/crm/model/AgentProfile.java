@@ -1,7 +1,12 @@
     package com.itsag3t1.crm.model;
     import jakarta.persistence.*;
+    import lombok.Getter;
+    import lombok.Setter;
+
     import java.io.Serializable;
 
+    @Getter
+    @Setter
     @Entity
     @Table(name = "agent_profile",
         uniqueConstraints = {@UniqueConstraint(columnNames = "client_id")}) // Ensures each client has only one agent
@@ -18,20 +23,5 @@
         @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false, unique = true) // Enforces one agent per client
         private Profile client;
 
-        public String getAgentId() {
-            return agentId;
-        }
-
-        public void setAgentId(String agentId) {
-            this.agentId = agentId;
-        }
-
-        public Profile getClient() {
-            return client;
-        }
-
-        public void setClient(Profile client) {
-            this.client = client;
-        }
         
     }

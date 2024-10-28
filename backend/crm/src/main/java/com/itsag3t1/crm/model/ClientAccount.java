@@ -10,8 +10,8 @@ import lombok.Setter;
 
 import java.util.Date;
 
-//@Getter
-//@Setter
+@Getter
+@Setter
 @Entity
 @Table(name = "client_accounts")
 public class ClientAccount {
@@ -20,47 +20,34 @@ public class ClientAccount {
     @Column(name = "account_id")
     private Long accountId;
 
-    @Setter
-    @Getter
     @NotNull(message = "Profile must not be null")
     @ManyToOne
     @JoinColumn(name = "profile_id", nullable = false)
     @JsonBackReference
     private Profile profile;
 
-    @Getter
-    @Setter
     @NotNull(message = "Account type must not be null")
     @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
     private AccountType accountType;
 
-    @Getter
-    @Setter
     @NotNull(message = "Account status must not be null")
     @Enumerated(EnumType.STRING)
     @Column(name = "account_status", nullable = false)
     private AccountStatus accountStatus;
 
-    @Getter
-    @Setter
     @Temporal(TemporalType.DATE)
     @Column(name = "opening_date")
-    private Date openingDate;
+    private Date openingDate = new Date();
 
-    @Setter
-    @Getter
     @NotNull(message = "Currency must not be null")
     @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
-    @Setter
-    @Getter
     @NotNull(message = "Branch ID must not be null")
     @Column(name = "branch_id", nullable = false, length = 10)
     private String branchId;
 
-    @Getter
     @Min(value = 0, message = "Initial deposit must be 0 or higher")
     @Column(name = "initial_deposit", nullable = false)
     private Double initialDeposit;
@@ -74,17 +61,12 @@ public class ClientAccount {
         this.profile = profile;
         this.accountType = accountType;
         this.accountStatus = accountStatus;
-        this.openingDate = new Date();
         this.currency = currency;
         this.branchId = branchId;
         this.initialDeposit = initialDeposit;
     }
 
-    // Getters and setters
-    public Long getClientId() {
-        return accountId;
-    }
-
+    // Custom setter for initialDeposit with validation
     public void setInitialDeposit(Double initialDeposit) {
         if (initialDeposit == null) {
             throw new InvalidDataException("Initial deposit must not be null.");
