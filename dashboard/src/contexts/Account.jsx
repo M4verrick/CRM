@@ -10,38 +10,95 @@ const Account = (props) => {
     const [user, setUser] = useState(null);
     const [userAttributes, setUserAttributes] = useState(null);
 
-    // Get user attributes from Cognito
-    const getUserAttributes = useCallback(async (cognitoUser) => {
+    // Fixed getUserAttributes function
+    const getUserAttributes = useCallback((cognitoUser) => {
         return new Promise((resolve, reject) => {
-            cognitoUser.getUserAttributes((err, attributes) => {
-                if (err) {
-                    reject(err);
+            // First ensure we have a valid session
+            cognitoUser.getSession((sessionErr, session) => {
+                if (sessionErr) {
+                    console.error("Session error in getUserAttributes:", sessionErr);
+                    reject(sessionErr);
                     return;
                 }
-                
-                // Convert array of attributes to an object
-                const userAttr = {};
-                attributes?.forEach(attribute => {
-                    userAttr[attribute.getName()] = attribute.getValue();
+
+                if (!session.isValid()) {
+                    console.error("Invalid session in getUserAttributes");
+                    reject(new Error("Invalid session"));
+                    return;
+                }
+
+                // Now get the attributes
+                cognitoUser.getUserAttributes((err, attributes) => {
+                    if (err) {
+                        console.error("Error getting user attributes:", err);
+                        reject(err);
+                        return;
+                    }
+                    
+                    if (!attributes) {
+                        console.log("No attributes found");
+                        resolve({});
+                        return;
+                    }
+
+                    // Convert array of attributes to an object
+                    const userAttr = {};
+                    attributes.forEach(attribute => {
+                        userAttr[attribute.getName()] = attribute.getValue();
+                    });
+                    
+                    console.log("Successfully retrieved user attributes:", userAttr);
+                    resolve(userAttr);
                 });
-                resolve(userAttr);
             });
         });
     }, []);
 
-    // Initialize auth state
+    // Modified initializeAuth
     const initializeAuth = useCallback(async () => {
         try {
             setIsLoading(true);
-            const session = await getSession();
+            console.log("Starting auth initialization");
+
             const cognitoUser = Pool.getCurrentUser();
-            
-            if (session && cognitoUser) {
+            if (!cognitoUser) {
+                console.log("No current user found");
+                throw new Error("No user found");
+            }
+
+            // Get session first
+            const session = await new Promise((resolve, reject) => {
+                cognitoUser.getSession((err, session) => {
+                    if (err) {
+                        console.error("Session error:", err);
+                        reject(err);
+                        return;
+                    }
+                    resolve(session);
+                });
+            });
+
+            if (!session.isValid()) {
+                console.log("Session is invalid");
+                throw new Error("Invalid session");
+            }
+
+            console.log("Valid session found");
+
+            try {
                 const attributes = await getUserAttributes(cognitoUser);
                 setUserAttributes(attributes);
                 setUser(cognitoUser);
                 setIsAuthenticated(true);
+                console.log("Auth initialization complete with attributes");
+            } catch (attrError) {
+                console.error("Error getting user attributes:", attrError);
+                // Continue with authentication even if attributes fail
+                setUser(cognitoUser);
+                setIsAuthenticated(true);
+                console.log("Auth initialization complete without attributes");
             }
+
         } catch (error) {
             console.error("Auth initialization error:", error);
             setIsAuthenticated(false);
@@ -52,66 +109,47 @@ const Account = (props) => {
         }
     }, [getUserAttributes]);
 
-    // Check auth status on mount
-    useEffect(() => {
-        initializeAuth();
-    }, [initializeAuth]);
-
-    const getSession = async () => {
-        return await new Promise((resolve, reject) => {
-            const user = Pool.getCurrentUser();
-            if (user) {
-                user.getSession((err, session) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(session);
-                    }
-                });
-            } else {
-                reject(new Error("No user found"));
-            }
-        });
-    };
-
+    // Modified authenticate function
     const authenticate = async (Username, Password) => {
         try {
             setIsLoading(true);
+            console.log("Starting authentication");
+
+            const user = new CognitoUser({
+                Username,
+                Pool,
+                Storage: window.localStorage
+            });
+
+            const authDetails = new AuthenticationDetails({
+                Username,
+                Password
+            });
+
             const authResult = await new Promise((resolve, reject) => {
-                const user = new CognitoUser({ Username, Pool });
-                const authDetails = new AuthenticationDetails({ Username, Password });
-        
                 user.authenticateUser(authDetails, {
-                    onSuccess: (data) => {
-                        resolve(data);
+                    onSuccess: async (result) => {
+                        console.log("Authentication successful");
+                        resolve(result);
                     },
                     onFailure: (err) => {
-                        reject(new Error(err.message || "Invalid login credentials"));
+                        console.error("Authentication failed:", err);
+                        reject(err);
                     },
-                    newPasswordRequired: (data) => {
+                    newPasswordRequired: (userAttributes, requiredAttributes) => {
+                        console.log("New password required");
                         reject(new Error("New password required"));
-                    },
+                    }
                 });
             });
 
-            // Update auth state after successful login
+            // Wait for auth state to be initialized
             await initializeAuth();
             return authResult;
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
-    const logout = async () => {
-        try {
-            setIsLoading(true);
-            const user = Pool.getCurrentUser();
-            if (user) {
-                user.signOut();
-                setIsAuthenticated(false);
-                setUser(null);
-                setUserAttributes(null);
-            }
+        } catch (error) {
+            console.error("Authentication error:", error);
+            throw error;
         } finally {
             setIsLoading(false);
         }
@@ -138,6 +176,41 @@ const Account = (props) => {
         return groups.includes(group);
     }, [getUserGroups]);
 
+    // Modified getSession with better error handling
+    const getSession = async () => {
+        try {
+            const user = Pool.getCurrentUser();
+            console.log("Current user from pool:", user); // Debug log
+
+            if (!user) {
+                throw new Error("No user found");
+            }
+
+            return await new Promise((resolve, reject) => {
+                // Get session and verify it's valid
+                user.getSession((err, session) => {
+                    if (err) {
+                        console.error("Session error:", err); // Debug log
+                        reject(err);
+                        return;
+                    }
+
+                    if (!session.isValid()) {
+                        console.error("Session is invalid"); // Debug log
+                        reject(new Error("Invalid session"));
+                        return;
+                    }
+
+                    console.log("Valid session obtained:", session); // Debug log
+                    resolve(session);
+                });
+            });
+        } catch (error) {
+            console.error("GetSession error:", error); // Debug log
+            throw error;
+        }
+    };
+
     // Refresh session
     const refreshSession = async () => {
         try {
@@ -147,6 +220,32 @@ const Account = (props) => {
             setIsLoading(false);
         }
     };
+
+    // Modified logout function
+    const logout = async () => {
+        try {
+            setIsLoading(true);
+            const user = Pool.getCurrentUser();
+            if (user) {
+                console.log("Logging out user"); // Debug log
+                user.signOut();
+                setIsAuthenticated(false);
+                setUser(null);
+                setUserAttributes(null);
+                console.log("Logout complete"); // Debug log
+            }
+        } catch (error) {
+            console.error("Logout error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Initialize auth state on mount
+    useEffect(() => {
+        console.log("Initializing auth state on mount"); // Debug log
+        initializeAuth();
+    }, [initializeAuth]);
 
     return (
         <AccountContext.Provider 

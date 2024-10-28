@@ -44,6 +44,7 @@ export default function AuthLogin() {
   // used to handle login
   const { authenticate } = useContext(AccountContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <>
@@ -62,9 +63,9 @@ export default function AuthLogin() {
           try {
             // form submission logic
             await authenticate(values.email, values.password);
-
-            // Redirect to dashboard
-            navigate('/');
+            // Redirect to the intended page or default to dashboard
+            const from = location.state?.from?.pathname || '/';
+            navigate(from, { replace: true });
           } catch (error) {
             // Handle error case by setting form errors if needed
             setErrors({ submit: error.message || "Something went wrong" });

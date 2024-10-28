@@ -22,56 +22,80 @@ const UserForm = Loadable(lazy(() => import('pages/forms/NewUser')));
 // Define your routes with role-based protection
 const MainRoutes = {
   path: '/',
-  element: <Dashboard />,
+  element: (
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+    ),
   children: [
-    // {
-    //   path: '/',
-    //   element: (
-    //     <ProtectedRoute>
-    //       <DashboardDefault />
-    //     </ProtectedRoute>
-    //   ),
-    // },
     {
       path: '/',
-      element: <DashboardDefault />
+      element: (
+        <ProtectedRoute>
+          <DashboardDefault />
+        </ProtectedRoute>
+        )
     },
-    // All tables and forms
     {
       path: 'ProfileTable',
       element: (
-        <ProfileTable />
+        <ProtectedRoute>
+          <ProfileTable />
+        </ProtectedRoute>
       )
     },
     {
       path: 'UserTable',
       element:
       (
-        <UserTable />
+        <ProtectedRoute>
+          <UserTable />
+        </ProtectedRoute>
       )
     },
     {
       path: 'ClientTransactionTable',
       element:
       (
-        <ClientTransactionTable />
+        <ProtectedRoute>
+          <ClientTransactionTable />
+        </ProtectedRoute>
       )
     },
     {
       path: 'UserTransactionTable',
-      element: <UserTransactionTable />
+      element:
+      (
+        <ProtectedRoute>
+          <UserTransactionTable />
+        </ProtectedRoute>
+      )
     },
     {
       path: 'AccountForm',
-      element: <AccountForm />
+      element: 
+      (
+        <ProtectedRoute>
+          <AccountForm />
+        </ProtectedRoute>
+      )
     },
     {
       path: 'ClientForm',
-      element: <ClientForm />
+      element: 
+      (
+        <ProtectedRoute>
+          <ClientForm />
+        </ProtectedRoute>
+      )
     },
     {
       path: 'UserForm',
-      element: <UserForm />
+      element:(
+        <ProtectedRoute>
+          <UserForm />
+        </ProtectedRoute>
+      )
     },
     {
       path: 'unauthorized',
