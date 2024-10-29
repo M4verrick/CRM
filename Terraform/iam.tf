@@ -1,17 +1,15 @@
-module "lb_role" {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+module "cluster_autoscaler_irsa_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.3.1"
 
-  # Hardcoded name for the IAM role
-  role_name = "eks_lb_controller_role"
+  role_name                        = "cluster-autoscaler"
+  attach_cluster_autoscaler_policy = true
+  cluster_autoscaler_cluster_ids   = [module.eks.cluster_name]
 
-  # Attach load balancer controller policy
-  attach_load_balancer_controller_policy = true
-
-  # Specify the OIDC provider and service account configuration - need to setup
   oidc_providers = {
-    main = {
+    ex = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
+      namespace_service_accounts = ["kube-system:cluster-autoscaler"]
     }
   }
 }
