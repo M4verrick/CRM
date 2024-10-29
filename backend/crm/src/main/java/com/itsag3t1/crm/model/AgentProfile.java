@@ -9,7 +9,7 @@
     @Setter
     @Entity
     @Table(name = "agent_profile",
-        uniqueConstraints = {@UniqueConstraint(columnNames = "client_id")}) // Ensures each client has only one agent
+        uniqueConstraints = {@UniqueConstraint(columnNames = "profile_id")}) // Ensures each client has only one agent
     public class AgentProfile implements Serializable {
 
         @Id
@@ -20,8 +20,8 @@
         private String agentId;
 
         @OneToOne
-        @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false, unique = true) // Enforces one agent per client
-        private Profile client;
+        @JoinColumn(name = "profile_id", referencedColumnName = "id", nullable = false, unique = true) // Enforces one agent per client
+        private Profile profile;
 
         
     }

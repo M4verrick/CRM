@@ -4,6 +4,7 @@ import com.itsag3t1.crm.exception.DatabaseException;
 import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
 import com.itsag3t1.crm.model.ClientAccount;
+import com.itsag3t1.crm.model.Profile;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
 import com.itsag3t1.crm.repository.AgentProfileRepository;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -58,6 +60,10 @@ public class ClientAccountService {
         } finally {
             MDC.clear(); // Clear MDC after logging
         }
+    }
+
+    public List<ClientAccount> getAllClientAccounts() {
+        return accountRepository.findAll();
     }
 
     public boolean deleteAccount(Long accountId, String agentId) {
@@ -108,7 +114,7 @@ public class ClientAccountService {
 
     private boolean isClientAssociatedWithAgent(Long clientId, String agentId) {
         // Check if the clientId exists in the agent's profile mapping
-        return agentProfileRepository.existsByAgentIdAndClientId(agentId, clientId);
+        return agentProfileRepository.existsByAgentIdAndProfile_Id(agentId, clientId);
     }
 
 }

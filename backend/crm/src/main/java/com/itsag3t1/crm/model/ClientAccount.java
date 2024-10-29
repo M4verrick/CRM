@@ -22,7 +22,7 @@ public class ClientAccount {
 
     @NotNull(message = "Profile must not be null")
     @ManyToOne
-    @JoinColumn(name = "profile_id", nullable = false)
+    @JoinColumn(name = "profile_id",nullable = false)
     @JsonBackReference
     private Profile profile;
 
@@ -37,7 +37,7 @@ public class ClientAccount {
     private AccountStatus accountStatus;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "opening_date")
+    @Column(name = "opening_date", nullable = false)
     private Date openingDate = new Date();
 
     @NotNull(message = "Currency must not be null")
@@ -49,6 +49,7 @@ public class ClientAccount {
     private String branchId;
 
     @Min(value = 0, message = "Initial deposit must be 0 or higher")
+    @NotNull(message = "Initial deposit must not be null")
     @Column(name = "initial_deposit", nullable = false)
     private Double initialDeposit;
 
@@ -64,15 +65,16 @@ public class ClientAccount {
         this.currency = currency;
         this.branchId = branchId;
         this.initialDeposit = initialDeposit;
+        this.openingDate = new Date();
     }
 
     // Custom setter for initialDeposit with validation
-    public void setInitialDeposit(Double initialDeposit) {
-        if (initialDeposit == null) {
-            throw new InvalidDataException("Initial deposit must not be null.");
-        }
-        this.initialDeposit = initialDeposit;
-    }
+//    public void setInitialDeposit(Double initialDeposit) {
+//        if (initialDeposit == null) {
+//            throw new InvalidDataException("Initial deposit must not be null.");
+//        }
+//        this.initialDeposit = initialDeposit;
+//    }
 
     // Enums
     public enum AccountType {

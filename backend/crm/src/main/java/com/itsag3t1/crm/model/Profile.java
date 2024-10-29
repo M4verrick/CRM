@@ -98,11 +98,14 @@ public class Profile {
     private String verificationStatus = "PENDING";
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<ClientAccount> clientAccounts = new ArrayList<>();
     // No-argument constructor
     public Profile() {
     }
+
+    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private AgentProfile agentProfile;
 
     // Builder constructor
     private Profile(Builder builder) {

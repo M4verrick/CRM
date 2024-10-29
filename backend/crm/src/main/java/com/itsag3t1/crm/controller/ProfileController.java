@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.security.oauth2.jwt.Jwt;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -33,25 +31,26 @@ public class ProfileController {
         this.emailService = emailService;
     }
 
+
+
+
     @GetMapping
     public List<Profile> getAllProfiles(Authentication authentication) {
-        // Get agentId
         String agentId = ClaimsUtil.getAgentId(authentication);
         log.info("Agent ID: {}", agentId);
-        // Pass agentId to ProfileService to allow logging inside ProfileService
-        return profileService.getAllProfiles();
+        return profileService.getAllProfiles(agentId);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Profile> getProfileById(@PathVariable Long id, @RequestParam String agentId) {
-        // Pass agentId to ProfileService to allow logging inside ProfileService
+    public ResponseEntity<Profile> getProfileById(@PathVariable Long id, Authentication authentication) {
+        String agentId = ClaimsUtil.getAgentId(authentication);
         Optional<Profile> profile = profileService.getProfileById(id, agentId);
         return profile.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, @RequestParam String agentId) {
-        // Generate unique verification token
+    public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, Authentication authentication) {
+        String agentId = ClaimsUtil.getAgentId(authentication);
         String token = TokenUtil.generateVerificationToken();
         Profile newProfile = new Profile.Builder()
                 .setFirstName(profile.getFirstName())
@@ -69,22 +68,19 @@ public class ProfileController {
                 .setEmailVerified(false)
                 .build();
 
-        // Pass agentId to ProfileService to allow logging inside ProfileService
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
-
-        // Send verification email after profile is created
         String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        emailService.sendVerificationEmail("hello@example.com", savedProfile.getFirstName(), verificationLink);
+        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails, @RequestParam String agentId) {
+    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails, Authentication authentication) {
+        String agentId = ClaimsUtil.getAgentId(authentication);
         Optional<Profile> profile = profileService.getProfileById(id, agentId);
         if (profile.isPresent()) {
             Profile updatedProfile = new Profile.Builder(profile.get())
-                    .setId(id)
                     .setFirstName(profileDetails.getFirstName())
                     .setLastName(profileDetails.getLastName())
                     .setEmail(profileDetails.getEmail())
@@ -98,7 +94,6 @@ public class ProfileController {
                     .setGender(profileDetails.getGender())
                     .build();
 
-            // Pass agentId to ProfileService to allow logging inside ProfileService
             profileService.saveProfile(updatedProfile, agentId);
             return ResponseEntity.ok(updatedProfile);
         } else {
@@ -107,20 +102,19 @@ public class ProfileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProfile(@PathVariable Long id, @RequestParam String agentId) {
+    public ResponseEntity<String> deleteProfile(@PathVariable Long id, Authentication authentication) {
+        String agentId = ClaimsUtil.getAgentId(authentication);
         try {
             profileService.deleteProfile(id, agentId);
             return ResponseEntity.noContent().build();
         } catch (ResponseStatusException ex) {
-            // Return a conflict response if profile cannot be deleted due to active accounts
             return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
         }
     }
 
-
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token, @RequestParam String agentId) {
-        // Pass agentId to ProfileService to allow logging inside ProfileService
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token, Authentication authentication) {
+        String agentId = ClaimsUtil.getAgentId(authentication);
         Optional<Profile> optionalProfile = profileService.getProfileByVerificationToken(token, agentId);
         if (optionalProfile.isEmpty()) {
             return ResponseEntity.badRequest().body("Invalid verification token");
@@ -132,9 +126,7 @@ public class ProfileController {
                 .setEmailVerified(true)
                 .build();
 
-        // Pass agentId to ProfileService to allow logging inside ProfileService
         profileService.saveProfile(verifiedProfile, agentId);
-
         return ResponseEntity.ok("Email successfully verified.");
     }
 
@@ -142,35 +134,30 @@ public class ProfileController {
     public ResponseEntity<String> verifyClientIdentity(
             @PathVariable Long clientId,
             @RequestParam("nricNumber") String nricNumber,
-            @RequestParam String agentId) {
+            Authentication authentication) {
 
-        // Pass agentId to ProfileService to allow logging inside ProfileService
+        String agentId = ClaimsUtil.getAgentId(authentication);
         Optional<Profile> optionalProfile = profileService.getProfileById(clientId, agentId);
         if (optionalProfile.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Profile profile = optionalProfile.get();
-
-        // Validate the NRIC number
         if (isValidNric(nricNumber)) {
             Profile updatedProfile = new Profile.Builder(profile)
                     .setVerificationStatus("VERIFIED")
                     .build();
-            // Pass agentId to ProfileService to allow logging inside ProfileService
             profileService.saveProfile(updatedProfile, agentId);
             return ResponseEntity.ok("Your identity has been verified.");
         } else {
             Profile updatedProfile = new Profile.Builder(profile)
                     .setVerificationStatus("PENDING")
                     .build();
-            // Pass agentId to ProfileService to allow logging inside ProfileService
             profileService.saveProfile(updatedProfile, agentId);
             return ResponseEntity.badRequest().body("Invalid NRIC number provided. Verification status is set to PENDING.");
         }
     }
 
-    // NRIC validation method
     private boolean isValidNric(String nricNumber) {
         String nricPattern = "^[STFGM]\\d{7}[A-Z]$";
         return Pattern.matches(nricPattern, nricNumber);
