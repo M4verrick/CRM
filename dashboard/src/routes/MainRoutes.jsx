@@ -48,7 +48,7 @@ const MainRoutes = {
       path: 'UserTable',
       element:
       (
-        <ProtectedRoute>
+        <ProtectedRoute roles={['admin', 'root-admin']}>
           <UserTable />
         </ProtectedRoute>
       )
