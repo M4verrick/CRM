@@ -1,10 +1,10 @@
 package com.itsag3t1.crm.service;
 
+import com.itsag3t1.crm.model.AgentProfile;
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.model.Profile;
-import com.itsag3t1.crm.repository.ClientAccountRepository;
-import com.itsag3t1.crm.model.AgentProfile;
 import com.itsag3t1.crm.repository.AgentProfileRepository;
+import com.itsag3t1.crm.repository.ClientAccountRepository;
 import com.itsag3t1.crm.repository.ProfileRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,6 @@ import java.util.Optional;
 
 @Service
 public class ProfileService {
-    // ISO 8601 format for logging timestamps
     private static final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     private final Logger log = LoggerFactory.getLogger(ProfileService.class);
     private final ProfileRepository profileRepository;
@@ -34,83 +33,72 @@ public class ProfileService {
         this.profileRepository = profileRepository;
         this.clientAccountRepository = clientAccountRepository;
         this.agentProfileRepository = agentProfileRepository;
-
     }
 
-    public List<Profile> getAllProfiles() {
+
+
+    public List<Profile> getAllProfiles(String agentId) {
         try {
-            List<Profile> profiles = profileRepository.findAll();
-
-            // Log the action of retrieving all profiles
-//            MDC.put("agent_id", agentId);
+            List<Profile> profiles = profileRepository.findByAgentProfile_AgentId(agentId);
+            MDC.put("agent_id", agentId);
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-
             log.info("{} retrieved all profiles at {}", MDC.get("agent_id"), MDC.get("date_time"));
-
             return profiles;
         } finally {
-            MDC.clear(); // Clear MDC after logging
+            MDC.clear();
         }
     }
 
     public Optional<Profile> getProfileById(Long id, String agentId) {
         try {
-            Optional<Profile> profile = profileRepository.findById(id);
-
-            // Log the action of retrieving profile by ID
+            Optional<Profile> profile = profileRepository.findByIdAndAgentProfile_AgentId(id, agentId);
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", id.toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-
             log.info("{} retrieved profile {} at {}", MDC.get("agent_id"), MDC.get("profile_id"), MDC.get("date_time"));
-
             return profile;
         } finally {
-            MDC.clear(); // Clear MDC after logging
+            MDC.clear();
         }
     }
 
     public Optional<Profile> getProfileByVerificationToken(String token, String agentId) {
         try {
             Optional<Profile> profile = profileRepository.findByVerificationToken(token);
-
-            // Log the action of retrieving profile by verification token
             MDC.put("agent_id", agentId);
             MDC.put("verification_token", token);
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-
             log.info("{} retrieved profile by token {} at {}", MDC.get("agent_id"), MDC.get("verification_token"), MDC.get("date_time"));
-
             return profile;
         } finally {
-            MDC.clear(); // Clear MDC after logging
+            MDC.clear();
         }
     }
 
     public Profile saveProfile(Profile profile, String agentId) {
         try {
+            // Retrieve or create the AgentProfile
+            AgentProfile agentProfile = agentProfileRepository.findByAgentId(agentId)
+                    .orElseGet(() -> {
+                        AgentProfile newAgentProfile = new AgentProfile();
+                        newAgentProfile.setAgentId(agentId);
+                        return agentProfileRepository.save(newAgentProfile);
+                    });
+
+            profile.setAgentProfile(agentProfile);
             Profile savedProfile = profileRepository.save(profile);
-            
-            //add into Agent-ClientProfile
-            AgentProfile agentProfile = new AgentProfile();
-            agentProfile.setAgentId(agentId);
-            agentProfile.setClient(savedProfile);
 
-            agentProfileRepository.save(agentProfile);
-
-            // Log the action of saving the profile
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", savedProfile.getId().toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-
             log.info("{} saved profile {} at {}", MDC.get("agent_id"), MDC.get("profile_id"), MDC.get("date_time"));
 
             return savedProfile;
         } catch (DataAccessException e) {
             log.error("An error occurred while saving the profile: {}", e.getMessage(), e);
-            throw e; // Re-throw the exception after logging
+            throw e;
         } finally {
-            MDC.clear(); // Clear MDC after logging
+            MDC.clear();
         }
     }
 
@@ -120,19 +108,17 @@ public class ProfileService {
             MDC.put("profile_id", id.toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
-            // Check if the profile has active client accounts
             long activeAccountCount = clientAccountRepository.countActiveAccountsByProfileId(id, ClientAccount.AccountStatus.ACTIVE);
             if (activeAccountCount > 0) {
                 log.info("Profile {} has active client accounts and cannot be deleted", id);
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Profile cannot be deleted due to active accounts.");
             }
 
-            // Proceed with deletion if no active accounts are found
             profileRepository.deleteById(id);
             log.info("Profile {} deleted successfully", id);
         } catch (DataAccessException e) {
             log.error("An error occurred while deleting the profile: {}", e.getMessage(), e);
-            throw e; // Re-throw the exception after logging
+            throw e;
         } finally {
             MDC.clear();
         }
