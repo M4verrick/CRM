@@ -101,9 +101,6 @@ public class Profile {
     public Profile() {
     }
 
-    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    private AgentProfile agentProfile;
-
     // Builder constructor
     private Profile(Builder builder) {
         this.id = builder.id;

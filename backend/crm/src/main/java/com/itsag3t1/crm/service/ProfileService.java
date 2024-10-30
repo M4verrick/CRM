@@ -82,10 +82,9 @@ public class ProfileService {
                     .orElseGet(() -> {
                         AgentProfile newAgentProfile = new AgentProfile();
                         newAgentProfile.setAgentId(agentId);
+                        newAgentProfile.setProfileId(profile.getId());
                         return agentProfileRepository.save(newAgentProfile);
                     });
-
-            profile.setAgentProfile(agentProfile);
             Profile savedProfile = profileRepository.save(profile);
 
             MDC.put("agent_id", agentId);

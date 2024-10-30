@@ -19,9 +19,8 @@
         @Column(name = "agent_id", nullable = false)
         private String agentId;
 
-        @OneToOne
         @JoinColumn(name = "profile_id", referencedColumnName = "id", nullable = false, unique = true) // Enforces one agent per client
-        private Profile profile;
+        private Long profileId;
 
         
     }
