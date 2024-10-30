@@ -148,7 +148,6 @@ public class Profile {
         private boolean isEmailVerified = false;
         private String verificationToken;
         private String verificationStatus = "PENDING";
-        private List<ClientAccount> clientAccounts = new ArrayList<>();
 
         public Builder() {
         }

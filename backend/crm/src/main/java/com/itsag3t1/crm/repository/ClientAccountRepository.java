@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClientAccountRepository extends JpaRepository<ClientAccount, Long> {
 
-    @Query("SELECT COUNT(c) FROM ClientAccount c WHERE c.profile.id = :profileId AND c.accountStatus = :status")
+    @Query("SELECT COUNT(c) FROM ClientAccount c WHERE c.profileId = :profileId AND c.accountStatus = :status")
     long countActiveAccountsByProfileId(@Param("profileId") Long profileId, @Param("status") AccountStatus status);
 }

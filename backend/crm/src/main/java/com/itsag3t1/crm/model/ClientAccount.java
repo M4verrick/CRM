@@ -21,9 +21,7 @@ public class ClientAccount {
     private Long accountId;
 
     @NotNull(message = "Profile must not be null")
-    @ManyToOne
     @JoinColumn(name = "profile_id",nullable = false)
-    @JsonBackReference
     private Long profileId;
 
     @NotNull(message = "Account type must not be null")
