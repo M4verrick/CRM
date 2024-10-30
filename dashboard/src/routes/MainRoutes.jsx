@@ -5,7 +5,7 @@ import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import { Button, Result } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 // render pages
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
@@ -18,14 +18,12 @@ const ClientForm = Loadable(lazy(() => import('pages/forms/NewClient')));
 const UserForm = Loadable(lazy(() => import('pages/forms/NewUser')));
 
 // result pages
-const navigate = useNavigate();
-
 const Unauthorized = () => {
   return <div><Result
     status="403"
     title="403"
     subTitle="Sorry, you are not authorized to access this page."
-    extra={<Button type="primary" onClick={() => navigate('/')}>
+    extra={<Button type="primary" onClick={() => <Navigate to="/" />}>
       Back Home
     </Button>} /></div>;
 }
@@ -33,8 +31,8 @@ const DoesNotExist = () => {
   return <div><Result
     status="404"
     title="404"
-    subTitle="Sorry, the page you visited does not exist ."
-    extra={<Button type="primary" onClick={() => navigate('/')}>
+    subTitle="Sorry, the page you visited does not exist."
+    extra={<Button type="primary" onClick={() => <Navigate to="/" />}>
       Back Home
     </Button>} /></div>;
 }
