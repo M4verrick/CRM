@@ -1,8 +1,8 @@
 import {CognitoUserPool} from "amazon-cognito-identity-js"
 
 const poolData = {
-    UserPoolId: process.env.REACT_APP_USER_POOL_ID,
-    ClientId: process.env.REACT_APP_USER_POOL_ID,
+    UserPoolId: import.meta.env.VITE_USER_POOL_ID,
+    ClientId: import.meta.env.VITE_CLIENT_ID,
     Storage: window.localStorage // Explicitly set storage
 }
 
