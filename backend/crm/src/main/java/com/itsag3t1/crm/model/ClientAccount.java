@@ -24,7 +24,7 @@ public class ClientAccount {
     @ManyToOne
     @JoinColumn(name = "profile_id",nullable = false)
     @JsonBackReference
-    private Profile profile;
+    private Long profileId;
 
     @NotNull(message = "Account type must not be null")
     @Enumerated(EnumType.STRING)
@@ -58,8 +58,8 @@ public class ClientAccount {
     }
 
     // Constructor to initialize fields
-    public ClientAccount(Profile profile, AccountType accountType, AccountStatus accountStatus, String currency, String branchId, Double initialDeposit) {
-        this.profile = profile;
+    public ClientAccount(Long profileId, AccountType accountType, AccountStatus accountStatus, String currency, String branchId, Double initialDeposit) {
+        this.profileId = profileId;
         this.accountType = accountType;
         this.accountStatus = accountStatus;
         this.currency = currency;
