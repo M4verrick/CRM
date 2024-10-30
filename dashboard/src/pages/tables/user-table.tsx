@@ -3,243 +3,158 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Dropdown, Space, Tag } from 'antd';
 import React from 'react';
-import { useRef } from 'react';
-import request from 'umi-request';
 
-export const waitTimePromise = async (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
+// cognito integration
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
+
+const fetchUsers = async (params?: ListUsersParams) => {
+  try {
+    const cognitoISP = new CognitoIdentityServiceProvider({
+      region: "ap-southeast-1",
+      credentials: {
+        accessKeyId: "AKIAVD3BDD5QBC4X7FU2",
+        secretAccessKey: "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"
+      }
+    });
+
+    // bug here
+    const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers(params || {
+      UserPoolId: "ap-southeast-1_ya55bZ0sg",
+      Limit: 20,
+    }).promise();
+    console.error('Done fetching users:');
+
+    const usersList = (response.Users || []).map(transformUser);
+    return {
+      data: usersList,
+      total: usersList.length,
+      success: true
+    };
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    return {
+      data: [],
+      total: 0,
+      success: false,
+      error: err instanceof Error ? err.message : 'An error occurred'
+    };
+  }
 };
 
-export const waitTime = async (time: number = 100) => {
-  await waitTimePromise(time);
+// Import AWS types
+type AWSCognitoUserType = CognitoIdentityServiceProvider.UserType;
+type AWSCognitoListUsersResponse = CognitoIdentityServiceProvider.ListUsersResponse;
+// type AWSAttributeType = CognitoIdentityServiceProvider.AttributeType;
+
+// Type for the params we pass to listUsers
+type ListUsersParams = CognitoIdentityServiceProvider.ListUsersRequest;
+
+type CognitoUserTableItem = {
+  username: string;
+  email: string;
+  emailVerified: boolean;
+  userId: string;
+  enabled: boolean;
+  status: AWSCognitoUserType['UserStatus'];
+  created: Date;
+  lastModified: Date;
 };
 
-// Define table items
-type GithubIssueItem = {
-  url: string;
-  id: number;
-  number: number;
-  title: string;
-  labels: {
-    name: string;
-    color: string;
-  }[];
-  state: string;
-  comments: number;
-  created_at: string;
-  updated_at: string;
-  closed_at?: string;
+const transformUser = (user: AWSCognitoUserType): CognitoUserTableItem => {
+  return {
+    username: user.Username || '',
+    email: user.Attributes?.find(attr => attr.Name === 'email')?.Value || '',
+    emailVerified: user.Attributes?.find(attr => attr.Name === 'email_verified')?.Value === 'true',
+    userId: user.Attributes?.find(attr => attr.Name === 'sub')?.Value || '',
+    enabled: user.Enabled || false,
+    status: user.UserStatus || 'UNKNOWN',
+    created: new Date(user.UserCreateDate || ''),
+    lastModified: new Date(user.UserLastModifiedDate || '')
+  };
 };
 
-const columns: ProColumns<GithubIssueItem>[] = [
+const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     dataIndex: 'index',
     valueType: 'indexBorder',
-    width: 48,
+    width: 48
   },
   {
-    title: '标题',
-    dataIndex: 'title',
+    title: 'Username',
+    dataIndex: 'username',
     copyable: true,
-    ellipsis: true,
-    tooltip: '标题过长会自动收缩',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
+    ellipsis: true
   },
   {
-    disable: true,
-    title: '状态',
-    dataIndex: 'state',
+    title: 'Email',
+    dataIndex: 'email',
+    copyable: true,
+    ellipsis: true
+  },
+  {
+    title: 'Email Verified',
+    dataIndex: 'emailVerified',
+    valueType: 'checkbox'
+  },
+  {
+    title: 'User ID',
+    dataIndex: 'userId',
+    copyable: true,
+    ellipsis: true
+  },
+  {
+    title: 'Enabled',
+    dataIndex: 'enabled',
+    valueType: 'checkbox'
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
     filters: true,
     onFilter: true,
-    ellipsis: true,
-    valueType: 'select',
     valueEnum: {
-      all: { text: '超长'.repeat(50) },
-      open: {
-        text: '未解决',
-        status: 'Error',
-      },
-      closed: {
-        text: '已解决',
-        status: 'Success',
-        disabled: true,
-      },
-      processing: {
-        text: '解决中',
-        status: 'Processing',
-      },
-    },
+      UNCONFIRMED: { text: 'Unconfirmed', status: 'Secondary' },
+      CONFIRMED: { text: 'Confirmed', status: 'Success' },
+      ARCHIVED: { text: 'Archived', status: 'Default' },
+      COMPROMISED: { text: 'Compromised', status: 'Error' },
+      UNKNOWN: { text: 'Unknown', status: 'Warning' },
+      RESET_REQUIRED: { text: 'Reset Required', status: 'Processing' },
+      FORCE_CHANGE_PASSWORD: { text: 'Force Change Password', status: 'Processing' }
+    }
   },
   {
-    disable: true,
-    title: '标签',
-    dataIndex: 'labels',
-    search: false,
-    renderFormItem: (_, { defaultRender }) => {
-      return defaultRender(_);
-    },
-    render: (_, record) => (
-      <Space>
-        {record.labels.map(({ name, color }) => (
-          <Tag color={color} key={name}>
-            {name}
-          </Tag>
-        ))}
-      </Space>
-    ),
-  },
-  {
-    title: '创建时间',
-    key: 'showTime',
-    dataIndex: 'created_at',
+    title: 'Created At',
+    dataIndex: 'created',
     valueType: 'date',
-    sorter: true,
-    hideInSearch: true,
+    sorter: true
   },
   {
-    title: '创建时间',
-    dataIndex: 'created_at',
-    valueType: 'dateRange',
-    hideInTable: true,
-    search: {
-      transform: (value) => {
-        return {
-          startTime: value[0],
-          endTime: value[1],
-        };
-      },
-    },
-  },
-  {
-    title: '操作',
-    valueType: 'option',
-    key: 'option',
-    render: (text, record, _, action) => [
-      <a
-        key="editable"
-        onClick={() => {
-          action?.startEditable?.(record.id);
-        }}
-      >
-        编辑
-      </a>,
-      <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
-        查看
-      </a>,
-      <TableDropdown
-        key="actionGroup"
-        onSelect={() => action?.reload()}
-        menus={[
-          { key: 'delete', name: '删除' },
-        ]}
-      />,
-    ],
-  },
+    title: 'Last Modified',
+    dataIndex: 'lastModified',
+    valueType: 'date',
+    sorter: true
+  }
 ];
 
 export default () => {
-  const actionRef = useRef<ActionType>();
   return (
-    <ProTable<GithubIssueItem>
+    <ProTable<CognitoUserTableItem>
       columns={columns}
-      actionRef={actionRef}
-      cardBordered
       request={async (params, sort, filter) => {
-        console.log(sort, filter);
-        await waitTime(2000);
-        return request<{
-          data: GithubIssueItem[];
-        }>('https://proapi.azurewebsites.net/github/issues', {
-          params,
+        return fetchUsers({
+          UserPoolId: "ap-southeast-1_ya55bZ0sg",
         });
       }}
-      editable={{
-        type: 'multiple',
-      }}
-      columnsState={{
-        persistenceKey: 'pro-table-singe-demos',
-        persistenceType: 'localStorage',
-        defaultValue: {
-          option: { fixed: 'right', disable: true },
-        },
-        onChange(value) {
-          console.log('value: ', value);
-        },
-      }}
-      rowKey="id"
-      search={{
-        labelWidth: 'auto',
-      }}
-      options={{
-        setting: {
-          listsHeight: 400,
-        },
-      }}
-      form={{
-        // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
-        syncToUrl: (values, type) => {
-          if (type === 'get') {
-            return {
-              ...values,
-              created_at: [values.startTime, values.endTime],
-            };
-          }
-          return values;
-        },
-      }}
       pagination={{
-        pageSize: 5,
-        onChange: (page) => console.log(page),
+        pageSize: 10,
+        current: 1
+      }}
+      rowKey="username"
+      search={{
+        labelWidth: 'auto'
       }}
       dateFormatter="string"
-      headerTitle="高级表格"
-      toolBarRender={() => [
-        <Button
-          key="button"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            actionRef.current?.reload();
-          }}
-          type="primary"
-        >
-          新建
-        </Button>,
-        <Dropdown
-          key="menu"
-          menu={{
-            items: [
-              {
-                label: '1st item',
-                key: '1',
-              },
-              {
-                label: '2nd item',
-                key: '2',
-              },
-              {
-                label: '3rd item',
-                key: '3',
-              },
-            ],
-          }}
-        >
-          <Button>
-            <EllipsisOutlined />
-          </Button>
-        </Dropdown>,
-      ]}
+      headerTitle="Cognito Users"
     />
   );
 };
-
