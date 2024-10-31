@@ -7,44 +7,11 @@ import React from 'react';
 // cognito integration
 import { CognitoIdentityServiceProvider } from 'aws-sdk';
 
-const fetchUsers = async (params?: ListUsersParams) => {
-  try {
-    const cognitoISP = new CognitoIdentityServiceProvider({
-      region: "ap-southeast-1",
-      credentials: {
-        accessKeyId: "AKIAVD3BDD5QBC4X7FU2",
-        secretAccessKey: "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"
-      }
-    });
-
-    // bug here
-    const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers(params || {
-      UserPoolId: "ap-southeast-1_ya55bZ0sg",
-      Limit: 20,
-    }).promise();
-    console.error('Done fetching users:');
-
-    const usersList = (response.Users || []).map(transformUser);
-    return {
-      data: usersList,
-      total: usersList.length,
-      success: true
-    };
-  } catch (err) {
-    console.error('Error fetching users:', err);
-    return {
-      data: [],
-      total: 0,
-      success: false,
-      error: err instanceof Error ? err.message : 'An error occurred'
-    };
-  }
-};
-
 // Import AWS types
 type AWSCognitoUserType = CognitoIdentityServiceProvider.UserType;
 type AWSCognitoListUsersResponse = CognitoIdentityServiceProvider.ListUsersResponse;
-// type AWSAttributeType = CognitoIdentityServiceProvider.AttributeType;
+type AWSGroupType = CognitoIdentityServiceProvider.GroupType;
+type AWSAdminListGroupsForUserResponse = CognitoIdentityServiceProvider.AdminListGroupsForUserResponse;
 
 // Type for the params we pass to listUsers
 type ListUsersParams = CognitoIdentityServiceProvider.ListUsersRequest;
@@ -60,9 +27,11 @@ type CognitoUserTableItem = {
   status: AWSCognitoUserType['UserStatus'];
   created: Date;
   lastModified: Date;
+  groups: string[]; // Add this field
 };
 
-const transformUser = (user: AWSCognitoUserType): CognitoUserTableItem => {
+// Update the transform function to include groups
+const transformUser = (user: AWSCognitoUserType, groups: AWSGroupType[] = []): CognitoUserTableItem => {
   return {
     username: user.Username || '',
     given_name: user.Attributes?.find(attr => attr.Name === 'given_name')?.Value || '',
@@ -73,9 +42,60 @@ const transformUser = (user: AWSCognitoUserType): CognitoUserTableItem => {
     enabled: user.Enabled || false,
     status: user.UserStatus || 'UNKNOWN',
     created: new Date(user.UserCreateDate || ''),
-    lastModified: new Date(user.UserLastModifiedDate || '')
+    lastModified: new Date(user.UserLastModifiedDate || ''),
+    groups: groups.map(g => g.GroupName || '') // Add this field
   };
 };
+
+const fetchUsers = async (params?: ListUsersParams) => {
+  try {
+    const cognitoISP = new CognitoIdentityServiceProvider({
+      region: "ap-southeast-1",
+      credentials: {
+        accessKeyId: "AKIAVD3BDD5QBC4X7FU2",
+        secretAccessKey: "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"
+      }
+    });
+
+    // fetch all users
+    const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers(params || {
+      UserPoolId: "ap-southeast-1_ya55bZ0sg",
+      Limit: 20,
+    }).promise();
+
+    // Fetch groups for each user. 2n+1 computational complexity.
+    const usersWithGroups = await Promise.all((response.Users || []).map(async (user) => {
+      if (!user.Username) return transformUser(user);
+
+      try {
+        const groupsResponse: AWSAdminListGroupsForUserResponse = await cognitoISP.adminListGroupsForUser({
+          Username: user.Username,
+          UserPoolId: params?.UserPoolId || "ap-southeast-1_ya55bZ0sg",
+        }).promise();
+
+        return transformUser(user, groupsResponse.Groups || []);
+      } catch (error) {
+        console.error(`Error fetching groups for user ${user.Username}:`, error);
+        return transformUser(user);
+      }
+    }));
+
+    return {
+      data: usersWithGroups,
+      total: usersWithGroups.length,
+      success: true
+    };
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    return {
+      data: [],
+      total: 0,
+      success: false,
+      error: err instanceof Error ? err.message : 'An error occurred'
+    };
+  }
+};
+
 
 const columns: ProColumns<CognitoUserTableItem>[] = [
   {
@@ -104,18 +124,41 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Email Verified',
     dataIndex: 'emailVerified',
-    valueType: 'checkbox'
+    valueEnum: {
+      true: { text: 'true'},
+      false: { text: 'false'},
+    }
+  },
+  {
+    title: 'Groups',
+    dataIndex: 'groups',
+    render: (_, record) => (
+      <Space>
+        {record.groups.map((group) => (
+          <Tag key={group} color="blue">
+            {group}
+          </Tag>
+        ))}
+      </Space>
+    ),
   },
   {
     title: 'User ID',
     dataIndex: 'userId',
     copyable: true,
-    ellipsis: true
+    ellipsis: true,
+    hideInTable: true,
+    
   },
   {
     title: 'Enabled',
     dataIndex: 'enabled',
-    valueType: 'checkbox'
+    filters: true,
+    onFilter: true,
+    valueEnum: {
+      true: { text: 'true'},
+      false: { text: 'false'},
+    }
   },
   {
     title: 'Status',
@@ -156,8 +199,9 @@ export default () => {
       columns={columns}
       request={async (params, sort, filter) => {
         return fetchUsers({
-          UserPoolId: "ap-southeast-1_ya55bZ0sg",
-        });
+      UserPoolId: "ap-southeast-1_ya55bZ0sg",
+      Limit: 20,
+    });
       }}
       pagination={{
         pageSize: 10,
