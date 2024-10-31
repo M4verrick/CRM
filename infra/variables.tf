@@ -3,6 +3,11 @@ variable "ssh_key_path" {
   type        = string
   default     = "~/.ssh/id_rsa"
 }
+variable "domain_name" {
+  description = "Route 53 domain name"
+  type        = string
+  default     = "itsag3t1.com"
+}
 variable "vpc_cidr" {
   description = "VPC CIDR"
   type        = string
@@ -24,6 +29,7 @@ variable "addons" {
   default = {
     enable_aws_load_balancer_controller = true
     enable_metrics_server               = true
+    enable_external_dns                 = true
   }
 }
 # Addons Git

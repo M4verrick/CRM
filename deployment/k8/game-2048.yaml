@@ -47,7 +47,8 @@ metadata:
   name: game-2048
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
+    kubernetes.io/ingress.class: alb
+    external-dns.alpha.kubernetes.io/hostname: my-app.itsag3t1.com
 spec:
   ingressClassName: alb
   rules:
