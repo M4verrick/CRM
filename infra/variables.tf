@@ -76,5 +76,5 @@ variable "gitops_workload_basepath" {
 variable "gitops_workload_path" {
   description = "Git repository path for workload"
   type        = string
-  default     = "deployment/k8/game-2048"
+  default     = "deployment/k8"
 }
