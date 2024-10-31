@@ -22,8 +22,8 @@ spec:
       - image: public.ecr.aws/l6m2t8p7/docker-2048
         name: game-2048
         ports:
-        - containerPort: 80
-          name: http
+        - containerPort: 443
+          name: https
 ---
 apiVersion: v1
 kind: Service
@@ -32,9 +32,9 @@ metadata:
   name: game-2048
 spec:
   ports:
-    - name: http
-      port: 80
-      targetPort: http
+    - name: https
+      port: 443
+      targetPort: https
       protocol: TCP
   type: ClusterIP
   selector:
@@ -47,16 +47,16 @@ metadata:
   name: game-2048
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
-    kubernetes.io/ingress.class: alb
+    kubernetes.io/ingress.class: ip
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
     alb.ingress.kubernetes.io/ssl-redirect: 'true'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/d45a4745-dd6f-413d-8623-5b04df7644f5
 spec:
   ingressClassName: alb
-  tls:
-    - hosts:
-      - my-app.itsag3t1.com
   rules:
-    - http:
+    - host: my-app.itsag3t1.com
+      http:
         paths:
         - path: /
           pathType: Prefix
@@ -64,4 +64,4 @@ spec:
             service:
               name: game-2048
               port:
-                name: http
+                name: https
