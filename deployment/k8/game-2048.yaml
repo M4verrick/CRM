@@ -36,7 +36,7 @@ spec:
       port: 80
       targetPort: http
       protocol: TCP
-  type: NodePort
+  type: ClusterIP
   selector:
     app.kubernetes.io/name: game-2048
 ---
@@ -48,6 +48,7 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/target-type: ip
     external-dns.alpha.kubernetes.io/hostname: ssl.itsag3t1.com
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
@@ -63,4 +64,4 @@ spec:
             service:
               name: game-2048
               port:
-                number: 80
+                name: http
