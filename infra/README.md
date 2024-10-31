@@ -1,21 +1,63 @@
-# Karpenter and ArgoCD on Fargate
+# ArgoCD on Amazon EKS
 
-Example on how to deploy Amazon EKS with addons configured via ArgoCD.
-- ArgoCD, Karpenter, ALB, CoreDNS run on Fargate
--
+This example shows how to deploy Amazon EKS with addons configured via ArgoCD
 
-Deploy EKS Cluster
+The example demonstrate how to use private git repository for addons and workload.
+
+The example reads your private ssh key, and creates two secretes to access the git repository for addons and another one for workloads
+
+## Prerequisites
+- Create a Github ssh key file, example assumes the file path `~/.ssh/id_rsa`, update `main.tf` if using a different location
+
+Before you begin, make sure you have the following command line tools installed:
+- git
+- terraform
+- kubectl
+- argocd
+
+### Fork the Addon GitOps Repo
+1. Fork the git repository for addons [here](https://github.com/gitops-bridge-dev/gitops-bridge-argocd-control-plane-template).
+2. Update the following environment variables to point to your fork by changing the default values:
+```shell
+export TF_VAR_gitops_addons_org=git@github.com:gitops-bridge-dev
+export TF_VAR_gitops_addons_repo=gitops-bridge-argocd-control-plane-template
+```
+
+## Deploy the EKS Cluster
+Initialize Terraform and deploy the EKS cluster:
 ```shell
 terraform init
-terraform apply
+terraform apply -auto-approve
 ```
-
-Access Terraform output to configure `kubectl` and `argocd`
+Retrieve `kubectl` config, then execute the output command:
 ```shell
-terraform output
+terraform output -raw configure_kubectl
 ```
 
-Destroy EKS Cluster
+
+### Monitor GitOps Progress for Addons
+Wait until all the ArgoCD applications' `HEALTH STATUS` is `Healthy`. Use Crl+C to exit the `watch` command
+```shell
+watch kubectl get applications -n argocd
+```
+
+### Verify the Addons
+Verify that the addons are ready:
+```shell
+kubectl get deployment -n kube-system \
+  aws-load-balancer-controller \
+  metrics-server
+```
+
+## Access ArgoCD
+Access ArgoCD's UI, run the command from the output:
+```shell
+terraform output -raw access_argocd
+```
+
+
+## Destroy the EKS Cluster
+To tear down all the resources and the EKS cluster, run the following command:
 ```shell
 ./destroy.sh
 ```

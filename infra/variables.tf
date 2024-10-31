@@ -1,15 +1,8 @@
-variable "domain_name" {
-  description = "Route 53 domain name"
-  type        = string
-  default = "itsag3t1.com"
-}
-
 variable "ssh_key_path" {
   description = "SSH key path for git access"
   type        = string
   default     = "~/.ssh/id_rsa"
 }
-
 variable "vpc_cidr" {
   description = "VPC CIDR"
   type        = string
@@ -23,25 +16,16 @@ variable "region" {
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
-  default     = "1.29"
+  default     = "1.28"
 }
 variable "addons" {
   description = "Kubernetes addons"
   type        = any
   default = {
     enable_aws_load_balancer_controller = true
-    enable_aws_ebs_csi_resources        = true # generate gp2 and gp3 storage classes for ebs-csi
-    enable_karpenter                    = true
-    enable_keda                         = true
-    enable_cert_manager                 = true
-    enable_aws_cloudwatch_metrics       = true
-    enable_fargate_fluentbit            = true
-    enable_aws_for_fluentbit            = true
-    enable_external_dns                 = true
-    enable_external_secrets             = true
+    enable_metrics_server               = true
   }
 }
-
 # Addons Git
 variable "gitops_addons_org" {
   description = "Git repository org/user contains for addons"
@@ -68,7 +52,6 @@ variable "gitops_addons_path" {
   type        = string
   default     = "bootstrap/control-plane/addons"
 }
-
 # Workloads Git
 variable "gitops_workload_org" {
   description = "Git repository org/user contains for workload"
@@ -83,15 +66,15 @@ variable "gitops_workload_repo" {
 variable "gitops_workload_revision" {
   description = "Git repository revision/branch/ref for workload"
   type        = string
-  default     = "main"
+  default     = "master"
 }
 variable "gitops_workload_basepath" {
   description = "Git repository base path for workload"
   type        = string
-  default     = "deployment/"
+  default     = ""
 }
 variable "gitops_workload_path" {
   description = "Git repository path for workload"
   type        = string
-  default     = "k8s"
+  default     = "deployment/k8"
 }
