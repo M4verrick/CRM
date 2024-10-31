@@ -39,6 +39,13 @@ locals {
   vpc_cidr = var.vpc_cidr
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
+  enable_ingress          = true
+  is_route53_private_zone = false
+  # change to a valid domain name you created a route53 zone
+  # aws route53 create-hosted-zone --name example.com --caller-reference "$(date)"
+  domain_name      = var.domain_name
+  route53_zone_arn = try(data.aws_route53_zone.this[0].arn, "")
+
   git_private_ssh_key = var.ssh_key_path # Update with the git ssh key to be used by ArgoCD
 
   gitops_addons_org      = var.gitops_addons_org
@@ -112,6 +119,9 @@ locals {
       aws_region       = local.region
       aws_account_id   = data.aws_caller_identity.current.account_id
       aws_vpc_id       = module.vpc.vpc_id
+    },
+    {
+      external_dns_domain_filters = "[${local.domain_name}]"
     },
     {
       addons_repo_url      = local.gitops_addons_url
@@ -220,6 +230,8 @@ module "eks_blueprints_addons" {
   enable_velero                       = local.aws_addons.enable_velero
   enable_aws_gateway_api_controller   = local.aws_addons.enable_aws_gateway_api_controller
 
+  external_dns_route53_zone_arns = [local.route53_zone_arn] # ArgoCD Server and UI domain name is registered in Route 53
+
   tags = local.tags
 }
 
@@ -295,3 +307,41 @@ module "vpc" {
 
   tags = local.tags
 }
+
+################################################################################
+# Route 53
+################################################################################
+# To get the hosted zone to be use in argocd domain
+data "aws_route53_zone" "this" {
+  count        = local.enable_ingress ? 1 : 0
+  name         = local.domain_name
+  private_zone = local.is_route53_private_zone
+}
+
+
+################################################################################
+# ACM Certificate
+################################################################################
+
+resource "aws_acm_certificate" "cert" {
+  count             = local.enable_ingress ? 1 : 0
+  domain_name       = "*.${local.domain_name}"
+  validation_method = "DNS"
+}
+
+resource "aws_route53_record" "validation" {
+  count           = local.enable_ingress ? 1 : 0
+  zone_id         = data.aws_route53_zone.this[0].zone_id
+  name            = tolist(aws_acm_certificate.cert[0].domain_validation_options)[0].resource_record_name
+  type            = tolist(aws_acm_certificate.cert[0].domain_validation_options)[0].resource_record_type
+  records         = [tolist(aws_acm_certificate.cert[0].domain_validation_options)[0].resource_record_value]
+  ttl             = 60
+  allow_overwrite = true
+}
+
+resource "aws_acm_certificate_validation" "this" {
+  count                   = local.enable_ingress ? 1 : 0
+  certificate_arn         = aws_acm_certificate.cert[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
+}
+
