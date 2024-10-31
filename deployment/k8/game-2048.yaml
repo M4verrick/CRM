@@ -32,7 +32,7 @@ metadata:
   name: game-2048
 spec:
   ports:
-    - name: https
+    - name: http
       port: 80
       targetPort: http
       protocol: TCP
