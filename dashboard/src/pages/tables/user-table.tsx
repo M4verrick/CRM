@@ -4,8 +4,12 @@ import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Dropdown, Space, Tag } from 'antd';
 import React from 'react';
 
+// TODO: make the searchable params and edit function in Protable functional,
+
 // cognito integration
 import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
 
 // Import AWS types
 type AWSCognitoUserType = CognitoIdentityServiceProvider.UserType;
@@ -107,13 +111,13 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     title: 'First Name',
     dataIndex: 'given_name',
     copyable: true,
-    ellipsis: true,
+    width: 140,
   },
   {
     title: 'Last Name',
     dataIndex: 'family_name',
     copyable: true,
-    ellipsis: true,
+    width: 140,
   },
   {
     title: 'Email',
@@ -125,8 +129,8 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     title: 'Email Verified',
     dataIndex: 'emailVerified',
     valueEnum: {
-      true: { text: 'true'},
-      false: { text: 'false'},
+      true: { text: 'true' },
+      false: { text: 'false' },
     }
   },
   {
@@ -148,7 +152,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     copyable: true,
     ellipsis: true,
     hideInTable: true,
-    
+
   },
   {
     title: 'Enabled',
@@ -156,8 +160,8 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     filters: true,
     onFilter: true,
     valueEnum: {
-      true: { text: 'true'},
-      false: { text: 'false'},
+      true: { text: 'true' },
+      false: { text: 'false' },
     }
   },
   {
@@ -191,28 +195,53 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     valueType: 'date',
     sorter: true
   },
+  {
+    title: 'Options',
+    valueType: 'option',
+    key: 'option',
+    render: (text, record, _, action) => [
+      <a
+        key="editable"
+        onClick={() => {
+          // action?.startEditable?.(record.id);
+        }}
+      >
+        edit
+      </a>,
+      <a
+        key="editable"
+        onClick={() => {
+          // action?.startEditable?.(record.id);
+        }}
+      >
+        delete
+      </a>,
+    ],
+  },
 ];
 
 export default () => {
   return (
-    <ProTable<CognitoUserTableItem>
-      columns={columns}
-      request={async (params, sort, filter) => {
-        return fetchUsers({
-      UserPoolId: "ap-southeast-1_ya55bZ0sg",
-      Limit: 20,
-    });
-      }}
-      pagination={{
-        pageSize: 10,
-        current: 1
-      }}
-      rowKey="username"
-      search={{
-        labelWidth: 'auto'
-      }}
-      dateFormatter="string"
-      headerTitle="Cognito Users"
-    />
+    <ConfigProvider locale={enUS}>
+      <ProTable<CognitoUserTableItem>
+        columns={columns}
+        request={async (params, sort, filter) => {
+          return fetchUsers({
+            UserPoolId: "ap-southeast-1_ya55bZ0sg",
+            Limit: 20,
+          });
+        }}
+        pagination={{
+          pageSize: 10,
+          current: 1
+        }}
+        rowKey="username"
+        search={{
+          labelWidth: 'auto'
+        }}
+        dateFormatter="string"
+        headerTitle="Cognito Users"
+      />
+    </ConfigProvider>
   );
 };
