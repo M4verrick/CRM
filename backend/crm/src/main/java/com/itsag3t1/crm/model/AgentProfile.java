@@ -1,26 +1,24 @@
-    package com.itsag3t1.crm.model;
-    import jakarta.persistence.*;
-    import lombok.Getter;
-    import lombok.Setter;
+package com.itsag3t1.crm.model;
 
-    import java.io.Serializable;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-    @Getter
-    @Setter
-    @Entity
-    @Table(name = "agent_profile",
-        uniqueConstraints = {@UniqueConstraint(columnNames = "profile_id")}) // Ensures each client has only one agent
-    public class AgentProfile implements Serializable {
+import java.io.Serializable;
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
-        private Long id;
+@Getter
+@Setter
+@Entity
+@Table(name = "agent_profile")
+public class AgentProfile implements Serializable {
 
-        @Column(name = "agent_id", nullable = false)
-        private String agentId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-        @JoinColumn(name = "profile_id", referencedColumnName = "id", nullable = false, unique = true) // Enforces one agent per client
-        private Long profileId;
+    @Column(name = "agent_id", nullable = false)
+    private String agentId;
 
-        
-    }
+    @Column(name = "profile_id", nullable = false)  // Removed unique constraint
+    private Long profileId;
+}
