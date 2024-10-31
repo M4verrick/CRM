@@ -8,4 +8,4 @@ services:
       - SERVICES=logs,ses
       - DEFAULT_REGION=ap-southeast-1
     volumes:
-      - "./scripts/localstack/cloudwatch.sh:/etc/localstack/init/ready.d/init-aws.sh"
+      - "/scripts/localstack/cloudwatch.sh:/etc/localstack/init/ready.d/cloudwatch.sh"
