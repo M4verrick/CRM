@@ -13,24 +13,24 @@
             </encoder>
         </appender>
 
-        <appender name="CLOUDWATCH" class="com.itsag3t1.crm.logger.CloudWatchAppender">
-            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-                <level>INFO</level>
-            </filter>
-            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-                <providers>
-                    <timestamp/>
-                    <loggerName/>
-                    <logLevel/>
-                    <message/>
-                    <mdc/>
-                </providers>
-            </encoder>
-        </appender>
+<!--        <appender name="CLOUDWATCH" class="com.itsag3t1.crm.logger.CloudWatchAppender">-->
+<!--            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+<!--                <level>INFO</level>-->
+<!--            </filter>-->
+<!--            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">-->
+<!--                <providers>-->
+<!--                    <timestamp/>-->
+<!--                    <loggerName/>-->
+<!--                    <logLevel/>-->
+<!--                    <message/>-->
+<!--                    <mdc/>-->
+<!--                </providers>-->
+<!--            </encoder>-->
+<!--        </appender>-->
 
         <root level="info">
             <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="CLOUDWATCH"/>
+<!--            <appender-ref ref="CLOUDWATCH"/>-->
         </root>
     </springProfile>
 
