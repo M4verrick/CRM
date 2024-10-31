@@ -4,6 +4,7 @@ import com.itsag3t1.crm.exception.DatabaseException;
 import com.itsag3t1.crm.exception.InvalidDataException;
 import com.itsag3t1.crm.exception.ResourceNotFoundException;
 import com.itsag3t1.crm.model.ClientAccount;
+import com.itsag3t1.crm.model.Profile;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
 import com.itsag3t1.crm.repository.AgentProfileRepository;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,7 +32,7 @@ public class ClientAccountService {
         validateAccountData(account);
 
         // Check if the clientId is associated with the agentId
-        if (!isClientAssociatedWithAgent(account.getClientId(), agentId)) {
+        if (!isClientAssociatedWithAgent(account.getAccountId(), agentId)) {
             throw new InvalidDataException("Agent is not authorized to create an account for this client");
         }
         // Set initial deposit to 0.0 if it's null
@@ -47,7 +49,7 @@ public class ClientAccountService {
             savedAccount = accountRepository.save(account);
             // Log the creation after the account is saved
             MDC.put("agent_id", agentId);
-            MDC.put("client_id", savedAccount.getClientId().toString());
+            MDC.put("client_id", savedAccount.getAccountId().toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
             log.info("{} created {} account at {}", MDC.get("agent_id"), MDC.get("client_id"), MDC.get("date_time"));
@@ -60,19 +62,23 @@ public class ClientAccountService {
         }
     }
 
+    public List<ClientAccount> getAllClientAccounts() {
+        return accountRepository.findAll();
+    }
+
     public boolean deleteAccount(Long accountId, String agentId) {
         Optional<ClientAccount> account;
         // Check if the clientId is associated with the agentId
         try {
             account = accountRepository.findById(accountId);
             if (account.isPresent()) {
-                if (!isClientAssociatedWithAgent(account.get().getClientId(), agentId)) {
+                if (!isClientAssociatedWithAgent(account.get().getAccountId(), agentId)) {
                     throw new InvalidDataException("Agent is not authorized to create an account for this client");
                 }
                 accountRepository.deleteById(accountId);
                 // Log the deletion after the account is deleted
                 MDC.put("agent_id", agentId);
-                MDC.put("client_id", account.get().getClientId().toString());
+                MDC.put("client_id", account.get().getAccountId().toString());
                 MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
                 log.info("{} deleted {} account at {}", MDC.get("agent_id"), MDC.get("client_id"),
@@ -89,7 +95,7 @@ public class ClientAccountService {
     }
 
     private void validateAccountData(ClientAccount account) {
-        if (account.getClientId() == null) {
+        if (account.getAccountId() == null) {
             throw new InvalidDataException("Client ID must not be null");
         }
         if (account.getAccountType() == null) {
@@ -108,7 +114,7 @@ public class ClientAccountService {
 
     private boolean isClientAssociatedWithAgent(Long clientId, String agentId) {
         // Check if the clientId exists in the agent's profile mapping
-        return agentProfileRepository.existsByAgentIdAndClientId(agentId, clientId);
+        return agentProfileRepository.existsByAgentIdAndProfile_Id(agentId, clientId);
     }
 
 }
