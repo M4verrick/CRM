@@ -51,6 +51,8 @@ type ListUsersParams = CognitoIdentityServiceProvider.ListUsersRequest;
 
 type CognitoUserTableItem = {
   username: string;
+  given_name: string;
+  family_name: string;
   email: string;
   emailVerified: boolean;
   userId: string;
@@ -63,6 +65,8 @@ type CognitoUserTableItem = {
 const transformUser = (user: AWSCognitoUserType): CognitoUserTableItem => {
   return {
     username: user.Username || '',
+    given_name: user.Attributes?.find(attr => attr.Name === 'given_name')?.Value || '',
+    family_name: user.Attributes?.find(attr => attr.Name === 'family_name')?.Value || '',
     email: user.Attributes?.find(attr => attr.Name === 'email')?.Value || '',
     emailVerified: user.Attributes?.find(attr => attr.Name === 'email_verified')?.Value === 'true',
     userId: user.Attributes?.find(attr => attr.Name === 'sub')?.Value || '',
@@ -80,10 +84,16 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     width: 48
   },
   {
-    title: 'Username',
-    dataIndex: 'username',
+    title: 'First Name',
+    dataIndex: 'given_name',
     copyable: true,
-    ellipsis: true
+    ellipsis: true,
+  },
+  {
+    title: 'Last Name',
+    dataIndex: 'family_name',
+    copyable: true,
+    ellipsis: true,
   },
   {
     title: 'Email',
@@ -126,14 +136,18 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     title: 'Created At',
     dataIndex: 'created',
     valueType: 'date',
+    hideInSearch: true,
+    hideInTable: true,
     sorter: true
   },
   {
     title: 'Last Modified',
     dataIndex: 'lastModified',
+    hideInSearch: true,
+    hideInTable: true,
     valueType: 'date',
     sorter: true
-  }
+  },
 ];
 
 export default () => {
