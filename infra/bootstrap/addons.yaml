@@ -7,10 +7,15 @@ spec:
   syncPolicy:
     preserveResourcesOnDeletion: true
   generators:
-    - clusters: {}
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: akuity.io/argo-cd-cluster-name
+              operator: NotIn
+              values: [in-cluster]
   template:
     metadata:
-      name: cluster-addons
+      name: 'bootstrap-addons'
     spec:
       project: default
       source:
@@ -19,8 +24,9 @@ spec:
         targetRevision: '{{metadata.annotations.addons_repo_revision}}'
         directory:
           recurse: true
+          exclude: exclude/*
       destination:
-        namespace: argocd
+        namespace: 'argocd'
         name: '{{name}}'
       syncPolicy:
         automated: {}

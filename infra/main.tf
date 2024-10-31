@@ -4,8 +4,6 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
-provider "bcrypt" {}
-
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
@@ -33,20 +31,13 @@ provider "kubernetes" {
 }
 
 locals {
-  name   = "itsag3t1"
+  name   = "ex-${replace(basename(path.cwd), "_", "-")}"
   region = var.region
 
   cluster_version = var.kubernetes_version
 
   vpc_cidr = var.vpc_cidr
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
-
-  enable_ingress          = true
-  is_route53_private_zone = false
-  # change to a valid domain name you created a route53 zone
-  # aws route53 create-hosted-zone --name example.com --caller-reference "$(date)"
-  domain_name = var.domain_name
-  crm_domain_arn = try(data.aws_route53_zone.this[0].arn, "")
 
   git_private_ssh_key = var.ssh_key_path # Update with the git ssh key to be used by ArgoCD
 
@@ -57,10 +48,11 @@ locals {
   gitops_addons_revision = var.gitops_addons_revision
 
   gitops_workload_org      = var.gitops_workload_org
-  gitops_workload_url      = "${var.gitops_workload_org}/${var.gitops_workload_repo}"
+  gitops_workload_repo     = var.gitops_workload_repo
   gitops_workload_basepath = var.gitops_workload_basepath
   gitops_workload_path     = var.gitops_workload_path
   gitops_workload_revision = var.gitops_workload_revision
+  gitops_workload_url      = "${local.gitops_workload_org}/${local.gitops_workload_repo}"
 
   aws_addons = {
     enable_cert_manager                          = try(var.addons.enable_cert_manager, false)
@@ -132,7 +124,7 @@ locals {
       workload_repo_basepath = local.gitops_workload_basepath
       workload_repo_path     = local.gitops_workload_path
       workload_repo_revision = local.gitops_workload_revision
-    },
+    }
   )
 
   argocd_apps = {
@@ -142,7 +134,7 @@ locals {
 
   tags = {
     Blueprint  = local.name
-    GithubRepo = "github.com/cs301-itsa/project-2024-25t1-g3-t1"
+    GithubRepo = "github.com/gitops-bridge-dev/gitops-bridge"
   }
 }
 
@@ -187,50 +179,14 @@ module "gitops_bridge_bootstrap" {
 
   cluster = {
     cluster_name = module.eks.cluster_name
-    metadata = local.addons_metadata
-    addons   = local.addons
+    metadata     = local.addons_metadata
+    addons       = local.addons
   }
-  apps = local.argocd_apps
-  argocd = {
-    create_namespace = false
-    set_sensitive = [
-      {
-        name  = "configs.secret.argocdServerAdminPassword"
-        value = bcrypt_hash.argo.id
-      }
-    ]
-  }
-
-  # wait for fargate profile to be done before installing argocd
-  depends_on = [ module.eks, kubernetes_namespace.argocd, kubernetes_secret.git_secrets ]
+  apps       = local.argocd_apps
+  argocd     = { create_namespace = false }
+  depends_on = [kubernetes_namespace.argocd, kubernetes_secret.git_secrets]
 }
 
-################################################################################
-# ArgoCD Admin Password credentials with Secrets Manager
-# Login to AWS Secrets manager with the same role as Terraform to extract the ArgoCD admin password with the secret name as "argocd"
-################################################################################
-resource "random_password" "argocd" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
-# Argo requires the password to be bcrypt, we use custom provider of bcrypt,
-# as the default bcrypt function generates diff for each terraform plan
-resource "bcrypt_hash" "argo" {
-  cleartext = random_password.argocd.result
-}
-
-#tfsec:ignore:aws-ssm-secret-use-customer-key
-resource "aws_secretsmanager_secret" "argocd" {
-  name                    = "argocd"
-  recovery_window_in_days = 0 # Set to zero for this example to force delete during Terraform destroy
-}
-
-resource "aws_secretsmanager_secret_version" "argocd" {
-  secret_id     = aws_secretsmanager_secret.argocd.id
-  secret_string = random_password.argocd.result
-}
 
 ################################################################################
 # EKS Blueprints Addons
@@ -264,45 +220,6 @@ module "eks_blueprints_addons" {
   enable_velero                       = local.aws_addons.enable_velero
   enable_aws_gateway_api_controller   = local.aws_addons.enable_aws_gateway_api_controller
 
-  # We want to wait for the Fargate profiles to be deployed first
-  create_delay_dependencies = [for prof in module.eks.fargate_profiles : prof.fargate_profile_arn]
-
-  eks_addons = {
-    coredns = {
-      configuration_values = jsonencode({
-        computeType = "Fargate"
-        # Ensure that the we fully utilize the minimum amount of resources that are supplied by
-        # Fargate https://docs.aws.amazon.com/eks/latest/userguide/fargate-pod-configuration.html
-        # Fargate adds 256 MB to each pod's memory reservation for the required Kubernetes
-        # components (kubelet, kube-proxy, and containerd). Fargate rounds up to the following
-        # compute configuration that most closely matches the sum of vCPU and memory requests in
-        # order to ensure pods always have the resources that they need to run.
-        resources = {
-          limits = {
-            cpu = "0.5"
-            # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
-            # request/limit to ensure we can fit within that task
-            memory = "2G"
-          }
-          requests = {
-            cpu = "0.5"
-            # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
-            # request/limit to ensure we can fit within that task
-            memory = "2G"
-          }
-        }
-      })
-    }
-    kube-proxy = {}
-  }
-
-  karpenter_node = {
-    # Use static name so that it matches what is defined in `karpenter.yaml` example manifest
-    iam_role_use_name_prefix = false
-  }
-
-  external_dns_route53_zone_arns = [local.crm_domain_arn] # ArgoCD Server and UI domain name is registered in Route 53
-
   tags = local.tags
 }
 
@@ -322,43 +239,15 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
-  # Fargate profiles use the cluster primary security group so these are not utilized
-  create_cluster_security_group = false
-  create_node_security_group    = false
+  eks_managed_node_groups = {
+    initial = {
+      instance_types = ["t3.medium"]
 
-  manage_aws_auth_configmap = true
-  aws_auth_roles = [
-    # We need to add in the Karpenter node IAM role for nodes launched by Karpenter
-    {
-      rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
-      username = "system:node:{{EC2PrivateDNSName}}"
-      groups = [
-        "system:bootstrappers",
-        "system:nodes",
-      ]
-    },
-  ]
-
-  fargate_profiles = {
-    karpenter = {
-      selectors = [
-        { namespace = "karpenter" }
-      ]
-    }
-    kube_system = {
-      name = "kube-system"
-      selectors = [
-        { namespace = "kube-system" }
-      ]
-    }
-    argocd = {
-      name = "argocd"
-      selectors = [
-        { namespace = "argocd" }
-      ]
+      min_size     = 3
+      max_size     = 10
+      desired_size = 3
     }
   }
-
   # EKS Addons
   cluster_addons = {
     vpc-cni = {
@@ -375,34 +264,7 @@ module "eks" {
         }
       })
     }
-    aws-ebs-csi-driver = {
-      service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
-    }
   }
-
-  tags = merge(local.tags, {
-    # NOTE - if creating multiple security groups with this module, only tag the
-    # security group that Karpenter should utilize with the following tag
-    # (i.e. - at most, only one security group should have this tag in your account)
-    "karpenter.sh/discovery" = local.name
-  })
-}
-
-module "ebs_csi_driver_irsa" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "~> 5.20"
-
-  role_name_prefix = "${module.eks.cluster_name}-ebs-csi-"
-
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-
   tags = local.tags
 }
 
@@ -429,47 +291,7 @@ module "vpc" {
 
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = 1
-    # Tags subnets for Karpenter auto-discovery
-    "karpenter.sh/discovery" = local.name
   }
 
   tags = local.tags
-}
-
-
-################################################################################
-# Route 53
-################################################################################
-# To get the hosted zone to be use in argocd domain
-data "aws_route53_zone" "this" {
-  count        = local.enable_ingress ? 1 : 0
-  name         = local.domain_name
-  private_zone = local.is_route53_private_zone
-}
-
-
-################################################################################
-# ACM Certificate
-################################################################################
-
-resource "aws_acm_certificate" "cert" {
-  count             = local.enable_ingress ? 1 : 0
-  domain_name       = "*.${local.domain_name}"
-  validation_method = "DNS"
-}
-
-resource "aws_route53_record" "validation" {
-  count           = local.enable_ingress ? 1 : 0
-  zone_id         = data.aws_route53_zone.this[0].zone_id
-  name            = tolist(aws_acm_certificate.cert[0].domain_validation_options)[0].resource_record_name
-  type            = tolist(aws_acm_certificate.cert[0].domain_validation_options)[0].resource_record_type
-  records         = [tolist(aws_acm_certificate.cert[0].domain_validation_options)[0].resource_record_value]
-  ttl             = 60
-  allow_overwrite = true
-}
-
-resource "aws_acm_certificate_validation" "this" {
-  count                   = local.enable_ingress ? 1 : 0
-  certificate_arn         = aws_acm_certificate.cert[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
 }

@@ -5,16 +5,17 @@ metadata:
   namespace: argocd
 spec:
   syncPolicy:
-    preserveResourcesOnDeletion: false
+    preserveResourcesOnDeletion: true
   generators:
-    - clusters: {}
+    - clusters:
+        selector:
+          matchExpressions:
+            - key: akuity.io/argo-cd-cluster-name
+              operator: NotIn
+              values: [in-cluster]
   template:
     metadata:
-      name: workloads
-      finalizers:
-        # This finalizer is for demo purposes, in production remove apps using argocd CLI "argocd app delete workload --cascade"
-        # When you invoke argocd app delete with --cascade, the finalizer is added automatically.
-        - resources-finalizer.argocd.argoproj.io
+      name: 'workload'
     spec:
       project: default
       source:
@@ -22,13 +23,9 @@ spec:
         path: '{{metadata.annotations.workload_repo_basepath}}{{metadata.annotations.workload_repo_path}}'
         targetRevision: '{{metadata.annotations.workload_repo_revision}}'
       destination:
+        namespace: 'workload'
         name: '{{name}}'
       syncPolicy:
-        automated:
-          allowEmpty: true
+        automated: {}
         syncOptions:
-        - CreateNamespace=true
-        retry:
-          backoff:
-            duration: 1m
-          limit: 60
+          - CreateNamespace=true
