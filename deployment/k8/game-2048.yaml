@@ -22,8 +22,8 @@ spec:
       - image: public.ecr.aws/l6m2t8p7/docker-2048
         name: game-2048
         ports:
-        - containerPort: 443
-          name: https
+        - containerPort: 80
+          name: http
 ---
 apiVersion: v1
 kind: Service
@@ -32,9 +32,9 @@ metadata:
   name: game-2048
 spec:
   ports:
-    - name: https
-      port: 443
-      targetPort: https
+    - name: http
+      port: 80
+      targetPort: http
       protocol: TCP
   type: ClusterIP
   selector:
@@ -64,4 +64,4 @@ spec:
             service:
               name: game-2048
               port:
-                name: https
+                name: http

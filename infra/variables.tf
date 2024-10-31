@@ -30,6 +30,9 @@ variable "addons" {
     enable_aws_load_balancer_controller = true
     enable_metrics_server               = true
     enable_external_dns                 = true
+    enable_cert_manager                 = true
+    enable_ingress_nginx                = true
+
   }
 }
 # Addons Git
