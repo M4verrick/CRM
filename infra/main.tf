@@ -33,7 +33,7 @@ provider "kubernetes" {
 }
 
 locals {
-  name   = "${replace(basename(path.cwd), "_", "-")}"
+  name   = "itsag3t1"
   region = var.region
 
   cluster_version = var.kubernetes_version
@@ -45,11 +45,8 @@ locals {
   is_route53_private_zone = false
   # change to a valid domain name you created a route53 zone
   # aws route53 create-hosted-zone --name example.com --caller-reference "$(date)"
-  domain_name      = var.domain_name
-  argocd_subdomain = "argocd"
-  argocd_host      = "${local.argocd_subdomain}.${local.domain_name}"
-  route53_zone_arn = try(data.aws_route53_zone.this[0].arn, "")
-
+  domain_name = var.domain_name
+  crm_domain_arn = try(data.aws_route53_zone.this[0].arn, "")
 
   git_private_ssh_key = var.ssh_key_path # Update with the git ssh key to be used by ArgoCD
 
@@ -64,18 +61,6 @@ locals {
   gitops_workload_basepath = var.gitops_workload_basepath
   gitops_workload_path     = var.gitops_workload_path
   gitops_workload_revision = var.gitops_workload_revision
-
-  gitops_crm_frontend_org      = var.gitops_crm_frontend_org
-  gitops_crm_frontend_url      = "${var.gitops_crm_frontend_org}/${var.gitops_crm_frontend_repo}"
-  gitops_crm_frontend_basepath = var.gitops_crm_frontend_basepath
-  gitops_crm_frontend_path     = var.gitops_crm_frontend_path
-  gitops_crm_frontend_revision = var.gitops_crm_frontend_revision
-
-  gitops_crm_backend_org      = var.gitops_crm_backend_org
-  gitops_crm_backend_url      = "${var.gitops_crm_backend_org}/${var.gitops_crm_backend_repo}"
-  gitops_crm_backend_basepath = var.gitops_crm_backend_basepath
-  gitops_crm_backend_path     = var.gitops_crm_backend_path
-  gitops_crm_backend_revision = var.gitops_crm_backend_revision
 
   aws_addons = {
     enable_cert_manager                          = try(var.addons.enable_cert_manager, false)
@@ -148,18 +133,6 @@ locals {
       workload_repo_path     = local.gitops_workload_path
       workload_repo_revision = local.gitops_workload_revision
     },
-    {
-      crm_frontend_repo_url      = local.gitops_crm_frontend_url
-      crm_frontend_repo_basepath = local.gitops_crm_frontend_basepath
-      crm_frontend_repo_path     = local.gitops_crm_frontend_path
-      crm_frontend_repo_revision = local.gitops_crm_frontend_revision
-    },
-    {
-      crm_backend_repo_url      = local.gitops_crm_backend_url
-      crm_backend_repo_basepath = local.gitops_crm_backend_basepath
-      crm_backend_repo_path     = local.gitops_crm_backend_path
-      crm_backend_repo_revision = local.gitops_crm_backend_revision
-    }
   )
 
   argocd_apps = {
@@ -193,16 +166,6 @@ resource "kubernetes_secret" "git_secrets" {
     git-workloads = {
       type          = "git"
       url           = local.gitops_workload_org
-      sshPrivateKey = file(pathexpand(local.git_private_ssh_key))
-    }
-    git-crm-frontend = {
-      type          = "git"
-      url           = local.gitops_crm_frontend_org
-      sshPrivateKey = file(pathexpand(local.git_private_ssh_key))
-    }
-    git-crm-backend = {
-      type          = "git"
-      url           = local.gitops_crm_backend_org
       sshPrivateKey = file(pathexpand(local.git_private_ssh_key))
     }
   }
@@ -316,16 +279,16 @@ module "eks_blueprints_addons" {
         # order to ensure pods always have the resources that they need to run.
         resources = {
           limits = {
-            cpu = "0.25"
+            cpu = "0.5"
             # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
             # request/limit to ensure we can fit within that task
-            memory = "256M"
+            memory = "2G"
           }
           requests = {
-            cpu = "0.25"
+            cpu = "0.5"
             # We are targetting the smallest Task size of 512Mb, so we subtract 256Mb from the
             # request/limit to ensure we can fit within that task
-            memory = "256M"
+            memory = "2G"
           }
         }
       })
@@ -337,6 +300,8 @@ module "eks_blueprints_addons" {
     # Use static name so that it matches what is defined in `karpenter.yaml` example manifest
     iam_role_use_name_prefix = false
   }
+
+  external_dns_route53_zone_arns = [local.crm_domain_arn] # ArgoCD Server and UI domain name is registered in Route 53
 
   tags = local.tags
 }
@@ -390,18 +355,6 @@ module "eks" {
       name = "argocd"
       selectors = [
         { namespace = "argocd" }
-      ]
-    }
-    crm-frontend = {
-      name = "crm-frontend"
-      selectors = [
-        { namespace = "crm-frontend" }
-      ]
-    }
-    crm-backend = {
-      name = "crm-backend"
-      selectors = [
-        { namespace = "crm-backend" }
       ]
     }
   }
@@ -520,4 +473,3 @@ resource "aws_acm_certificate_validation" "this" {
   certificate_arn         = aws_acm_certificate.cert[0].arn
   validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
 }
-

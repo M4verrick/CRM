@@ -37,7 +37,6 @@ variable "addons" {
     enable_aws_cloudwatch_metrics       = true
     enable_fargate_fluentbit            = true
     enable_aws_for_fluentbit            = true
-    enable_aws_gateway_api_controller   = true
     enable_external_dns                 = true
     enable_external_secrets             = true
   }
@@ -89,72 +88,10 @@ variable "gitops_workload_revision" {
 variable "gitops_workload_basepath" {
   description = "Git repository base path for workload"
   type        = string
-  default     = "infra/"
+  default     = "deployment/"
 }
 variable "gitops_workload_path" {
   description = "Git repository path for workload"
   type        = string
-  default     = "karpenter/k8s"
-}
-
-# CRM Frontend Git
-variable "gitops_crm_frontend_org" {
-  description = "Git repository org/user contains for CRM Frontend"
-  type        = string
-  default     = "git@github.com:cs301-itsa"
-}
-
-variable "gitops_crm_frontend_repo" {
-  description = "Git repository contains for CRM Frontend"
-  type        = string
-  default     = "project-2024-25t1-g3-t1"
-}
-
-variable "gitops_crm_frontend_revision" {
-  description = "Git repository revision/branch/ref for CRM Frontend"
-  type        = string
-  default     = "main"
-}
-
-variable "gitops_crm_frontend_basepath" {
-  description = "Git repository base path for CRM Frontend"
-  type        = string
-  default     = "deployment/"
-}
-
-variable "gitops_crm_frontend_path" {
-  description = "Git repository path for CRM Frontend"
-  type        = string
-  default     = "crm-frontend/k8s"
-}
-
-# CRM Backend Git
-variable "gitops_crm_backend_org" {
-  description = "Git repository org/user contains for CRM Backend"
-  type        = string
-  default     = "git@github.com:cs301-itsa"
-}
-
-variable "gitops_crm_backend_repo" {
-  description = "Git repository contains for CRM Backend"
-  type        = string
-  default     = "project-2024-25t1-g3-t1"
-}
-
-variable "gitops_crm_backend_revision" {
-  description = "Git repository revision/branch/ref for CRM Backend"
-  type        = string
-  default     = "main"
-}
-
-variable "gitops_crm_backend_basepath" {
-  description = "Git repository base path for CRM Backend"
-  type        = string
-  default     = "deployment/"
-}
-
-variable "gitops_crm_backend_path" {
-  description = "Git repository path for CRM Backend"
-  type        = string
-  default     = "crm-backend/k8s"
+  default     = "k8s"
 }
