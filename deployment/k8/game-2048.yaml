@@ -65,4 +65,3 @@ spec:
               name: game-2048
               port:
                 name: http
-                
