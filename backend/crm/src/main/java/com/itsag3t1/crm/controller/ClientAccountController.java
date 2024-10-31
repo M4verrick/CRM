@@ -3,17 +3,27 @@ package com.itsag3t1.crm.controller;
 //import com.itsag3t1.crm.auth.CurrentAuthContext;
 
 import com.itsag3t1.crm.model.ClientAccount;
+import com.itsag3t1.crm.model.Profile;
 import com.itsag3t1.crm.service.ClientAccountService;
+import com.mysql.cj.xdevapi.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
 public class ClientAccountController {
     @Autowired
     private ClientAccountService accountService;
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ClientAccount>> getAllClientAccounts() {
+        List<ClientAccount> clientAccounts = accountService.getAllClientAccounts();
+        return ResponseEntity.ok(clientAccounts);
+    }
 
     // Adding the AgentID as a request header for account creation
     @PostMapping
