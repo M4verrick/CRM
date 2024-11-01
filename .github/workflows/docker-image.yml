@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "master" ]
 
+env:
+  AWS_REGION: ap-southeast-1
+
 jobs:
 
   build:
@@ -31,8 +34,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: public.ecr.aws/t2p9h2o6
-          IMAGE_TAG: ${{ github.sha }}
-          AWS_REGION: ap-southeast-1                   # set this to your preferred AWS region, e.g. us-west-1
+          IMAGE_TAG: ${{ github.sha }}                 # set this to your preferred AWS region, e.g. us-west-1
           ECR_REPOSITORY: itsag3t1/backend
         run: |
           # Build a docker container and
