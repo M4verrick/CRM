@@ -1,26 +1,26 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: game-2048
+  name: itsag3t1-crm
 spec: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: game-2048
-  name: game-2048
+  namespace: itsag3t1-crm
+  name: itsag3t1-crm
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: game-2048
+      app.kubernetes.io/name: itsag3t1-crm
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: game-2048
+        app.kubernetes.io/name: itsag3t1-crm
     spec:
       containers:
-      - image: public.ecr.aws/l6m2t8p7/docker-2048
-        name: game-2048
+      - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:79ae28d28af24f126165c85248021d2e248c4c44
+        name: itsag3t1-crm
         ports:
         - containerPort: 80
           name: http
@@ -28,8 +28,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: game-2048
-  name: game-2048
+  namespace: itsag3t1-crm
+  name: itsag3t1-crm
 spec:
   ports:
     - name: http
@@ -38,13 +38,13 @@ spec:
       protocol: TCP
   type: ClusterIP
   selector:
-    app.kubernetes.io/name: game-2048
+    app.kubernetes.io/name: itsag3t1-crm
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: game-2048
-  name: game-2048
+  namespace: itsag3t1-crm
+  name: itsag3t1-crm
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     kubernetes.io/ingress.class: alb
@@ -62,6 +62,6 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: game-2048
+              name: itsag3t1-crm
               port:
                 name: http
