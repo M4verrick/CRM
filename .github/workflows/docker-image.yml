@@ -27,7 +27,7 @@ jobs:
         run: docker build ./backend/crm --file ./backend/crm/Dockerfile --tag backend:${{ github.sha }}
 
       - name: Tag the Docker image
-        run: docker tag itsag3t1/backend:latest public.ecr.aws/t2p9h2o6/itsag3t1/backend:latest
+        run: docker tag itsag3t1/backend:${{ github.sha }} public.ecr.aws/t2p9h2o6/itsag3t1/backend:latest
 
       - name: Push the Docker image
         run: docker push public.ecr.aws/t2p9h2o6/itsag3t1/backend:latest
