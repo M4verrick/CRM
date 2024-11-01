@@ -52,7 +52,7 @@ metadata:
     external-dns.alpha.kubernetes.io/hostname: game.itsag3t1.com
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/a07b827f-3e63-4ffa-8c4e-eda3da1a862c
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/d50cd17f-ab25-498c-b537-a8ad0a2f0b89
 spec:
   ingressClassName: alb
   rules:
