@@ -1,26 +1,13 @@
-# Use the official Node.js image as the base image
-FROM node:18
+FROM node:21-alpine3.19
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the package.json and yarn.lock files to the working directory
-COPY package.json yarn.lock ./
+COPY yarn.lock package.json ./
 
-# Install the dependencies
 RUN yarn install
 
-# Copy the rest of the application code to the working directory
 COPY . .
 
-# Build the React application
-RUN yarn build
+EXPOSE 3000
 
-# Install http-server globally
-RUN yarn global add http-server
-
-# Expose port 8080 to the outside world
-EXPOSE 8080
-
-# Start http-server to serve the built application
-CMD ["http-server", "build", "-p", "8080"]
+CMD ["yarn", "start", "--host", "0.0.0.0"]
