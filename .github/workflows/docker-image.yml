@@ -36,7 +36,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
           REGISTRY_ALIAS: t2p9h2o6
           IMAGE_TAG: ${{ github.sha }}                 # set this to your preferred AWS region, e.g. us-west-1
-          ECR_REPOSITORY: itsag3t1/backend
+          REPOSITORY: itsag3t1/backend
         run: |
           # Build a docker container and
           # push it to ECR so that it can
