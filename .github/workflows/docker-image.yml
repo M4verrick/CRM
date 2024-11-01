@@ -24,7 +24,7 @@ jobs:
         run: aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 351854075744.dkr.ecr.ap-southeast-1.amazonaws.com
 
       - name: Build the Docker image
-        run: docker build ./backend/crm --file ./backend/crm/Dockerfile --tag backend:${{ github.sha }}
+        run: docker build ./backend/crm --file ./backend/crm/Dockerfile --tag itsag3t1/backend:${{ github.sha }}
 
       - name: Tag the Docker image
         run: docker tag itsag3t1/backend:${{ github.sha }} public.ecr.aws/t2p9h2o6/itsag3t1/backend:latest
