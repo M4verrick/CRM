@@ -2,6 +2,8 @@ import React from 'react';
 import "./Form.css";
 import { PageContainer } from '@ant-design/pro-components';
 import { Form, Button, DatePicker, Input, Select, Card } from "antd";
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
 
 // api useHook
 import { useApi } from 'hooks/useApi'
@@ -54,6 +56,7 @@ const NewAccount = () => {
   return (
     <PageContainer>
     <Card>
+    <ConfigProvider locale={enUS}>
     <div className="Form">
       <header className="Form-header">
         <Form
@@ -164,6 +167,7 @@ const NewAccount = () => {
         </Form>
       </header>
     </div>
+    </ConfigProvider>
     </Card>
     </PageContainer>
   );

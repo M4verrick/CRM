@@ -3,6 +3,8 @@ import "./Form.css";
 import { PageContainer } from '@ant-design/pro-components';
 import { Form, Button, Input, Select, Card, Modal } from "antd";
 import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
 
 const NewUser = () => {
   const [form] = Form.useForm();
@@ -114,6 +116,7 @@ const NewUser = () => {
   };
 
   return (
+    <ConfigProvider locale={enUS}>
     <PageContainer>
     <Card>
     <div className="Form">
@@ -199,6 +202,7 @@ const NewUser = () => {
     </div>
     </Card>
     </PageContainer>
+    </ConfigProvider>
   );
 }
 

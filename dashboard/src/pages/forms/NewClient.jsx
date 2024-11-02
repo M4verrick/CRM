@@ -2,9 +2,12 @@ import React from 'react';
 import "./Form.css";
 import { PageContainer } from '@ant-design/pro-components';
 import { Form, Button, Checkbox, DatePicker, Input, Select, Card } from "antd";
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
 
 const NewClient = () => {
   return (
+    <ConfigProvider locale={enUS}>
     <PageContainer>
     <Card>
     <div className="Form">
@@ -152,6 +155,7 @@ const NewClient = () => {
     </div>
     </Card>
     </PageContainer>
+    </ConfigProvider>
   );
 }
 
