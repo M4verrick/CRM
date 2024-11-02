@@ -28,7 +28,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: itsag3t1-crm-backend
+  namespace: itsag3t1-crm
   name: itsag3t1-crm-backend
 spec:
   ports:
