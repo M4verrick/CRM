@@ -4,11 +4,11 @@ import React, { lazy } from 'react';
 import Loadable from 'components/Loadable';
 import Dashboard from 'layout/Dashboard';
 import ProtectedRoute from './ProtectedRoute.jsx';
+import { Button, Result } from 'antd';
+import { Navigate } from 'react-router-dom';
 
 // render pages
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
-
-const Unauthorized = () => <div>You are not authorized to view this page</div>;
 const ProfileTable = Loadable(lazy(() => import('pages/tables/profile-table')));
 const UserTable = Loadable(lazy(() => import('pages/tables/user-table')));
 const ClientTransactionTable = Loadable(lazy(() => import('pages/tables/client-transaction-table')));
@@ -16,6 +16,26 @@ const UserTransactionTable = Loadable(lazy(() => import('pages/tables/user-trans
 const AccountForm = Loadable(lazy(() => import('pages/forms/NewAccount')));
 const ClientForm = Loadable(lazy(() => import('pages/forms/NewClient')));
 const UserForm = Loadable(lazy(() => import('pages/forms/NewUser')));
+
+// result pages
+const Unauthorized = () => {
+  return <div><Result
+    status="403"
+    title="403"
+    subTitle="Sorry, you are not authorized to access this page."
+    extra={<Button type="primary" onClick={() => <Navigate to="/" />}>
+      Back Home
+    </Button>} /></div>;
+}
+const DoesNotExist = () => {
+  return <div><Result
+    status="404"
+    title="404"
+    subTitle="Sorry, the page you visited does not exist."
+    extra={<Button type="primary" onClick={() => <Navigate to="/" />}>
+      Back Home
+    </Button>} /></div>;
+}
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -26,7 +46,7 @@ const MainRoutes = {
     <ProtectedRoute>
       <Dashboard />
     </ProtectedRoute>
-    ),
+  ),
   children: [
     {
       path: '/',
@@ -34,7 +54,7 @@ const MainRoutes = {
         <ProtectedRoute>
           <DashboardDefault />
         </ProtectedRoute>
-        )
+      )
     },
     {
       path: 'ProfileTable',
@@ -47,51 +67,51 @@ const MainRoutes = {
     {
       path: 'UserTable',
       element:
-      (
-        <ProtectedRoute>
-          <UserTable />
-        </ProtectedRoute>
-      )
+        (
+          <ProtectedRoute roles={['admin', 'root-admin']}>
+            <UserTable />
+          </ProtectedRoute>
+        )
     },
     {
       path: 'ClientTransactionTable',
       element:
-      (
-        <ProtectedRoute>
-          <ClientTransactionTable />
-        </ProtectedRoute>
-      )
+        (
+          <ProtectedRoute>
+            <ClientTransactionTable />
+          </ProtectedRoute>
+        )
     },
     {
       path: 'UserTransactionTable',
       element:
-      (
-        <ProtectedRoute>
-          <UserTransactionTable />
-        </ProtectedRoute>
-      )
+        (
+          <ProtectedRoute>
+            <UserTransactionTable />
+          </ProtectedRoute>
+        )
     },
     {
       path: 'AccountForm',
-      element: 
-      (
-        <ProtectedRoute>
-          <AccountForm />
-        </ProtectedRoute>
-      )
+      element:
+        (
+          <ProtectedRoute>
+            <AccountForm />
+          </ProtectedRoute>
+        )
     },
     {
       path: 'ClientForm',
-      element: 
-      (
-        <ProtectedRoute>
-          <ClientForm />
-        </ProtectedRoute>
-      )
+      element:
+        (
+          <ProtectedRoute>
+            <ClientForm />
+          </ProtectedRoute>
+        )
     },
     {
       path: 'UserForm',
-      element:(
+      element: (
         <ProtectedRoute>
           <UserForm />
         </ProtectedRoute>
@@ -100,6 +120,10 @@ const MainRoutes = {
     {
       path: 'unauthorized',
       element: <Unauthorized />,
+    },
+    {
+      path: '*',
+      element: <DoesNotExist />,
     },
   ]
 };
