@@ -2,42 +2,113 @@ import React from 'react';
 import "./Form.css";
 import { PageContainer } from '@ant-design/pro-components';
 import { Form, Button, Input, Select, Card, Modal } from "antd";
-import axios from 'axios';
-
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
 
 const NewUser = () => {
   const [form] = Form.useForm();
 
+  const createUserInCognito = async (userData) => {
+    // Configure the AWS SDK with your credentials and region
+    const cognitoIdentityServiceProvider = new CognitoIdentityServiceProvider({
+      region: 'ap-southeast-1',
+      credentials: {
+        accessKeyId: 'AKIAVD3BDD5QBC4X7FU2',
+        secretAccessKey: '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'
+      }
+    });
+
+    // Set up the parameters for creating a new user
+    const params = {
+      UserPoolId: 'ap-southeast-1_ya55bZ0sg',
+      Username: userData.email,
+      TemporaryPassword: generateTemporaryPassword(),
+      UserAttributes: [
+        {
+          Name: 'email',
+          Value: userData.email
+        },
+        {
+          Name: 'given_name',
+          Value: userData.firstName
+        },
+        {
+          Name: 'family_name',
+          Value: userData.lasttName
+        },
+        {
+          Name: 'email_verified',
+          Value: 'true'
+        }
+      ],
+      MessageAction: 'SUPPRESS' // If you want to handle sending credentials yourself
+    };
+
+    try {
+      // Create the user
+      const createUserResponse = await cognitoIdentityServiceProvider.adminCreateUser(params).promise();
+      
+      // If user creation was successful, add them to their group
+      if (createUserResponse.User) {
+        const addToGroupParams = {
+          UserPoolId: 'ap-southeast-1_ya55bZ0sg',
+          Username: userData.email,
+          GroupName: userData.type // 'agent' or 'admin' from the form
+        };
+
+        await cognitoIdentityServiceProvider.adminAddUserToGroup(addToGroupParams).promise();
+        return createUserResponse.User;
+      }
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
+  };
+
+  const generateTemporaryPassword = () => {
+    // Generate a random temporary password that meets Cognito's requirements
+    const length = 12;
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
+    let password = '';
+    
+    // Ensure at least one of each required character type
+    password += 'A'; // Uppercase
+    password += 'a'; // Lowercase
+    password += '1'; // Number
+    password += '!'; // Special character
+    
+    // Fill the rest randomly
+    for (let i = password.length; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    
+    return password;
+  };
+
   const onFinish = async (values) => {
     try {
-      // Send form data to backend
-      const response = await axios.post('/api/validate-form', values);
-
-      // If validation passes, you can proceed with success actions (e.g., form submission)
+      // Create the user in Cognito
+      const user = await createUserInCognito(values);
+      
+      // If successful, show success message
       Modal.success({
         title: 'Success',
-        content: 'Your form has been successfully submitted!',
+        content: 'User has been successfully created! A temporary password will be sent to their email.',
         onOk() {
-          console.log('OK clicked');
-          // Perform additional success actions here (e.g., navigate to another page)
+          form.resetFields();
         },
       });
     } catch (error) {
-      if (error.response && error.response.data.errors) {
-        // Update the form with backend validation errors
-        const errors = error.response.data.errors;
-
-        // Convert backend errors to a format that Ant Design can handle
-        const formErrors = Object.keys(errors).map((field) => ({
-          name: field,
-          errors: [errors[field]],
-        }));
-
-        // Set the validation errors on the form fields
-        form.setFields(formErrors);
+      if (error.code === 'UsernameExistsException') {
+        message.error('A user with this email already exists.');
+        form.setFields([
+          {
+            name: 'email',
+            errors: ['A user with this email already exists'],
+          },
+        ]);
       } else {
-        // Handle other errors (e.g., network error)
-        message.error('An error occurred. Please try again.');
+        message.error('An error occurred while creating the user. Please try again.');
       }
     }
   };
@@ -51,9 +122,7 @@ const NewUser = () => {
           autoComplete="off"
           labelCol={{ span: 10 }}
           wrapperCol={{ span: 24 }}
-          onFinish={(values) => {
-            console.log({ values });
-          }}
+          onFinish={onFinish}
           onFinishFailed={(error) => {
             console.log({ error });
           }}
@@ -67,7 +136,6 @@ const NewUser = () => {
                 message: "Please enter first name",
               },
               { whitespace: true },
-              { min: 3 },
             ]}
             hasFeedback
           >
@@ -83,7 +151,6 @@ const NewUser = () => {
                 message: "Please enter last name",
               },
               { whitespace: true },
-              { min: 3 },
             ]}
             hasFeedback
           >
@@ -105,22 +172,6 @@ const NewUser = () => {
             <Input placeholder="Email" />
           </Form.Item>
 
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              {
-                required: true,
-                message: "Please enter password",
-              },
-              { whitespace: false },
-              { min: 3 },
-            ]}
-            hasFeedback
-          >
-            <Input placeholder="Password" />
-          </Form.Item>
-
           <Form.Item 
             name="type"
             label="Account Type"
@@ -133,8 +184,8 @@ const NewUser = () => {
             hasFeedback
           >
             <Select placeholder="Select account type">
-              <Select.Option value="agent">Agent</Select.Option>
-              <Select.Option value="admin">Admin</Select.Option>
+              <Select.Option value="agent">agent</Select.Option>
+              <Select.Option value="admin">admin</Select.Option>
             </Select>
           </Form.Item>
 
