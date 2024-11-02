@@ -12,7 +12,6 @@ spec:
       labels:
         app.kubernetes.io/name: itsag3t1-crm-backend
     spec:
-      serviceAccountName: rds-access-sa
       containers:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:879c636734d5f3960682cd4cc6e4a150cfa0aa10
         name: itsag3t1-crm-backend
@@ -21,7 +20,7 @@ spec:
           name: http
         env:
           - name: DB_HOSTNAME
-            value: "external-rds-service"
+            value: "my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com"
           - name: DB_PORT
             value: "5432"
           - name: DB_NAME
@@ -48,12 +47,3 @@ spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: itsag3t1-crm-backend
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: external-rds-service
-  namespace: itsag3t1-crm
-spec:
-  type: ExternalName
-  externalName: my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com
