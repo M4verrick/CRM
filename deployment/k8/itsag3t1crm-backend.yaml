@@ -14,7 +14,7 @@ spec:
     spec:
       serviceAccountName: rds-access-sa
       containers:
-      - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:0624581fabbea47f02e92852c8cff7094bc202f3
+      - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:b6ac93157f50953390c6e68bdc26368e00d41a59
         name: itsag3t1-crm-backend
         ports:
         - containerPort: 8080
