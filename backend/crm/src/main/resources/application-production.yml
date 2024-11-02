@@ -5,7 +5,7 @@ spring:
   server:
     port: 8080 # to update
   datasource:
-    url: jdbc:postgresql://${DB_HOSTNAME}:${DB_PORT}}/${DB_NAME}/${DB_PASSWORD}}${DB_USERNAME}}
+    url: jdbc:postgresql://${DB_HOSTNAME}}}:${DB_PORT}/${DB_NAME}/${DB_PASSWORD}${DB_USERNAME}
     username: ${DB_USERNAME} # to update
     password: ${DB_PASSWORD} # to update
     driver-class-name: org.postgresql.Driver
