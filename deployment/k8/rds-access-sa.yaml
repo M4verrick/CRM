@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: rds-access-sa
-  namespace: itsag3t1-crm
-  annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::351854075744:role/rds-access
