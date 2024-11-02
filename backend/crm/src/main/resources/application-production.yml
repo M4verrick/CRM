@@ -5,9 +5,10 @@ spring:
   server:
     port: 8080 # to update
   datasource:
-    url: jdbc-secretsmanager:postgresql://postgres-db.cjqt4bf02oy9.ap-northeast-2.rds.amazonaws.com:5432/crmdb
+    url: jdbc:postgresql://postgres-db.cjqt4bf02oy9.ap-northeast-2.rds.amazonaws.com:5432/crmdb
     username: crmdbadmin # to update
-    driver-class-name: com.amazonaws.secretsmanager.sql.AWSSecretsManagerPostgreSQLDriver
+    password: ${DB_PASSWORD} # to update
+    driver-class-name: org.postgresql.Driver
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   security:
     oauth2:
