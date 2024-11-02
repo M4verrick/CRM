@@ -20,7 +20,3 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_ya55bZ0sg
-
-cloudwatch:
-  loggroupname: crm-logs
-  logstreamname: crm-log-stream
