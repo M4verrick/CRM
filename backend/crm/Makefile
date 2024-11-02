@@ -18,18 +18,18 @@ clean-image:
 	docker rmi -f $(CRM_IMAGE_NAME)
 
 # Start the application locally
-start-local: start-localstack up
+start-local: up
 
 # Stop the application locally and clean the Maven project
-stop-local: stop-localstack down clean-image
+stop-local: down clean-image
 
 # Build the project and start the application locally using the package Docker Compose file
-start-build-local: start-localstack
+start-build-local:
 	mvn clean package -DskipTests
 	docker-compose -f $(DOCKER_COMPOSE_FILE_PACKAGE) up -d
 
 # Stop the application locally and clean the Maven project
-stop-local-clean: stop-localstack
+stop-local-clean:
 	docker-compose -f $(DOCKER_COMPOSE_FILE_PACKAGE) down -v
 	mvn clean
 	docker rmi -f $(CRM_IMAGE_NAME)

@@ -6,7 +6,7 @@ spring:
     port: 8080
     address: 127.0.0.1
   datasource:
-    url: jdbc:postgresql://db:5432/crmdatabase
+    url: jdbc:postgresql://db:5432/crmdb
     username: crmappuser
     password: crmapppassword
     driver-class-name: org.postgresql.Driver

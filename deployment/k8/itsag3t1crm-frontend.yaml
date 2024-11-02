@@ -46,8 +46,8 @@ metadata:
   namespace: itsag3t1-crm
   name: itsag3t1-crm
   annotations:
+    kubernetes.io/ingress.class: nginx
     alb.ingress.kubernetes.io/scheme: internet-facing
-    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/target-type: ip
     external-dns.alpha.kubernetes.io/hostname: game.itsag3t1.com
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'

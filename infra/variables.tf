@@ -32,7 +32,7 @@ variable "addons" {
     enable_external_dns                 = true
     enable_cert_manager                 = true
     enable_ingress_nginx                = true
-
+    enable_external_secrets             = true
   }
 }
 # Addons Git
