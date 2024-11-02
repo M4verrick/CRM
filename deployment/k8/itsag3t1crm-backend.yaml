@@ -12,6 +12,7 @@ spec:
       labels:
         app.kubernetes.io/name: itsag3t1-crm-backend
     spec:
+      serviceAccountName: rds-access-sa
       containers:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:0624581fabbea47f02e92852c8cff7094bc202f3
         name: itsag3t1-crm-backend
