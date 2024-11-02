@@ -114,7 +114,7 @@ public class ClientAccountService {
 
     private boolean isClientAssociatedWithAgent(Long clientId, String agentId) {
         // Check if the clientId exists in the agent's profile mapping
-        return agentProfileRepository.existsByAgentIdAndProfile_Id(agentId, clientId);
+        return agentProfileRepository.existsByAgentIdAndProfileId(agentId, clientId);
     }
 
 }
