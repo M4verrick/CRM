@@ -13,7 +13,7 @@ spec:
         app.kubernetes.io/name: itsag3t1-crm-backend
     spec:
       containers:
-      - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:b6bafca9cb653a5f65d903e6929696b65fa209b3
+      - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:630388285ebf39623c40e20f3d2f051b20cafb61
         name: itsag3t1-crm-backend
         ports:
         - containerPort: 8080
