@@ -14,8 +14,7 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: www.itsag3t1.com
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix
@@ -24,8 +23,7 @@ spec:
                 name: itsag3t1-crm-frontend
                 port:
                   name: http
-    - host: www.itsag3t1.com
-      http:
+    - http:
         paths:
           - path: /backend
             pathType: Prefix
