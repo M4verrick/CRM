@@ -22,7 +22,7 @@ spec:
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: db-password
+                name: external-secrets-sm
                 key: crm_db_password
 ---
 apiVersion: v1
