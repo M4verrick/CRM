@@ -16,16 +16,14 @@ spec:
   rules:
     - http:
         paths:
-          - path: /
+          - path: /home
             pathType: Prefix
             backend:
               service:
                 name: itsag3t1-crm-frontend
                 port:
                   name: http
-    - http:
-        paths:
-          - path: /api/*
+          - path: /api
             pathType: Prefix
             backend:
               service:
