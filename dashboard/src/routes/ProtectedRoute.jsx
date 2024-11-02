@@ -2,9 +2,13 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import { useAccount } from 'contexts/Account.jsx';
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAccount();
+const ProtectedRoute = ({ children, roles = [] }) => {
   const location = useLocation();
+  const { 
+      isAuthenticated, 
+      isLoading, 
+      hasGroup 
+  } = useAccount();
 
   // Show loading indicator while checking authentication
   if (isLoading) {
@@ -21,10 +25,15 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Optional: Check for specific user roles if needed
-  // const hasRequiredRole = (requiredRoles) => {
-  //   if (!requiredRoles?.length) return true;
-  //   return requiredRoles.some(role => userGroups?.includes(role));
-  // };
+  const hasRequiredRole = (requiredRoles) => {
+    if (!requiredRoles?.length) return true;
+    return requiredRoles.some(role => hasGroup(role));
+  };
+
+  if (!hasRequiredRole()) {
+    // Redirect to unauthorized page or dashboard
+    return <Navigate to="/unauthorized" replace />;
+  }
 
   return children;
 };
