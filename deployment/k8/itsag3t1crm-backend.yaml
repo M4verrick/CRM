@@ -20,6 +20,14 @@ spec:
         - containerPort: 8080
           name: http
         env:
+          - name: DB_HOSTNAME
+            value: "external-rds-service"
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_NAME
+            value: "crmdb"
+          - name: DB_USERNAME
+            value: "crmdbadmin"        #
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
@@ -40,3 +48,12 @@ spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: itsag3t1-crm-backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-rds-service
+  namespace: itsag3t1-crm
+spec:
+  type: ExternalName
+  externalName: my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com
