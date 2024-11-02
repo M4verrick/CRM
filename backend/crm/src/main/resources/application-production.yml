@@ -2,11 +2,8 @@ spring:
   config:
     activate:
       on-profile: production
-    import: aws-secretsmanager
   server:
     port: 8080 # to update
-  logging:
-    config: classpath:logback-production.xml
   datasource:
     url: jdbc-secretsmanager:postgresql://postgres-db.cjqt4bf02oy9.ap-northeast-2.rds.amazonaws.com:5432/crmdb
     username: crmdbadmin # to update
