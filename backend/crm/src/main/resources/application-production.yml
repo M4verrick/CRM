@@ -9,7 +9,6 @@ spring:
     username: crmdbadmin # to update
     password: ${DB_PASSWORD} # to update
     driver-class-name: org.postgresql.Driver
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
   security:
     oauth2:
       resourceserver:
