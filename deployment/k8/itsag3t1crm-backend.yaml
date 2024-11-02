@@ -8,51 +8,51 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: itsag3t1-crm
-  name: itsag3t1-crm
+  name: itsag3t1-crm-backend
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: itsag3t1-crm
+      app.kubernetes.io/name: itsag3t1-crm-backend
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: itsag3t1-crm
+        app.kubernetes.io/name: itsag3t1-crm-backend
     spec:
       containers:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:621ddfa95dc1a041fd4fba5dbb96882935cdf542
-        name: itsag3t1-crm
+        name: itsag3t1-crm-backend
         ports:
-        - containerPort: 3000
+        - containerPort: 8080
           name: http
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: itsag3t1-crm
-  name: itsag3t1-crm
+  namespace: itsag3t1-crm-backend
+  name: itsag3t1-crm-backend
 spec:
   ports:
     - name: http
       port: 80
-      targetPort: 3000
+      targetPort: 8080
       protocol: TCP
   type: ClusterIP
   selector:
-    app.kubernetes.io/name: itsag3t1-crm
+    app.kubernetes.io/name: itsag3t1-crm-backend
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: itsag3t1-crm
-  name: itsag3t1-crm
+  namespace: itsag3t1-crm-backend
+  name: itsag3t1-crm-backend
   annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
     kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    external-dns.alpha.kubernetes.io/hostname: game.itsag3t1.com
+    external-dns.alpha.kubernetes.io/hostname: backend.itsag3t1.com
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/d50cd17f-ab25-498c-b537-a8ad0a2f0b89
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/edeabd3a-8dca-4f2c-ad42-1e6b3d16124c
 spec:
   ingressClassName: alb
   rules:
@@ -62,6 +62,6 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: itsag3t1-crm
+              name: itsag3t1-crm-backend
               port:
                 name: http

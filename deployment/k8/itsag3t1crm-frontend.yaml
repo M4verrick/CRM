@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: itsag3t1-crm
+spec: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: itsag3t1-crm
+  name: itsag3t1-crm-frontend
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: itsag3t1-crm-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: itsag3t1-crm-frontend
+    spec:
+      containers:
+      - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:621ddfa95dc1a041fd4fba5dbb96882935cdf542
+        name: itsag3t1-crm-frontend
+        ports:
+        - containerPort: 3000
+          name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: itsag3t1-crm
+  name: itsag3t1-crm-frontend
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: itsag3t1-crm-frontend
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: itsag3t1-crm
+  name: itsag3t1-crm-frontend
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    external-dns.alpha.kubernetes.io/hostname: www.itsag3t1.com
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/edeabd3a-8dca-4f2c-ad42-1e6b3d16124c
+spec:
+  ingressClassName: alb
+  rules:
+     - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: itsag3t1-crm-frontend
+              port:
+                name: http

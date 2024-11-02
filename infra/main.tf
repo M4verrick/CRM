@@ -31,7 +31,7 @@ provider "kubernetes" {
 }
 
 locals {
-  name   = "ex-${replace(basename(path.cwd), "_", "-")}"
+  name   = "itsag3t1-crm"
   region = var.region
 
   cluster_version = var.kubernetes_version
@@ -292,8 +292,9 @@ module "vpc" {
   cidr = local.vpc_cidr
 
   azs             = local.azs
-  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
+  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
+  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 4)]
+  database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr,8, k + 8)]
 
   enable_nat_gateway = true
   single_nat_gateway = true
