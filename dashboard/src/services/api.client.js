@@ -33,10 +33,6 @@ const createApiClient = () => {
 
         // Add the access token to the request
         config.headers.Authorization = `Bearer ${AccessToken}`;
-        console.log(config.headers.Authorization)
-        
-        // Optionally add ID token if needed for specific endpoints
-        // config.headers['X-Id-Token'] = IdToken;
       }
 
       return config;
