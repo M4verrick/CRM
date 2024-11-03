@@ -233,6 +233,31 @@ module "eks_blueprints_addons" {
 
   external_dns_route53_zone_arns = [local.route53_zone_arn] # ArgoCD Server and UI domain name is registered in Route 53
 
+  karpenter_node = {
+    iam_role_use_name_prefix = false
+  }
+
+  karpenter = {
+    values = [
+      <<-EOT
+    nodeSelector:
+      karpenter.sh/controller: 'true'
+    settings:
+      clusterName: ${module.eks.cluster_name}
+      clusterEndpoint: ${module.eks.cluster_endpoint}
+      interruptionQueue: "karpenter-${local.name}"
+    tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - key: karpenter.sh/controller
+        operator: Exists
+        effect: NoSchedule
+    webhook:
+      enabled: false
+    EOT
+    ]
+  }
+
   tags = local.tags
 }
 
@@ -262,11 +287,13 @@ module "eks" {
     }
 
     labels = {
+      instance_types = ["t3.small"]
       # Used to ensure Karpenter runs on nodes that it does not manage
       "karpenter.sh/controller" = "true"
     }
 
     taints = {
+      instance_types = ["t3.small"]
       # The pods that do not tolerate this taint should run on nodes
       # created by Karpenter
       karpenter = {
@@ -276,6 +303,7 @@ module "eks" {
       }
     }
   }
+
   # EKS Addons
   cluster_addons = {
     vpc-cni = {
@@ -292,6 +320,8 @@ module "eks" {
         }
       })
     }
+    eks-pod-identity-agent = {}
+    kube-proxy             = {}
     coredns = {
       configuration_values = jsonencode({
         tolerations = [
