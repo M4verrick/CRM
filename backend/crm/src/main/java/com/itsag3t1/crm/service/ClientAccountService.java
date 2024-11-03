@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -21,23 +22,27 @@ import java.util.Optional;
 @Service
 public class ClientAccountService {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(ClientAccountService.class);
-
-    // Assuming this format for ISO 8601 datetime
     private static final SimpleDateFormat ISO_8601_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+    private final ClientAccountRepository accountRepository;
+    private final AgentProfileRepository agentProfileRepository;
+
     @Autowired
-    private ClientAccountRepository accountRepository;
-    private AgentProfileRepository agentProfileRepository;
+    public ClientAccountService(ClientAccountRepository accountRepository, AgentProfileRepository agentProfileRepository) {
+        this.accountRepository = accountRepository;
+        this.agentProfileRepository = agentProfileRepository;
+    }
 
     public ClientAccount createAccount(ClientAccount account, String agentId) {
         validateAccountData(account);
 
         // Check if the clientId is associated with the agentId
-        if (!isClientAssociatedWithAgent(account.getAccountId(), agentId)) {
+        if (!isClientAssociatedWithAgent(account.getProfileId(), agentId)) {
             throw new InvalidDataException("Agent is not authorized to create an account for this client");
         }
         // Set initial deposit to 0.0 if it's null
         if (account.getInitialDeposit() == null) {
-            account.setInitialDeposit(0.0);
+            account.setInitialDeposit(BigDecimal.valueOf(0.0));
         }
 
         // Set current date for opening date
@@ -72,7 +77,7 @@ public class ClientAccountService {
         try {
             account = accountRepository.findById(accountId);
             if (account.isPresent()) {
-                if (!isClientAssociatedWithAgent(account.get().getAccountId(), agentId)) {
+                if (!isClientAssociatedWithAgent(account.get().getProfileId(), agentId)) {
                     throw new InvalidDataException("Agent is not authorized to create an account for this client");
                 }
                 accountRepository.deleteById(accountId);
@@ -95,9 +100,6 @@ public class ClientAccountService {
     }
 
     private void validateAccountData(ClientAccount account) {
-        if (account.getAccountId() == null) {
-            throw new InvalidDataException("Client ID must not be null");
-        }
         if (account.getAccountType() == null) {
             throw new InvalidDataException("Account type must not be null");
         }
@@ -114,7 +116,7 @@ public class ClientAccountService {
 
     private boolean isClientAssociatedWithAgent(Long clientId, String agentId) {
         // Check if the clientId exists in the agent's profile mapping
-        return agentProfileRepository.existsByAgentIdAndProfile_Id(agentId, clientId);
+        return agentProfileRepository.existsByAgentIdAndProfileId(agentId, clientId);
     }
 
 }
