@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class AgentProfile implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "agent_id", nullable = false)
