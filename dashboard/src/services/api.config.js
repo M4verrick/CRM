@@ -11,6 +11,6 @@ const API_CONFIG = {
 };
 
 export const getApiConfig = () => {
-  const environment = process.env.NODE_ENV || 'development';
+  const environment = 'development';
   return API_CONFIG[environment];
 };

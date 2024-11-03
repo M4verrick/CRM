@@ -5,9 +5,6 @@ import { Form, Button, DatePicker, Input, Select, Card } from "antd";
 import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
 
-// api useHook
-import { useApi } from 'hooks/useApi'
-
 const { Option } = Select;
 
 const currencies = [
@@ -26,31 +23,6 @@ const currencies = [
   { code: "USD", name: "United States Dollar" }
 ];
 
-
-// export const UserProfile = () => {
-//   const { loading, error, get, put } = useApi();
-//   const [user, setUser] = useState(null);
-
-//   const fetchUser = async () => {
-//     try {
-//       const userData = await get('/users/profile');
-//       setUser(userData);
-//     } catch (err) {
-//       console.error('Failed to fetch user:', err);
-//     }
-//   };
-
-//   const updateUser = async (updatedData) => {
-//     try {
-//       const result = await put('/users/profile', updatedData);
-//       setUser(result);
-//     } catch (err) {
-//       console.error('Failed to update user:', err);
-//     }
-//   };
-
-//   // ... rest of component
-// };
 
 const NewAccount = () => {
   return (
