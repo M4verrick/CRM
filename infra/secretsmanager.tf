@@ -5,7 +5,7 @@ resource "random_password" "master"{
 }
 
 resource "aws_secretsmanager_secret" "password" {
-  name = "crm_db_password"
+  name = "db_password"
   recovery_window_in_days = 0
 }
 
