@@ -18,7 +18,7 @@ public class Profile {
     // Setters
     // Getters
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -97,15 +97,9 @@ public class Profile {
     @Column(name = "verification_status", nullable = false, length = 20)
     private String verificationStatus = "PENDING";
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
-    private List<ClientAccount> clientAccounts = new ArrayList<>();
     // No-argument constructor
     public Profile() {
     }
-
-    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
-    private AgentProfile agentProfile;
 
     // Builder constructor
     private Profile(Builder builder) {
@@ -124,7 +118,6 @@ public class Profile {
         this.isEmailVerified = builder.isEmailVerified;
         this.verificationToken = builder.verificationToken;
         this.verificationStatus = builder.verificationStatus;
-        this.clientAccounts = builder.clientAccounts;
     }
 
     public boolean isEmailVerified() {
@@ -133,18 +126,6 @@ public class Profile {
 
     public void setEmailVerified(boolean emailVerified) {
         isEmailVerified = emailVerified;
-    }
-
-    // Method to add a single ClientAccount
-    public void addClientAccount(ClientAccount account) {
-        clientAccounts.add(account);
-        account.setProfile(this);
-    }
-
-    // Method to remove a single ClientAccount
-    public void removeClientAccount(ClientAccount account) {
-        clientAccounts.remove(account);
-        account.setProfile(null);
     }
 
     // Builder class
@@ -164,7 +145,6 @@ public class Profile {
         private boolean isEmailVerified = false;
         private String verificationToken;
         private String verificationStatus = "PENDING";
-        private List<ClientAccount> clientAccounts = new ArrayList<>();
 
         public Builder() {
         }
@@ -185,7 +165,6 @@ public class Profile {
             this.isEmailVerified = profile.isEmailVerified();
             this.verificationToken = profile.getVerificationToken();
             this.verificationStatus = profile.getVerificationStatus();
-            this.clientAccounts = profile.getClientAccounts();
         }
 
         // Builder methods
@@ -261,11 +240,6 @@ public class Profile {
 
         public Builder setVerificationStatus(String verificationStatus) {
             this.verificationStatus = verificationStatus;
-            return this;
-        }
-
-        public Builder setClientAccounts(List<ClientAccount> clientAccounts) {
-            this.clientAccounts = clientAccounts;
             return this;
         }
 
