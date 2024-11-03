@@ -19,6 +19,8 @@ spec:
         - containerPort: 8080
           name: http
         env:
+          - name: COGNITO_ISSUER_URL
+            value: "https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_ya55bZ0sg"
           - name: DB_HOSTNAME
             value: "my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com"
           - name: DB_PORT

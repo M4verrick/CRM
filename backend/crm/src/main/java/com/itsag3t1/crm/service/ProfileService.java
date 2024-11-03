@@ -109,17 +109,15 @@ public class ProfileService {
     @Transactional
     public Profile saveProfile(Profile profile, String agentId) {
         try {
-            // Save the Profile first
             Profile savedProfile = profileRepository.save(profile);
-            System.out.println(savedProfile.getId());
-
-            // Now create the AgentProfile with the saved Profile's ID
-            AgentProfile agentProfile = new AgentProfile();
-            agentProfile.setAgentId(agentId);
-            agentProfile.setProfileId(savedProfile.getId()); // Use the saved Profile's ID
-
-            // Save the AgentProfile
-            agentProfileRepository.save(agentProfile);
+            // Retrieve or create the AgentProfile
+            if (!agentProfileRepository.existsByAgentIdAndProfileId(agentId, savedProfile.getId())) {
+                // Step 3: Create and save the AgentProfile with the generated `profile_id`
+                AgentProfile agentProfile = new AgentProfile();
+                agentProfile.setAgentId(agentId);
+                agentProfile.setProfileId(savedProfile.getId());
+                agentProfileRepository.save(agentProfile);
+            }
 
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", savedProfile.getId().toString());

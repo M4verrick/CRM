@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +42,7 @@ public class ClientAccountService {
         }
         // Set initial deposit to 0.0 if it's null
         if (account.getInitialDeposit() == null) {
-            account.setInitialDeposit(0.0);
+            account.setInitialDeposit(BigDecimal.valueOf(0.0));
         }
 
         // Set current date for opening date
