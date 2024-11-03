@@ -62,7 +62,7 @@ public class ProfileController {
         String agentId = ClaimsUtil.getAgentId(authentication);
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
-        if(!isAtLeast18YearsOld(dateOfBirth)){
+        if (!isAtLeast18YearsOld(dateOfBirth)) {
             throw new UnderageException("User must be at least 18 years old.");
         }
         Profile newProfile = new Profile.Builder()
@@ -83,13 +83,16 @@ public class ProfileController {
 
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
         String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
+        log.info("Sending email");
+        // emailService.sendVerificationEmail(savedProfile.getEmail(),
+        // savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails, Authentication authentication) {
+    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails,
+            Authentication authentication) {
         String agentId = ClaimsUtil.getAgentId(authentication);
         Optional<Profile> profile = profileService.getProfileById(id, agentId);
         if (profile.isPresent()) {
@@ -107,7 +110,7 @@ public class ProfileController {
                     .setGender(profileDetails.getGender())
                     .build();
 
-            profileService.saveProfile(updatedProfile, agentId);
+            profileService.updateProfile(id, updatedProfile, agentId);
             return ResponseEntity.ok(updatedProfile);
         } else {
             return ResponseEntity.notFound().build();
@@ -167,7 +170,8 @@ public class ProfileController {
                     .setVerificationStatus("PENDING")
                     .build();
             profileService.saveProfile(updatedProfile, agentId);
-            return ResponseEntity.badRequest().body("Invalid NRIC number provided. Verification status is set to PENDING.");
+            return ResponseEntity.badRequest()
+                    .body("Invalid NRIC number provided. Verification status is set to PENDING.");
         }
     }
 
@@ -176,10 +180,10 @@ public class ProfileController {
         return Pattern.matches(nricPattern, nricNumber);
     }
 
-    private boolean isAtLeast18YearsOld(Date dateOfBirth){
+    private boolean isAtLeast18YearsOld(Date dateOfBirth) {
         LocalDate today = LocalDate.now();
         LocalDate dob = dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        Period age = Period.between(dob,today);
+        Period age = Period.between(dob, today);
         return age.getYears() >= 18;
     }
 }

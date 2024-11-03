@@ -7,6 +7,7 @@ import com.itsag3t1.crm.model.ProfileAccountsDTO;
 import com.itsag3t1.crm.repository.AgentProfileRepository;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
 import com.itsag3t1.crm.repository.ProfileRepository;
+import com.itsag3t1.crm.exception.DatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -34,15 +35,16 @@ public class ProfileService {
     private final AgentProfileRepository agentProfileRepository;
 
     @Autowired
-    public ProfileService(ProfileRepository profileRepository, ClientAccountRepository clientAccountRepository, AgentProfileRepository agentProfileRepository) {
+    public ProfileService(ProfileRepository profileRepository, ClientAccountRepository clientAccountRepository,
+            AgentProfileRepository agentProfileRepository) {
         this.profileRepository = profileRepository;
         this.clientAccountRepository = clientAccountRepository;
         this.agentProfileRepository = agentProfileRepository;
     }
-    public List<Profile> getAllProfiles(){
+
+    public List<Profile> getAllProfiles() {
         return profileRepository.findAll();
     }
-
 
     public List<Profile> getAllProfilesByAgentId(String agentId) {
         try {
@@ -61,8 +63,6 @@ public class ProfileService {
         }
     }
 
-
-
     public Optional<Profile> getProfileById(Long id, String agentId) {
         try {
             // Check if the profile is associated with the given agentId
@@ -75,7 +75,8 @@ public class ProfileService {
                 MDC.put("agent_id", agentId);
                 MDC.put("profile_id", id.toString());
                 MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-                log.info("{} retrieved profile {} at {}", MDC.get("agent_id"), MDC.get("profile_id"), MDC.get("date_time"));
+                log.info("{} retrieved profile {} at {}", MDC.get("agent_id"), MDC.get("profile_id"),
+                        MDC.get("date_time"));
 
                 return profile;
             } else {
@@ -83,13 +84,13 @@ public class ProfileService {
                 MDC.put("agent_id", agentId);
                 MDC.put("profile_id", id.toString());
                 log.warn("Access denied for agent {} to profile {}", MDC.get("agent_id"), MDC.get("profile_id"));
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this profile.");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "You are not authorized to access this profile.");
             }
         } finally {
             MDC.clear();
         }
     }
-
 
     public Optional<Profile> getProfileByVerificationToken(String token, String agentId) {
         try {
@@ -97,7 +98,8 @@ public class ProfileService {
             MDC.put("agent_id", agentId);
             MDC.put("verification_token", token);
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-            log.info("{} retrieved profile by token {} at {}", MDC.get("agent_id"), MDC.get("verification_token"), MDC.get("date_time"));
+            log.info("{} retrieved profile by token {} at {}", MDC.get("agent_id"), MDC.get("verification_token"),
+                    MDC.get("date_time"));
             return profile;
         } finally {
             MDC.clear();
@@ -133,16 +135,43 @@ public class ProfileService {
         }
     }
 
+    @Transactional
+    public Profile updateProfile(Long id, Profile updatedProfile, String agentId) {
+        // Check if the agent has access to the profile
+        if (!agentProfileRepository.existsByAgentIdAndProfileId(agentId, id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You are not authorized to access this profile.");
+        }
+        Optional<Profile> existingProfileOptional = profileRepository.findById(id);
+
+        if (existingProfileOptional.isPresent()) {
+            // Save the updated profile
+            profileRepository.save(updatedProfile);
+
+            // Log the update operation (if necessary)
+            MDC.put("agent_id", agentId);
+            MDC.put("profile_id", updatedProfile.getId().toString());
+            MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
+            log.info("{} updated profile {} at {}", MDC.get("agent_id"), MDC.get("profile_id"), MDC.get("date_time"));
+
+            return updatedProfile;
+        } else {
+            throw new DatabaseException("Profile not found with id: " + id, null);
+        }
+    }
+
     public void deleteProfile(Long id, String agentId) {
         try {
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", id.toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
-            long activeAccountCount = clientAccountRepository.countActiveAccountsByProfileId(id, ClientAccount.AccountStatus.ACTIVE);
+            long activeAccountCount = clientAccountRepository.countActiveAccountsByProfileId(id,
+                    ClientAccount.AccountStatus.ACTIVE);
             if (activeAccountCount > 0) {
                 log.info("Profile {} has active client accounts and cannot be deleted", id);
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Profile cannot be deleted due to active accounts.");
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Profile cannot be deleted due to active accounts.");
             }
 
             profileRepository.deleteById(id);
