@@ -70,7 +70,7 @@ VALUES
     ('AGENT_002', 5),
     ('AGENT_003', 6);
 
- Insert sample data into client_accounts
+ -- Insert sample data into client_accounts
 INSERT INTO client_accounts (profile_id, account_type, account_status, opening_date, currency, branch_id, initial_deposit)
 VALUES
     (1, 'SAVINGS', 'ACTIVE', '2023-01-01', 'USD', 'BR001', 1000.00),

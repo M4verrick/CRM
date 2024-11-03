@@ -9,13 +9,8 @@ services:
       - "8080:8080"
     depends_on:
       - db
-    environment:
-      - CLOUDWATCH_URI=http://localstack:4566
-#      - AWS_ACCESS_KEY=test
-#      - AWS_KEY_ID=test
-      - AWS_ACCESS_KEY_ID=AKIAVD3BDD5QC5RI4KUU  # Updated to match expected variable
-      - AWS_SECRET_ACCESS_KEY=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  # Updated to match expected variable
-      - AWS_REGION=ap-southeast-1  # Match Localstack region
+    env_file:
+      - .env
 
   db:
     image: postgres:16
