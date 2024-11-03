@@ -40,7 +40,7 @@ spec:
           operator: In
           values: ["3"]
   limits:
-    cpu: 1000
+    cpu: 10000
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 30s
