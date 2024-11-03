@@ -37,7 +37,7 @@ spec:
           operator: In
           values: ["nitro"]
         - key: "karpenter.k8s.aws/instance-generation"
-          operator: Gt
+          operator: In
           values: ["3"]
   limits:
     cpu: 1000
