@@ -37,7 +37,7 @@ public class ClientAccountService {
         validateAccountData(account);
 
         // Check if the clientId is associated with the agentId
-        if (!isClientAssociatedWithAgent(account.getProfileId(), agentId)) {
+        if (!isClientAssociatedWithAgent(account.getProfile().getId(), agentId)) {
             throw new InvalidDataException("Agent is not authorized to create an account for this client");
         }
         // Set initial deposit to 0.0 if it's null
@@ -77,7 +77,7 @@ public class ClientAccountService {
         try {
             account = accountRepository.findById(accountId);
             if (account.isPresent()) {
-                if (!isClientAssociatedWithAgent(account.get().getProfileId(), agentId)) {
+                if (!isClientAssociatedWithAgent(account.get().getProfile().getId(), agentId)) {
                     throw new InvalidDataException("Agent is not authorized to create an account for this client");
                 }
                 accountRepository.deleteById(accountId);

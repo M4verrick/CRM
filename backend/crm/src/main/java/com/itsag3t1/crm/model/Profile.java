@@ -97,6 +97,9 @@ public class Profile {
     @Column(name = "verification_status", nullable = false, length = 20)
     private String verificationStatus = "PENDING";
 
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<ClientAccount> clientAccounts = new ArrayList<>();
     // No-argument constructor
     public Profile() {
     }
