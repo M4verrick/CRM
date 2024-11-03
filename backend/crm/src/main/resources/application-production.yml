@@ -23,4 +23,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_ya55bZ0sg
+          issuer-uri: ${COGNITO_ISSUER_URL}
