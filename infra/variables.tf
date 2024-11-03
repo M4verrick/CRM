@@ -34,6 +34,7 @@ variable "addons" {
     enable_ingress_nginx                = true
     enable_external_secrets             = true
     enable_aws_for_fluentbit            = true
+    enable_karpenter                    = true
   }
 }
 # Addons Git

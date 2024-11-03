@@ -257,8 +257,23 @@ module "eks" {
       instance_types = ["t3.small"]
 
       min_size     = 3
-      max_size     = 10
+      max_size     = 12
       desired_size = 3
+    }
+
+    labels = {
+      # Used to ensure Karpenter runs on nodes that it does not manage
+      "karpenter.sh/controller" = "true"
+    }
+
+    taints = {
+      # The pods that do not tolerate this taint should run on nodes
+      # created by Karpenter
+      karpenter = {
+        key    = "karpenter.sh/controller"
+        value  = "true"
+        effect = "NO_SCHEDULE"
+      }
     }
   }
   # EKS Addons
@@ -277,7 +292,28 @@ module "eks" {
         }
       })
     }
+    coredns = {
+      configuration_values = jsonencode({
+        tolerations = [
+          # Allow CoreDNS to run on the same nodes as the Karpenter controller
+          # for use during cluster creation when Karpenter nodes do not yet exist
+          {
+            key    = "karpenter.sh/controller"
+            value  = "true"
+            effect = "NoSchedule"
+          }
+        ]
+      })
+    }
   }
+
+  node_security_group_tags = merge(local.tags, {
+    # NOTE - if creating multiple security groups with this module, only tag the
+    # security group that Karpenter should utilize with the following tag
+    # (i.e. - at most, only one security group should have this tag in your account)
+    "karpenter.sh/discovery" = local.name
+  })
+
   tags = local.tags
 }
 
@@ -305,6 +341,8 @@ module "vpc" {
 
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = 1
+    # Tags subnets for Karpenter auto-discovery
+    "karpenter.sh/discovery" = local.name
   }
 
   tags = local.tags
