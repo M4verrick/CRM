@@ -62,7 +62,7 @@ public class ProfileController {
         String agentId = ClaimsUtil.getAgentId(authentication);
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
-        if(!isAtLeast18YearsOld(dateOfBirth)){
+        if(!isAtLeast18YearsOldbutLessThan100YearsOld(dateOfBirth)){
             throw new UnderageException("User must be at least 18 years old.");
         }
         Profile newProfile = new Profile.Builder()
@@ -176,10 +176,10 @@ public class ProfileController {
         return Pattern.matches(nricPattern, nricNumber);
     }
 
-    private boolean isAtLeast18YearsOld(Date dateOfBirth){
+    private boolean isAtLeast18YearsOldbutLessThan100YearsOld(Date dateOfBirth){
         LocalDate today = LocalDate.now();
         LocalDate dob = dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         Period age = Period.between(dob,today);
-        return age.getYears() >= 18;
+        return age.getYears() >= 18 && age.getYears()<= 100;
     }
 }
