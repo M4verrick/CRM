@@ -1,5 +1,5 @@
 ---
-apiVersion: karpenter.k8s.aws/v1
+apiVersion: karpenter.k8s.aws/v1beta1
 kind: EC2NodeClass
 metadata:
   name: default
@@ -15,7 +15,7 @@ spec:
   tags:
     karpenter.sh/discovery: itsag3t1-crm
 ---
-apiVersion: karpenter.sh/v1
+apiVersion: karpenter.sh/v1beta1
 kind: NodePool
 metadata:
   name: default

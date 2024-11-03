@@ -203,7 +203,7 @@ module "gitops_bridge_bootstrap" {
 ################################################################################
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "~> 1.0"
+  version = "~> 1.8"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
@@ -237,27 +237,6 @@ module "eks_blueprints_addons" {
     iam_role_use_name_prefix = false
   }
 
-  karpenter = {
-    values = [
-      <<-EOT
-    nodeSelector:
-      karpenter.sh/controller: 'true'
-    settings:
-      clusterName: ${module.eks.cluster_name}
-      clusterEndpoint: ${module.eks.cluster_endpoint}
-      interruptionQueue: "karpenter-${local.name}"
-    tolerations:
-      - key: CriticalAddonsOnly
-        operator: Exists
-      - key: karpenter.sh/controller
-        operator: Exists
-        effect: NoSchedule
-    webhook:
-      enabled: false
-    EOT
-    ]
-  }
-
   tags = local.tags
 }
 
@@ -267,7 +246,7 @@ module "eks_blueprints_addons" {
 #tfsec:ignore:aws-eks-enable-control-plane-logging
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.13"
+  version = "~> 20.23"
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
@@ -277,6 +256,8 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
+  authentication_mode                      = "API_AND_CONFIG_MAP"
+
   eks_managed_node_groups = {
     initial = {
       instance_types = ["t3.small"]
@@ -284,23 +265,6 @@ module "eks" {
       min_size     = 3
       max_size     = 12
       desired_size = 3
-    }
-
-    labels = {
-      instance_types = ["t3.small"]
-      # Used to ensure Karpenter runs on nodes that it does not manage
-      "karpenter.sh/controller" = "true"
-    }
-
-    taints = {
-      instance_types = ["t3.small"]
-      # The pods that do not tolerate this taint should run on nodes
-      # created by Karpenter
-      karpenter = {
-        key    = "karpenter.sh/controller"
-        value  = "true"
-        effect = "NO_SCHEDULE"
-      }
     }
   }
 
@@ -321,30 +285,31 @@ module "eks" {
       })
     }
     eks-pod-identity-agent = {}
-    kube-proxy             = {}
-    coredns = {
-      configuration_values = jsonencode({
-        tolerations = [
-          # Allow CoreDNS to run on the same nodes as the Karpenter controller
-          # for use during cluster creation when Karpenter nodes do not yet exist
-          {
-            key    = "karpenter.sh/controller"
-            value  = "true"
-            effect = "NoSchedule"
-          }
-        ]
-      })
-    }
+    kube-proxy = { most_recent = true }
+    # coredns = { most_recent = true }
   }
 
-  node_security_group_tags = merge(local.tags, {
+  tags = merge(local.tags, {
     # NOTE - if creating multiple security groups with this module, only tag the
     # security group that Karpenter should utilize with the following tag
     # (i.e. - at most, only one security group should have this tag in your account)
     "karpenter.sh/discovery" = local.name
   })
+}
 
-  tags = local.tags
+module "aws-auth" {
+  source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
+  version = "~> 20.0"
+
+  manage_aws_auth_configmap = true
+
+  aws_auth_roles = [
+    {
+      rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups   = ["system:bootstrappers", "system:nodes"]
+    },
+  ]
 }
 
 ################################################################################
