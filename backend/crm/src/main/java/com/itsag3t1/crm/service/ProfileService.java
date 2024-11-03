@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.profiles.ProfileProperty;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -103,17 +104,20 @@ public class ProfileService {
         }
     }
 
+    @Transactional
     public Profile saveProfile(Profile profile, String agentId) {
         try {
-            // Retrieve or create the AgentProfile
-            AgentProfile agentProfile = agentProfileRepository.findByAgentId(agentId)
-                    .orElseGet(() -> {
-                        AgentProfile newAgentProfile = new AgentProfile();
-                        newAgentProfile.setAgentId(agentId);
-                        newAgentProfile.setProfileId(profile.getId());
-                        return agentProfileRepository.save(newAgentProfile);
-                    });
+            // Save the Profile first
             Profile savedProfile = profileRepository.save(profile);
+            System.out.println(savedProfile.getId());
+
+            // Now create the AgentProfile with the saved Profile's ID
+            AgentProfile agentProfile = new AgentProfile();
+            agentProfile.setAgentId(agentId);
+            agentProfile.setProfileId(savedProfile.getId()); // Use the saved Profile's ID
+
+            // Save the AgentProfile
+            agentProfileRepository.save(agentProfile);
 
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", savedProfile.getId().toString());
