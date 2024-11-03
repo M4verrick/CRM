@@ -23,8 +23,43 @@ const currencies = [
   { code: "USD", name: "United States Dollar" }
 ];
 
+// api useHook
+import { useApi } from 'hooks/useApi';
 
+// TODO: backend handles invalid client ID? Test if it works. 
+// Edit fields to match endpoint
 const NewAccount = () => {
+  const { loading, error, post } = useApi();
+  const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const onFinish = async (values) => {
+    try {
+
+      const userData = await post('accounts', values);
+      
+      if (userData) {
+        messageApi.success('Account successfully registered!');
+        form.resetFields();
+      }
+    } catch (err) {
+      console.error('Failed to post a new account:', err);
+      
+      // Handle different types of errors
+      if (err.response) {
+        // Server responded with error
+        const errorMessage = err.response.data?.message || 'Failed to register account. Please try again.';
+        messageApi.error(errorMessage);
+      } else if (err.request) {
+        // Request made but no response
+        messageApi.error('Network error. Please check your connection.');
+      } else {
+        // Other errors
+        messageApi.error('An unexpected error occurred. Please try again.');
+      }
+    }
+  };
+
   return (
     <PageContainer>
     <Card>
@@ -35,9 +70,7 @@ const NewAccount = () => {
           autoComplete="off"
           labelCol={{ span: 12 }}
           wrapperCol={{ span: 12 }}
-          onFinish={(values) => {
-            console.log({ values });
-          }}
+          onFinish={onFinish}
           onFinishFailed={(error) => {
             console.log({ error });
           }}
@@ -55,7 +88,7 @@ const NewAccount = () => {
             ]}
             hasFeedback
           >
-            <Input placeholder="Type your client ID" />
+            <Input placeholder="client ID" />
           </Form.Item>
 
           <Form.Item 
