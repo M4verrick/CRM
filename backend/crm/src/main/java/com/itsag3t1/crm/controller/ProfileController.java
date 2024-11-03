@@ -113,13 +113,16 @@ public class ProfileController {
 
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
         String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
+        log.info("Sending email");
+        // emailService.sendVerificationEmail(savedProfile.getEmail(),
+        // savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails, Authentication authentication) {
+    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails,
+            Authentication authentication) {
         String agentId = ClaimsUtil.getAgentId(authentication);
         Optional<Profile> profile = profileService.getProfileById(id, agentId);
         if (profile.isPresent()) {
@@ -137,7 +140,7 @@ public class ProfileController {
                     .setGender(profileDetails.getGender())
                     .build();
 
-            profileService.saveProfile(updatedProfile, agentId);
+            profileService.updateProfile(id, updatedProfile, agentId);
             return ResponseEntity.ok(updatedProfile);
         } else {
             return ResponseEntity.notFound().build();
@@ -197,7 +200,8 @@ public class ProfileController {
                     .setVerificationStatus("PENDING")
                     .build();
             profileService.saveProfile(updatedProfile, agentId);
-            return ResponseEntity.badRequest().body("Invalid NRIC number provided. Verification status is set to PENDING.");
+            return ResponseEntity.badRequest()
+                    .body("Invalid NRIC number provided. Verification status is set to PENDING.");
         }
     }
 
