@@ -10,7 +10,7 @@ resource "aws_db_subnet_group" "main" {
 }
 
 data "aws_secretsmanager_secret" "password" {
-  name = "crm_db_password"
+  name = "db_password"
   depends_on = [aws_secretsmanager_secret.password]
 }
 
