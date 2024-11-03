@@ -37,21 +37,22 @@ public class ProfileController {
         this.emailService = emailService;
     }
 
+    /* For testing only */
     @GetMapping("/accountsById")
     public List<ProfileAccountsDTO> getAccountsGroupedByProfileId() {
         return profileService.getAccountsGroupedByProfileId();
     }
 
-//    @GetMapping
-//    public List<Profile> getAllProfiles(Authentication authentication) {
-//        String agentId = ClaimsUtil.getAgentId(authentication);
-//        log.info("Agent ID: {}", agentId);
-//        return profileService.getAllProfilesByAgentId(agentId);
-//    }
-
     @GetMapping
+    public List<Profile> getAllProfiles(Authentication authentication) {
+        String agentId = ClaimsUtil.getAgentId(authentication);
+        log.info("Agent ID: {}", agentId);
+        return profileService.getAllProfilesByAgentId(agentId);
+    }
+
+    /* For testing only */
+    @GetMapping("/test/")
     public List<Profile> getAllProfiles(@RequestParam String agentId) {
-//        String agentId = ClaimsUtil.getAgentId(authentication);
         log.info("Agent ID: {}", agentId);
         return profileService.getAllProfilesByAgentId(agentId);
     }
@@ -94,6 +95,7 @@ public class ProfileController {
         return ResponseEntity.ok(savedProfile);
     }
 
+    /* For testing only */
     @PostMapping("/testAgent")
     public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, @RequestParam String agentId) {
         String token = TokenUtil.generateVerificationToken();
