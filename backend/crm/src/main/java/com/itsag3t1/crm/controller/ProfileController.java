@@ -1,6 +1,6 @@
 package com.itsag3t1.crm.controller;
 
-import com.itsag3t1.crm.exception.UnderageException;
+import com.itsag3t1.crm.exception.AgeException;
 import com.itsag3t1.crm.model.Profile;
 import com.itsag3t1.crm.model.ProfileAccountsDTO;
 import com.itsag3t1.crm.service.EmailService;
@@ -10,7 +10,6 @@ import com.itsag3t1.crm.util.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -38,14 +37,21 @@ public class ProfileController {
         this.emailService = emailService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/accountsById")
     public List<ProfileAccountsDTO> getAccountsGroupedByProfileId() {
         return profileService.getAccountsGroupedByProfileId();
     }
 
+//    @GetMapping
+//    public List<Profile> getAllProfiles(Authentication authentication) {
+//        String agentId = ClaimsUtil.getAgentId(authentication);
+//        log.info("Agent ID: {}", agentId);
+//        return profileService.getAllProfilesByAgentId(agentId);
+//    }
+
     @GetMapping
-    public List<Profile> getAllProfiles(Authentication authentication) {
-        String agentId = ClaimsUtil.getAgentId(authentication);
+    public List<Profile> getAllProfiles(@RequestParam String agentId) {
+//        String agentId = ClaimsUtil.getAgentId(authentication);
         log.info("Agent ID: {}", agentId);
         return profileService.getAllProfilesByAgentId(agentId);
     }
@@ -57,13 +63,13 @@ public class ProfileController {
         return profile.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/agentAuthentication")
+    @PostMapping("/createProfileAgent")
     public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, Authentication authentication) {
         String agentId = ClaimsUtil.getAgentId(authentication);
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
-        if(!isAtLeast18YearsOldbutLessThan100YearsOld(dateOfBirth)){
-            throw new UnderageException("User must be at least 18 years old.");
+        if(!isValidAge(dateOfBirth)) {
+            throw new AgeException("User must be between 18 and 100 years old.");
         }
         Profile newProfile = new Profile.Builder()
                 .setFirstName(profile.getFirstName())
@@ -92,8 +98,8 @@ public class ProfileController {
     public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, @RequestParam String agentId) {
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
-        if(!isAtLeast18YearsOldbutLessThan100YearsOld(dateOfBirth)){
-            throw new UnderageException("User must be at least 18 years old.");
+        if(!isValidAge(dateOfBirth)){
+            throw new AgeException("User must be between 18 and 100 years old.");
         }
         Profile newProfile = new Profile.Builder()
                 .setFirstName(profile.getFirstName())
@@ -112,10 +118,11 @@ public class ProfileController {
                 .build();
 
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
-        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
+//        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
+        String verificationLink = "localhost:8080/api/clients/verify?token=" + token;
         log.info("Sending email");
-        // emailService.sendVerificationEmail(savedProfile.getEmail(),
-        // savedProfile.getFirstName(), verificationLink);
+         emailService.sendVerificationEmail(savedProfile.getEmail(),
+         savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
@@ -159,9 +166,8 @@ public class ProfileController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token, Authentication authentication) {
-        String agentId = ClaimsUtil.getAgentId(authentication);
-        Optional<Profile> optionalProfile = profileService.getProfileByVerificationToken(token, agentId);
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        Optional<Profile> optionalProfile = profileService.getProfileByVerificationToken(token);
         if (optionalProfile.isEmpty()) {
             return ResponseEntity.badRequest().body("Invalid verification token");
         }
@@ -172,11 +178,11 @@ public class ProfileController {
                 .setEmailVerified(true)
                 .build();
 
-        profileService.saveProfile(verifiedProfile, agentId);
+        profileService.saveProfile(verifiedProfile);
         return ResponseEntity.ok("Email successfully verified.");
     }
 
-    @PostMapping("/{clientId}/verify")
+    @PostMapping("/{clientId}/verifyNRIC")
     public ResponseEntity<String> verifyClientIdentity(
             @PathVariable Long clientId,
             @RequestParam("nricNumber") String nricNumber,
@@ -210,10 +216,11 @@ public class ProfileController {
         return Pattern.matches(nricPattern, nricNumber);
     }
 
-    private boolean isAtLeast18YearsOldbutLessThan100YearsOld(Date dateOfBirth){
+    private boolean isValidAge(Date dateOfBirth){
         LocalDate today = LocalDate.now();
         LocalDate dob = dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         Period age = Period.between(dob,today);
-        return age.getYears() >= 18 && age.getYears()<= 100;
+        return age.getYears() >= 18 && age.getYears() <= 100;
     }
+
 }

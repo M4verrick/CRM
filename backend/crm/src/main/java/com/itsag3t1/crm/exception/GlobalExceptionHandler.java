@@ -36,8 +36,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request format.");
     }
 
-    @ExceptionHandler(UnderageException.class)
-    public ResponseEntity<String> handleUnderageException(UnderageException ex) {
+    @ExceptionHandler(AgeException.class)
+    public ResponseEntity<String> handleUnderageException(AgeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
     // other exception handlers

@@ -92,15 +92,22 @@ public class ProfileService {
         }
     }
 
-    public Optional<Profile> getProfileByVerificationToken(String token, String agentId) {
+    public Optional<Profile> getProfileByVerificationToken(String token) {
+        return profileRepository.findByVerificationToken(token);
+    }
+    @Transactional
+    public Profile saveProfile(Profile profile) {
         try {
-            Optional<Profile> profile = profileRepository.findByVerificationToken(token);
-            MDC.put("agent_id", agentId);
-            MDC.put("verification_token", token);
+            Profile savedProfile = profileRepository.save(profile);
+
+            MDC.put("profile_id", savedProfile.getId().toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-            log.info("{} retrieved profile by token {} at {}", MDC.get("agent_id"), MDC.get("verification_token"),
-                    MDC.get("date_time"));
-            return profile;
+            log.info("Saved profile {} at {}", MDC.get("profile_id"), MDC.get("date_time"));
+
+            return savedProfile;
+        } catch (DataAccessException e) {
+            log.error("An error occurred while saving the profile: {}", e.getMessage(), e);
+            throw e;
         } finally {
             MDC.clear();
         }
@@ -188,7 +195,7 @@ public class ProfileService {
 
         // Group accounts by profileId
         Map<Long, List<ClientAccount>> accountsByProfile = accounts.stream()
-                .collect(Collectors.groupingBy(ClientAccount::getProfileId));
+                .collect(Collectors.groupingBy(account -> account.getProfile().getId()));
 
         // Convert Map to List of ProfileAccountsDTO
         return accountsByProfile.entrySet().stream()
