@@ -5,15 +5,15 @@ metadata:
   name: default
 spec:
   amiFamily: AL2
-  role: karpenter-itsag3t1
+  role: karpenter-itsag3t1-crm
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: itsag3t1
+        karpenter.sh/discovery: itsag3t1-crm
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: itsag3t1
+        karpenter.sh/discovery: itsag3t1-crm
   tags:
-    karpenter.sh/discovery: itsag3t1
+    karpenter.sh/discovery: itsag3t1-crm
 ---
 apiVersion: karpenter.sh/v1beta1
 kind: NodePool
