@@ -227,7 +227,7 @@ export default () => {
         columns={columns}
         request={async (params, sort, filter) => {
           return fetchUsers({
-            UserPoolId: "ap-southeast-1_ya55bZ0sg",
+            UserPoolId: import.meta.env.VITE_USER_POOL_ID,
             Limit: 20,
           });
         }}
