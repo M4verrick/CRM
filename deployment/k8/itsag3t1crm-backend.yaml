@@ -20,6 +20,9 @@ spec:
       containers:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:1d278d15b7c55751b3949df35e917c05071ea3f7
         name: itsag3t1-crm-backend
+        resources:
+          limits:
+            cpu: 800m
         ports:
         - containerPort: 8080
           name: http
