@@ -4,10 +4,11 @@ import { getAuthTokens, isTokenExpired } from './auth.service';
 
 const createApiClient = () => {
   const config = getApiConfig();
-  
+
   const instance = axios.create({
     baseURL: config.baseURL,
     timeout: config.timeout,
+    withCredentials: true, // Make sure this is true
     headers: {
       'Content-Type': 'application/json',
     },
@@ -16,6 +17,11 @@ const createApiClient = () => {
   // Request interceptor
   instance.interceptors.request.use(
     async (config) => {
+      // Request debug logs
+      console.group('🔑 Request Debug');
+      console.log('Request URL:', config.baseURL + config.url);
+      console.log('Request Headers:', config.headers);
+
       const tokens = getAuthTokens();
       
       if (tokens?.AuthenticationResult) {
