@@ -12,6 +12,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: itsag3t1-crm-backend
+        app: backend
     spec:
       nodeSelector:
         type: karpenter
@@ -41,13 +42,13 @@ spec:
       topologySpreadConstraints:
         - labelSelector:
             matchLabels:
-              app.kubernetes.io/name: itsag3t1-crm-backend
+              app: backend
           maxSkew: 1
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: ScheduleAnyway
         - labelSelector:
             matchLabels:
-              app.kubernetes.io/name: itsag3t1-crm-backend
+              app: backend
           maxSkew: 1
           topologyKey: topology.kubernetes.io/zone
           whenUnsatisfiable: ScheduleAnyway
