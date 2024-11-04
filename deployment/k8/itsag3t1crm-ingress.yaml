@@ -12,9 +12,10 @@ metadata:
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/98d0b30c-cafe-4b2e-87e9-64c304b65801
 spec:
-  ingressClassName: alb
+  ingressClassName: nginx
   rules:
-    - http:
+    - host: www.itsag3t1.com
+      http:
         paths:
           - path: /home
             pathType: Prefix
