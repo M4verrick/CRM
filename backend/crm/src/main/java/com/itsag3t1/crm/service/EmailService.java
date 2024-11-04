@@ -1,32 +1,42 @@
 package com.itsag3t1.crm.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
-
-import java.net.URI;
 
 @Service
 public class EmailService {
 
     private final SesClient sesClient;
 
-    // Initialize the SES client
+    // Use the verified sender email
+    private static final String SENDER_EMAIL = "testipo21@gmail.com";
+
+    // Initialize the SES client with specified region
     public EmailService() {
         this.sesClient = SesClient.builder()
                 .region(Region.AP_SOUTHEAST_1)
                 .build();
     }
 
+    /**
+     * Sends a verification email with a link for email verification.
+     *
+     * @param toEmail        Recipient's email address.
+     * @param clientName     Name of the client.
+     * @param verificationLink The link for email verification.
+     */
     public void sendVerificationEmail(String toEmail, String clientName, String verificationLink) {
 
+        // Define email subject and body
         String subject = "Please verify your email address";
         String bodyText = "Dear " + clientName + ",\n\n" +
-                "Please verify your email address by clicking on the following link:\n" +
+                "Please verify your email address by clicking the following link:\n" +
                 verificationLink + "\n\nThank you!";
 
-        // Construct the email request
+        // Construct the email request for SES
         SendEmailRequest emailRequest = SendEmailRequest.builder()
                 .destination(Destination.builder()
                         .toAddresses(toEmail)
@@ -43,14 +53,15 @@ public class EmailService {
                                         .build())
                                 .build())
                         .build())
-                .source("a@gmail.com")
+                .source(SENDER_EMAIL) // Set the verified sender email
                 .build();
 
         try {
+            // Send email through SES
             SendEmailResponse response = sesClient.sendEmail(emailRequest);
-            System.out.println("Email sent! Message ID: " + response.messageId());
+            System.out.println("Verification email sent! Message ID: " + response.messageId());
         } catch (SesException e) {
-            System.err.println("Email not sent. Error message: " + e.awsErrorDetails().errorMessage());
+            System.err.println("Failed to send verification email. Error: " + e.awsErrorDetails().errorMessage());
         }
     }
 }
