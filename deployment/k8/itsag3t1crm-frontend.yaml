@@ -24,12 +24,12 @@ spec:
         - containerPort: 3000
           name: http
       topologySpreadConstraints:
-        - labelSelector:
-            matchLabels:
-              app: frontend
-          maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: ScheduleAnyway
+#        - labelSelector:
+#            matchLabels:
+#              app: frontend
+#          maxSkew: 1
+#          topologyKey: kubernetes.io/hostname
+#          whenUnsatisfiable: ScheduleAnyway
         - labelSelector:
             matchLabels:
               app: frontend
