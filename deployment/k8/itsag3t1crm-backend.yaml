@@ -4,6 +4,7 @@ metadata:
   namespace: itsag3t1-crm
   name: itsag3t1-crm-backend
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app.kubernetes.io/name: itsag3t1-crm-backend
@@ -37,6 +38,19 @@ spec:
               secretKeyRef:
                 name: db-crm-password
                 key: crm_db_password
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app: itsag3t1-crm-backend
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+        - labelSelector:
+            matchLabels:
+              app: itsag3t1-crm-backend
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
 ---
 apiVersion: v1
 kind: Service
