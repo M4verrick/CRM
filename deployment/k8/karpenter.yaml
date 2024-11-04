@@ -47,5 +47,5 @@ spec:
     cpu: 1000
     memory: 1000Gi
   disruption:
-    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidationPolicy: WhenUnderutilized
     consolidateAfter: 1m
