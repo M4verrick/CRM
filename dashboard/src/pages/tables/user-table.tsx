@@ -3,243 +3,245 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Dropdown, Space, Tag } from 'antd';
 import React from 'react';
-import { useRef } from 'react';
-import request from 'umi-request';
 
-export const waitTimePromise = async (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
+// TODO: make the searchable params and edit function in Protable functional,
+
+// cognito integration
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
+
+// Import AWS types
+type AWSCognitoUserType = CognitoIdentityServiceProvider.UserType;
+type AWSCognitoListUsersResponse = CognitoIdentityServiceProvider.ListUsersResponse;
+type AWSGroupType = CognitoIdentityServiceProvider.GroupType;
+type AWSAdminListGroupsForUserResponse = CognitoIdentityServiceProvider.AdminListGroupsForUserResponse;
+
+// Type for the params we pass to listUsers
+type ListUsersParams = CognitoIdentityServiceProvider.ListUsersRequest;
+
+type CognitoUserTableItem = {
+  username: string;
+  given_name: string;
+  family_name: string;
+  email: string;
+  emailVerified: boolean;
+  userId: string;
+  enabled: boolean;
+  status: AWSCognitoUserType['UserStatus'];
+  created: Date;
+  lastModified: Date;
+  groups: string[]; // Add this field
 };
 
-export const waitTime = async (time: number = 100) => {
-  await waitTimePromise(time);
+// Update the transform function to include groups
+const transformUser = (user: AWSCognitoUserType, groups: AWSGroupType[] = []): CognitoUserTableItem => {
+  return {
+    username: user.Username || '',
+    given_name: user.Attributes?.find(attr => attr.Name === 'given_name')?.Value || '',
+    family_name: user.Attributes?.find(attr => attr.Name === 'family_name')?.Value || '',
+    email: user.Attributes?.find(attr => attr.Name === 'email')?.Value || '',
+    emailVerified: user.Attributes?.find(attr => attr.Name === 'email_verified')?.Value === 'true',
+    userId: user.Attributes?.find(attr => attr.Name === 'sub')?.Value || '',
+    enabled: user.Enabled || false,
+    status: user.UserStatus || 'UNKNOWN',
+    created: new Date(user.UserCreateDate || ''),
+    lastModified: new Date(user.UserLastModifiedDate || ''),
+    groups: groups.map(g => g.GroupName || '') // Add this field
+  };
 };
 
-// Define table items
-type GithubIssueItem = {
-  url: string;
-  id: number;
-  number: number;
-  title: string;
-  labels: {
-    name: string;
-    color: string;
-  }[];
-  state: string;
-  comments: number;
-  created_at: string;
-  updated_at: string;
-  closed_at?: string;
+const fetchUsers = async (params?: ListUsersParams) => {
+  try {
+    const cognitoISP = new CognitoIdentityServiceProvider({
+      region: "ap-southeast-1",
+      credentials: {
+        accessKeyId: "AKIAVD3BDD5QBC4X7FU2",
+        secretAccessKey: "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"
+      }
+    });
+
+    // fetch all users
+    const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers(params || {
+      UserPoolId: "ap-southeast-1_ya55bZ0sg",
+      Limit: 20,
+    }).promise();
+
+    // Fetch groups for each user. 2n+1 computational complexity.
+    const usersWithGroups = await Promise.all((response.Users || []).map(async (user) => {
+      if (!user.Username) return transformUser(user);
+
+      try {
+        const groupsResponse: AWSAdminListGroupsForUserResponse = await cognitoISP.adminListGroupsForUser({
+          Username: user.Username,
+          UserPoolId: params?.UserPoolId || "ap-southeast-1_ya55bZ0sg",
+        }).promise();
+
+        return transformUser(user, groupsResponse.Groups || []);
+      } catch (error) {
+        console.error(`Error fetching groups for user ${user.Username}:`, error);
+        return transformUser(user);
+      }
+    }));
+
+    return {
+      data: usersWithGroups,
+      total: usersWithGroups.length,
+      success: true
+    };
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    return {
+      data: [],
+      total: 0,
+      success: false,
+      error: err instanceof Error ? err.message : 'An error occurred'
+    };
+  }
 };
 
-const columns: ProColumns<GithubIssueItem>[] = [
+
+const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     dataIndex: 'index',
     valueType: 'indexBorder',
-    width: 48,
+    width: 48
   },
   {
-    title: '标题',
-    dataIndex: 'title',
+    title: 'First Name',
+    dataIndex: 'given_name',
     copyable: true,
-    ellipsis: true,
-    tooltip: '标题过长会自动收缩',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
+    width: 140,
   },
   {
-    disable: true,
-    title: '状态',
-    dataIndex: 'state',
-    filters: true,
-    onFilter: true,
-    ellipsis: true,
-    valueType: 'select',
+    title: 'Last Name',
+    dataIndex: 'family_name',
+    copyable: true,
+    width: 140,
+  },
+  {
+    title: 'Email',
+    dataIndex: 'email',
+    copyable: true,
+    ellipsis: true
+  },
+  {
+    title: 'Email Verified',
+    dataIndex: 'emailVerified',
     valueEnum: {
-      all: { text: '超长'.repeat(50) },
-      open: {
-        text: '未解决',
-        status: 'Error',
-      },
-      closed: {
-        text: '已解决',
-        status: 'Success',
-        disabled: true,
-      },
-      processing: {
-        text: '解决中',
-        status: 'Processing',
-      },
-    },
+      true: { text: 'true' },
+      false: { text: 'false' },
+    }
   },
   {
-    disable: true,
-    title: '标签',
-    dataIndex: 'labels',
-    search: false,
-    renderFormItem: (_, { defaultRender }) => {
-      return defaultRender(_);
-    },
+    title: 'Groups',
+    dataIndex: 'groups',
     render: (_, record) => (
       <Space>
-        {record.labels.map(({ name, color }) => (
-          <Tag color={color} key={name}>
-            {name}
+        {record.groups.map((group) => (
+          <Tag key={group} color="blue">
+            {group}
           </Tag>
         ))}
       </Space>
     ),
   },
   {
-    title: '创建时间',
-    key: 'showTime',
-    dataIndex: 'created_at',
-    valueType: 'date',
-    sorter: true,
-    hideInSearch: true,
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'created_at',
-    valueType: 'dateRange',
+    title: 'User ID',
+    dataIndex: 'userId',
+    copyable: true,
+    ellipsis: true,
     hideInTable: true,
-    search: {
-      transform: (value) => {
-        return {
-          startTime: value[0],
-          endTime: value[1],
-        };
-      },
-    },
+
   },
   {
-    title: '操作',
+    title: 'Enabled',
+    dataIndex: 'enabled',
+    filters: true,
+    onFilter: true,
+    valueEnum: {
+      true: { text: 'true' },
+      false: { text: 'false' },
+    }
+  },
+  {
+    title: 'Status',
+    dataIndex: 'status',
+    filters: true,
+    onFilter: true,
+    valueEnum: {
+      UNCONFIRMED: { text: 'Unconfirmed', status: 'Secondary' },
+      CONFIRMED: { text: 'Confirmed', status: 'Success' },
+      ARCHIVED: { text: 'Archived', status: 'Default' },
+      COMPROMISED: { text: 'Compromised', status: 'Error' },
+      UNKNOWN: { text: 'Unknown', status: 'Warning' },
+      RESET_REQUIRED: { text: 'Reset Required', status: 'Processing' },
+      FORCE_CHANGE_PASSWORD: { text: 'Force Change Password', status: 'Processing' }
+    }
+  },
+  {
+    title: 'Created At',
+    dataIndex: 'created',
+    valueType: 'date',
+    hideInSearch: true,
+    hideInTable: true,
+    sorter: true
+  },
+  {
+    title: 'Last Modified',
+    dataIndex: 'lastModified',
+    hideInSearch: true,
+    hideInTable: true,
+    valueType: 'date',
+    sorter: true
+  },
+  {
+    title: 'Options',
     valueType: 'option',
     key: 'option',
     render: (text, record, _, action) => [
       <a
         key="editable"
         onClick={() => {
-          action?.startEditable?.(record.id);
+          // action?.startEditable?.(record.id);
         }}
       >
-        编辑
+        edit
       </a>,
-      <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
-        查看
+      <a
+        key="editable"
+        onClick={() => {
+          // action?.startEditable?.(record.id);
+        }}
+      >
+        delete
       </a>,
-      <TableDropdown
-        key="actionGroup"
-        onSelect={() => action?.reload()}
-        menus={[
-          { key: 'delete', name: '删除' },
-        ]}
-      />,
     ],
   },
 ];
 
 export default () => {
-  const actionRef = useRef<ActionType>();
   return (
-    <ProTable<GithubIssueItem>
-      columns={columns}
-      actionRef={actionRef}
-      cardBordered
-      request={async (params, sort, filter) => {
-        console.log(sort, filter);
-        await waitTime(2000);
-        return request<{
-          data: GithubIssueItem[];
-        }>('https://proapi.azurewebsites.net/github/issues', {
-          params,
-        });
-      }}
-      editable={{
-        type: 'multiple',
-      }}
-      columnsState={{
-        persistenceKey: 'pro-table-singe-demos',
-        persistenceType: 'localStorage',
-        defaultValue: {
-          option: { fixed: 'right', disable: true },
-        },
-        onChange(value) {
-          console.log('value: ', value);
-        },
-      }}
-      rowKey="id"
-      search={{
-        labelWidth: 'auto',
-      }}
-      options={{
-        setting: {
-          listsHeight: 400,
-        },
-      }}
-      form={{
-        // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
-        syncToUrl: (values, type) => {
-          if (type === 'get') {
-            return {
-              ...values,
-              created_at: [values.startTime, values.endTime],
-            };
-          }
-          return values;
-        },
-      }}
-      pagination={{
-        pageSize: 5,
-        onChange: (page) => console.log(page),
-      }}
-      dateFormatter="string"
-      headerTitle="高级表格"
-      toolBarRender={() => [
-        <Button
-          key="button"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            actionRef.current?.reload();
-          }}
-          type="primary"
-        >
-          新建
-        </Button>,
-        <Dropdown
-          key="menu"
-          menu={{
-            items: [
-              {
-                label: '1st item',
-                key: '1',
-              },
-              {
-                label: '2nd item',
-                key: '2',
-              },
-              {
-                label: '3rd item',
-                key: '3',
-              },
-            ],
-          }}
-        >
-          <Button>
-            <EllipsisOutlined />
-          </Button>
-        </Dropdown>,
-      ]}
-    />
+    <ConfigProvider locale={enUS}>
+      <ProTable<CognitoUserTableItem>
+        columns={columns}
+        request={async (params, sort, filter) => {
+          return fetchUsers({
+            UserPoolId: "ap-southeast-1_ya55bZ0sg",
+            Limit: 20,
+          });
+        }}
+        pagination={{
+          pageSize: 10,
+          current: 1
+        }}
+        rowKey="username"
+        search={{
+          labelWidth: 'auto'
+        }}
+        dateFormatter="string"
+        headerTitle="Cognito Users"
+      />
+    </ConfigProvider>
   );
 };
-
