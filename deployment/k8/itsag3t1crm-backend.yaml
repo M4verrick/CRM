@@ -41,13 +41,13 @@ spec:
       topologySpreadConstraints:
         - labelSelector:
             matchLabels:
-              app: itsag3t1-crm-backend
+              app.kubernetes.io/name: itsag3t1-crm-backend
           maxSkew: 1
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: ScheduleAnyway
         - labelSelector:
             matchLabels:
-              app: itsag3t1-crm-backend
+              app.kubernetes.io/name: itsag3t1-crm-backend
           maxSkew: 1
           topologyKey: topology.kubernetes.io/zone
           whenUnsatisfiable: ScheduleAnyway
