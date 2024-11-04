@@ -29,6 +29,7 @@ spec:
         group: karpenter.k8s.aws
         kind: EC2NodeClass
         name: default
+      expireAfter: 72h
       requirements:
         - key: "karpenter.k8s.aws/instance-category"
           operator: In
@@ -47,4 +48,3 @@ spec:
     memory: 1000Gi
   disruption:
     consolidationPolicy: WhenUnderutilized
-    consolidateAfter: 1m
