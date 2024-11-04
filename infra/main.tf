@@ -259,7 +259,7 @@ module "eks" {
   authentication_mode                      = "API_AND_CONFIG_MAP"
 
   eks_managed_node_groups = {
-    initial = {
+    new = {
       instance_types = ["t3.small"]
 
       min_size     = 3

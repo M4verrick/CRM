@@ -21,11 +21,15 @@ metadata:
   name: default
 spec:
   template:
+    metadata:
+      labels:
+        type: karpenter
     spec:
       nodeClassRef:
         group: karpenter.k8s.aws
         kind: EC2NodeClass
         name: default
+      expireAfter: 72h
       requirements:
         - key: "karpenter.k8s.aws/instance-category"
           operator: In
@@ -41,6 +45,7 @@ spec:
           values: ["3"]
   limits:
     cpu: 1000
+    memory: 1000Gi
   disruption:
-    consolidationPolicy: WhenEmpty
-    consolidateAfter: 30s
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 1m
