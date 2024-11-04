@@ -230,6 +230,20 @@ module "eks_blueprints_addons" {
   enable_velero                       = local.aws_addons.enable_velero
   enable_aws_gateway_api_controller   = local.aws_addons.enable_aws_gateway_api_controller
   enable_ingress_nginx                = local.oss_addons.enable_ingress_nginx
+  ingress_nginx = {
+    name          = "ingress-nginx"
+    chart_version = "4.6.1"
+    repository    = "https://kubernetes.github.io/ingress-nginx"
+    namespace     = "ingress-nginx"
+    values        = [templatefile("${path.module}/nginx.yaml", {})]
+    set = [
+      {
+        name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-ssl-cert"
+        value = aws_acm_certificate.cert[0].arn
+        type  = "string"
+      }
+    ]
+  }
 
   external_dns_route53_zone_arns = [local.route53_zone_arn] # ArgoCD Server and UI domain name is registered in Route 53
 
