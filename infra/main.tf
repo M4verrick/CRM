@@ -240,6 +240,24 @@ module "eks_blueprints_addons" {
   tags = local.tags
 }
 
+module "iam_assumable_role_keda" {
+  source      = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  create_role = true
+  role_name   = "keda-role-${local.name}"
+  tags = {
+    Role = "keda-role-${local.name}"
+  }
+  provider_url  = replace(module.eks.oidc_provider, "https://", "")
+  # provider_url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+  role_policy_arns = [
+    "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
+  ]
+  oidc_fully_qualified_subjects = [
+    "system:serviceaccount:keda:keda-operator",
+  ]
+}
+
+
 ################################################################################
 # EKS Cluster
 ################################################################################
@@ -262,9 +280,9 @@ module "eks" {
     new = {
       instance_types = ["t3.small"]
 
-      min_size     = 2
-      max_size     = 4
-      desired_size = 2
+      min_size     = 3
+      max_size     = 3
+      desired_size = 3
     }
   }
 
