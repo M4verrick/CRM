@@ -1,6 +1,5 @@
 package com.itsag3t1.crm.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
@@ -9,10 +8,9 @@ import software.amazon.awssdk.services.ses.model.*;
 @Service
 public class EmailService {
 
-    private final SesClient sesClient;
-
     // Use the verified sender email
     private static final String SENDER_EMAIL = "testipo21@gmail.com";
+    private final SesClient sesClient;
 
     // Initialize the SES client with specified region
     public EmailService() {
@@ -24,8 +22,8 @@ public class EmailService {
     /**
      * Sends a verification email with a link for email verification.
      *
-     * @param toEmail        Recipient's email address.
-     * @param clientName     Name of the client.
+     * @param toEmail          Recipient's email address.
+     * @param clientName       Name of the client.
      * @param verificationLink The link for email verification.
      */
     public void sendVerificationEmail(String toEmail, String clientName, String verificationLink) {

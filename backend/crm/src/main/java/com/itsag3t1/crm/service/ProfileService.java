@@ -1,5 +1,6 @@
 package com.itsag3t1.crm.service;
 
+import com.itsag3t1.crm.exception.DatabaseException;
 import com.itsag3t1.crm.model.AgentProfile;
 import com.itsag3t1.crm.model.ClientAccount;
 import com.itsag3t1.crm.model.Profile;
@@ -7,7 +8,6 @@ import com.itsag3t1.crm.model.ProfileAccountsDTO;
 import com.itsag3t1.crm.repository.AgentProfileRepository;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
 import com.itsag3t1.crm.repository.ProfileRepository;
-import com.itsag3t1.crm.exception.DatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -15,10 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.profiles.ProfileProperty;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -36,7 +35,7 @@ public class ProfileService {
 
     @Autowired
     public ProfileService(ProfileRepository profileRepository, ClientAccountRepository clientAccountRepository,
-            AgentProfileRepository agentProfileRepository) {
+                          AgentProfileRepository agentProfileRepository) {
         this.profileRepository = profileRepository;
         this.clientAccountRepository = clientAccountRepository;
         this.agentProfileRepository = agentProfileRepository;
@@ -95,6 +94,7 @@ public class ProfileService {
     public Optional<Profile> getProfileByVerificationToken(String token) {
         return profileRepository.findByVerificationToken(token);
     }
+
     @Transactional
     public Profile saveProfile(Profile profile) {
         try {

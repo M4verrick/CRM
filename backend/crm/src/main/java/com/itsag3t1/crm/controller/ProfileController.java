@@ -21,7 +21,6 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RestController
@@ -71,7 +70,7 @@ public class ProfileController {
         String agentId = ClaimsUtil.getAgentId(authentication);
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
-        if(!isValidAge(dateOfBirth)) {
+        if (!isValidAge(dateOfBirth)) {
             throw new AgeException("User must be between 18 and 100 years old.");
         }
         Profile newProfile = new Profile.Builder()
@@ -103,7 +102,7 @@ public class ProfileController {
     public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, @RequestParam String agentId) {
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
-        if(!isValidAge(dateOfBirth)){
+        if (!isValidAge(dateOfBirth)) {
             throw new AgeException("User must be between 18 and 100 years old.");
         }
         Profile newProfile = new Profile.Builder()
@@ -126,15 +125,15 @@ public class ProfileController {
 //        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
         String verificationLink = "localhost:8080/api/clients/verify?token=" + token;
         log.info("Sending email");
-         emailService.sendVerificationEmail(savedProfile.getEmail(),
-         savedProfile.getFirstName(), verificationLink);
+        emailService.sendVerificationEmail(savedProfile.getEmail(),
+                savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails,
-            Authentication authentication) {
+                                                 Authentication authentication) {
         String agentId = ClaimsUtil.getAgentId(authentication);
         Optional<Profile> profile = profileService.getProfileById(id, agentId);
         if (profile.isPresent()) {
@@ -221,10 +220,10 @@ public class ProfileController {
         return Pattern.matches(nricPattern, nricNumber);
     }
 
-    private boolean isValidAge(Date dateOfBirth){
+    private boolean isValidAge(Date dateOfBirth) {
         LocalDate today = LocalDate.now();
         LocalDate dob = dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        Period age = Period.between(dob,today);
+        Period age = Period.between(dob, today);
         return age.getYears() >= 18 && age.getYears() <= 100;
     }
 
