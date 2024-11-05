@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -20,9 +21,12 @@ public class ClientAccount {
     @Column(name = "account_id")
     private Long accountId;
 
-    @NotNull(message = "Profile must not be null")
-    @ManyToOne
-    @JoinColumn(name = "profile_id",nullable = false)
+//    @NotNull(message = "Profile must not be null")
+//    @JoinColumn(name = "profile_id",nullable = false)
+//    private Long profileId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", nullable = false)
     @JsonBackReference
     private Profile profile;
 
@@ -50,15 +54,15 @@ public class ClientAccount {
 
     @Min(value = 0, message = "Initial deposit must be 0 or higher")
     @NotNull(message = "Initial deposit must not be null")
-    @Column(name = "initial_deposit", nullable = false)
-    private Double initialDeposit;
+    @Column(name = "initial_deposit", nullable = false, precision = 15, scale = 2)
+    private BigDecimal initialDeposit;
 
     // No-arg constructor for JPA
     public ClientAccount() {
     }
 
     // Constructor to initialize fields
-    public ClientAccount(Profile profile, AccountType accountType, AccountStatus accountStatus, String currency, String branchId, Double initialDeposit) {
+    public ClientAccount(Profile profile, AccountType accountType, AccountStatus accountStatus, String currency, String branchId, BigDecimal initialDeposit) {
         this.profile = profile;
         this.accountType = accountType;
         this.accountStatus = accountStatus;
