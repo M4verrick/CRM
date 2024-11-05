@@ -21,6 +21,8 @@ const createApiClient = () => {
       console.group('🔑 Request Debug');
       console.log('Request URL:', config.baseURL + config.url);
       console.log('Request Headers:', config.headers);
+      console.log('Request Data:', config.data);
+
 
       const tokens = getAuthTokens();
       

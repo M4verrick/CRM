@@ -10,7 +10,6 @@ import com.itsag3t1.crm.util.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +21,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RestController
@@ -59,13 +59,15 @@ public class ProfileController {
 
     @PostMapping
     public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, Authentication authentication) {
+        log.info("Creating profile: {}", profile.getId());
         String agentId = ClaimsUtil.getAgentId(authentication);
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
-        if(!isAtLeast18YearsOld(dateOfBirth)){
+        if (!isAtLeast18YearsOld(dateOfBirth)) {
             throw new UnderageException("User must be at least 18 years old.");
         }
         Profile newProfile = new Profile.Builder()
+                .setId(profile.getId())
                 .setFirstName(profile.getFirstName())
                 .setLastName(profile.getLastName())
                 .setEmail(profile.getEmail())
@@ -83,7 +85,7 @@ public class ProfileController {
 
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
         String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
+//        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
@@ -176,10 +178,10 @@ public class ProfileController {
         return Pattern.matches(nricPattern, nricNumber);
     }
 
-    private boolean isAtLeast18YearsOld(Date dateOfBirth){
+    private boolean isAtLeast18YearsOld(Date dateOfBirth) {
         LocalDate today = LocalDate.now();
         LocalDate dob = dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        Period age = Period.between(dob,today);
+        Period age = Period.between(dob, today);
         return age.getYears() >= 18;
     }
 }

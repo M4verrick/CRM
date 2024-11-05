@@ -1,6 +1,5 @@
 package com.itsag3t1.crm.model;
 
-import com.itsag3t1.crm.model.ClientAccount;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

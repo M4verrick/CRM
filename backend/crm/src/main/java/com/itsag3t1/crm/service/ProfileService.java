@@ -15,8 +15,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.profiles.ProfileProperty;
-import org.springframework.web.server.ResponseStatusException;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +37,8 @@ public class ProfileService {
         this.clientAccountRepository = clientAccountRepository;
         this.agentProfileRepository = agentProfileRepository;
     }
-    public List<Profile> getAllProfiles(){
+
+    public List<Profile> getAllProfiles() {
         return profileRepository.findAll();
     }
 
@@ -59,7 +59,6 @@ public class ProfileService {
             MDC.clear();
         }
     }
-
 
 
     public Optional<Profile> getProfileById(Long id, String agentId) {
@@ -105,15 +104,16 @@ public class ProfileService {
 
     public Profile saveProfile(Profile profile, String agentId) {
         try {
-            // Retrieve or create the AgentProfile
-            AgentProfile agentProfile = agentProfileRepository.findByAgentId(agentId)
-                    .orElseGet(() -> {
-                        AgentProfile newAgentProfile = new AgentProfile();
-                        newAgentProfile.setAgentId(agentId);
-                        newAgentProfile.setProfileId(profile.getId());
-                        return agentProfileRepository.save(newAgentProfile);
-                    });
             Profile savedProfile = profileRepository.save(profile);
+            // Retrieve or create the AgentProfile
+//            AgentProfile agentProfile = agentProfileRepository.findByAgentId(agentId)
+//                    .orElseGet(() -> {
+//                        AgentProfile newAgentProfile = new AgentProfile();
+//                        newAgentProfile.setAgentId(agentId);
+//                        newAgentProfile.setProfileId(profile.getId());
+//                        return agentProfileRepository.save(newAgentProfile);
+//                    });
+
 
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", savedProfile.getId().toString());

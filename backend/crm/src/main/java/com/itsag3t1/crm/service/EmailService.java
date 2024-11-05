@@ -5,8 +5,6 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
-import java.net.URI;
-
 @Service
 public class EmailService {
 

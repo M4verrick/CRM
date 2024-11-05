@@ -114,8 +114,8 @@ const NewClient = () => {
 
                 <Form.Item name="gender" label="Gender" requiredMark="optional">
                   <Select placeholder="Select your gender">
-                    <Select.Option value="male">Male</Select.Option>
-                    <Select.Option value="female">Female</Select.Option>
+                    <Select.Option value="MALE">Male</Select.Option>
+                    <Select.Option value="FEMALE">Female</Select.Option>
                   </Select>
                 </Form.Item>
 

@@ -12,5 +12,6 @@ const API_CONFIG = {
 
 export const getApiConfig = () => {
   const environment = import.meta.env.VITE_ENV || 'development';
+  console.log("Environment: ", environment);
   return API_CONFIG[environment];
 };

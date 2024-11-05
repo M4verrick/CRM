@@ -22,21 +22,10 @@ services:
       POSTGRES_USER: crmappuser
       POSTGRES_PASSWORD: crmapppassword
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./dbsetup/dbseed.sql:/docker-entrypoint-initdb.d/seed.sql
-
-  localstack:
-    image: localstack/localstack
-    container_name: localstack
-    ports:
-      - "4566:4566"
-    environment:
-      - SERVICES=logs,ses
-      - DEFAULT_REGION=ap-southeast-1
-    volumes:
-      - ./localstack/cloudwatch.sh:/docker-entrypoint-initaws.d/cloudwatch.sh
 
 volumes:
   db_data:

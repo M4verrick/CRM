@@ -1,7 +1,5 @@
 package com.itsag3t1.crm.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.itsag3t1.crm.exception.InvalidDataException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +19,7 @@ public class ClientAccount {
     private Long accountId;
 
     @NotNull(message = "Profile must not be null")
-    @JoinColumn(name = "profile_id",nullable = false)
+    @JoinColumn(name = "profile_id", nullable = false)
     private Long profileId;
 
     @NotNull(message = "Account type must not be null")

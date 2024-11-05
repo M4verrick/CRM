@@ -14,5 +14,6 @@ public interface ClientAccountRepository extends JpaRepository<ClientAccount, Lo
 
     @Query("SELECT COUNT(c) FROM ClientAccount c WHERE c.profileId = :profileId AND c.accountStatus = :status")
     long countActiveAccountsByProfileId(@Param("profileId") Long profileId, @Param("status") AccountStatus status);
+
     List<ClientAccount> findByProfileId(Long profileId);
 }
