@@ -97,6 +97,7 @@ public class Profile {
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<ClientAccount> clientAccounts = new ArrayList<>();
+
     // No-argument constructor
     public Profile() {
     }

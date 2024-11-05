@@ -18,7 +18,7 @@ public class ClientAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
     private Long accountId;
-  
+
 //    @NotNull(message = "Profile must not be null")
 //    @JoinColumn(name = "profile_id",nullable = false)
 //    private Long profileId;
