@@ -12,6 +12,7 @@ metadata:
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/98d0b30c-cafe-4b2e-87e9-64c304b65801
     alb.ingress.kubernetes.io/target-node-labels: type=karpenter
+    alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
 spec:
   ingressClassName: alb
   rules:
