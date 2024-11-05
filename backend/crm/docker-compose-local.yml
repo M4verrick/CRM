@@ -22,10 +22,10 @@ services:
       POSTGRES_USER: crmappuser
       POSTGRES_PASSWORD: crmapppassword
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./dbsetup/dbseed.sql:/docker-entrypoint-initdb.d/seed.sql
+#      - ./dbsetup/dbseed.sql:/docker-entrypoint-initdb.d/seed.sql
 
 volumes:
   db_data:
