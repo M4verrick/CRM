@@ -21,6 +21,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @RestController
@@ -66,6 +67,7 @@ public class ProfileController {
 
     @PostMapping("/createProfileAgent")
     public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, Authentication authentication) {
+        log.info("Creating profile: {}", profile.getId());
         String agentId = ClaimsUtil.getAgentId(authentication);
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
@@ -73,6 +75,7 @@ public class ProfileController {
             throw new AgeException("User must be between 18 and 100 years old.");
         }
         Profile newProfile = new Profile.Builder()
+                .setId(profile.getId())
                 .setFirstName(profile.getFirstName())
                 .setLastName(profile.getLastName())
                 .setEmail(profile.getEmail())
@@ -90,7 +93,7 @@ public class ProfileController {
 
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
         String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
+//        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }

@@ -1,14 +1,11 @@
 package com.itsag3t1.crm.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
@@ -131,6 +128,21 @@ public class Profile {
         isEmailVerified = emailVerified;
     }
 
+    @Getter
+    public enum Gender {
+        MALE("Male"),
+        FEMALE("Female"),
+        NON_BINARY("Non-binary"),
+        PREFER_NOT_TO_SAY("Prefer not to say");
+
+        private final String displayName;
+
+        Gender(String displayName) {
+            this.displayName = displayName;
+        }
+
+    }
+
     // Builder class
     public static class Builder {
         private Long id;
@@ -250,20 +262,6 @@ public class Profile {
             return new Profile(this);
         }
 
-
-    }
-    @Getter
-    public enum Gender {
-        MALE("Male"),
-        FEMALE("Female"),
-        NON_BINARY("Non-binary"),
-        PREFER_NOT_TO_SAY("Prefer not to say");
-
-        private final String displayName;
-
-        Gender(String displayName) {
-            this.displayName = displayName;
-        }
 
     }
 

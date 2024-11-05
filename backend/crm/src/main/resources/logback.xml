@@ -10,7 +10,6 @@
             </providers>
         </encoder>
     </appender>
-
     <root level="info">
         <appender-ref ref="CONSOLE"/>
     </root>

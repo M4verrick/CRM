@@ -10,7 +10,10 @@ import java.util.Optional;
 @Repository
 public interface AgentProfileRepository extends JpaRepository<AgentProfile, Long> {
     boolean existsByAgentIdAndProfileId(String agentId, Long clientId);
+
     Optional<AgentProfile> findByAgentId(String agentId);
+
     List<AgentProfile> findAllByAgentId(String agentId);
+
     Optional<AgentProfile> findByAgentIdAndProfileId(String agentId, Long clientId);
 }

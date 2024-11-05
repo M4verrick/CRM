@@ -11,8 +11,8 @@ const icons = {
 
 // Currently default (admin) route shows all pages for ease of testing,
 // settle the routing after settling the integration
-const tables = {
-  id: 'tables',
+const tablesAgent = {
+  id: 'tablesAgent',
   title: 'Profiles',
   type: 'group',
   children: [
@@ -24,27 +24,13 @@ const tables = {
       icon: icons.ChromeOutlined
     },
     {
-      id: 'user-table',
-      title: 'Manage System Users',
-      type: 'item',
-      url: '/UserTable',
-      icon: icons.ChromeOutlined
-    },
-    {
       id: 'client-transaction-table',
       title: 'Manage Transactions',
       type: 'item',
       url: '/ClientTransactionTable',
       icon: icons.ChromeOutlined
     },
-    {
-      id: 'user-transaction-table',
-      title: 'Manage User Transactions',
-      type: 'item',
-      url: '/UserTransactionTable',
-      icon: icons.ChromeOutlined
-    },
   ]
 };
 
-export default tables;
+export default tablesAgent;

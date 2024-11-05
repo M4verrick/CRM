@@ -54,18 +54,41 @@ const Account = (props) => {
         });
     }, []);
 
-    // Modified initializeAuth
+    // used for storing tokens for api calls.
+    const storeAuthTokens = (session) => {
+        try {
+            // Convert CognitoUserSession to the format we need
+            const authResult = {
+                AuthenticationResult: {
+                    AccessToken: session.getAccessToken().getJwtToken(),
+                    IdToken: session.getIdToken().getJwtToken(),
+                    RefreshToken: session.getRefreshToken().getToken(),
+                    ExpiresIn: session.getAccessToken().getExpiration() - Math.floor(Date.now() / 1000),
+                    TokenType: "Bearer"
+                },
+                ChallengeParameters: {}
+            };
+            
+            localStorage.setItem('auth_tokens', JSON.stringify(authResult));
+            return authResult;
+        } catch (error) {
+            console.error('Error storing auth tokens:', error);
+            throw error;
+        }
+    };
+
+    // initializeAuth
     const initializeAuth = useCallback(async () => {
         try {
             setIsLoading(true);
             console.log("Starting auth initialization");
-
+    
             const cognitoUser = Pool.getCurrentUser();
             if (!cognitoUser) {
                 console.log("No current user found");
                 throw new Error("No user found");
             }
-
+    
             // Get session first
             const session = await new Promise((resolve, reject) => {
                 cognitoUser.getSession((err, session) => {
@@ -77,23 +100,25 @@ const Account = (props) => {
                     resolve(session);
                 });
             });
-
+    
             if (!session.isValid()) {
                 console.log("Session is invalid");
                 throw new Error("Invalid session");
             }
 
             console.log("Valid session found");
-
+            // Store the tokens on initialization
+            storeAuthTokens(session);
+            console.log("Tokens stored");
+    
             try {
-                const attributes = await getUserAttributes(cognitoUser);
+                const attributes = await getUserAttributes(cognitoUser);               
                 setUserAttributes(attributes);
                 setUser(cognitoUser);
                 setIsAuthenticated(true);
                 console.log("Auth initialization complete with attributes");
             } catch (attrError) {
                 console.error("Error getting user attributes:", attrError);
-                // Continue with authentication even if attributes fail
                 setUser(cognitoUser);
                 setIsAuthenticated(true);
                 console.log("Auth initialization complete without attributes");
@@ -114,23 +139,25 @@ const Account = (props) => {
         try {
             setIsLoading(true);
             console.log("Starting authentication");
-
+    
             const user = new CognitoUser({
                 Username,
                 Pool,
                 Storage: window.localStorage
             });
-
+    
             const authDetails = new AuthenticationDetails({
                 Username,
                 Password
             });
-
+    
             const authResult = await new Promise((resolve, reject) => {
                 user.authenticateUser(authDetails, {
                     onSuccess: async (result) => {
                         console.log("Authentication successful");
-                        resolve(result);
+                        // Store tokens immediately after successful auth
+                        const tokens = storeAuthTokens(result);
+                        resolve(tokens);
                     },
                     onFailure: (err) => {
                         console.error("Authentication failed:", err);
@@ -142,11 +169,11 @@ const Account = (props) => {
                     }
                 });
             });
-
+    
             // Wait for auth state to be initialized
             await initializeAuth();
             return authResult;
-
+    
         } catch (error) {
             console.error("Authentication error:", error);
             throw error;
@@ -221,7 +248,7 @@ const Account = (props) => {
         }
     };
 
-    // Modified logout function
+    // Updates state and clears tokens on logout
     const logout = async () => {
         try {
             setIsLoading(true);
@@ -229,6 +256,8 @@ const Account = (props) => {
             if (user) {
                 console.log("Logging out user"); // Debug log
                 user.signOut();
+                // Clear stored tokens
+                localStorage.removeItem('auth_tokens');
                 setIsAuthenticated(false);
                 setUser(null);
                 setUserAttributes(null);
