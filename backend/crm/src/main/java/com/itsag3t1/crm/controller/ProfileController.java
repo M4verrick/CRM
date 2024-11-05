@@ -1,6 +1,6 @@
 package com.itsag3t1.crm.controller;
 
-import com.itsag3t1.crm.exception.UnderageException;
+import com.itsag3t1.crm.exception.AgeException;
 import com.itsag3t1.crm.model.Profile;
 import com.itsag3t1.crm.model.ProfileAccountsDTO;
 import com.itsag3t1.crm.service.EmailService;
@@ -38,7 +38,8 @@ public class ProfileController {
         this.emailService = emailService;
     }
 
-    @GetMapping("/all")
+    /* For testing only */
+    @GetMapping("/accountsById")
     public List<ProfileAccountsDTO> getAccountsGroupedByProfileId() {
         return profileService.getAccountsGroupedByProfileId();
     }
@@ -50,6 +51,13 @@ public class ProfileController {
         return profileService.getAllProfilesByAgentId(agentId);
     }
 
+    /* For testing only */
+    @GetMapping("/test/")
+    public List<Profile> getAllProfiles(@RequestParam String agentId) {
+        log.info("Agent ID: {}", agentId);
+        return profileService.getAllProfilesByAgentId(agentId);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Profile> getProfileById(@PathVariable Long id, Authentication authentication) {
         String agentId = ClaimsUtil.getAgentId(authentication);
@@ -57,14 +65,14 @@ public class ProfileController {
         return profile.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/createProfileAgent")
     public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, Authentication authentication) {
         log.info("Creating profile: {}", profile.getId());
         String agentId = ClaimsUtil.getAgentId(authentication);
         String token = TokenUtil.generateVerificationToken();
         Date dateOfBirth = profile.getDateOfBirth();
-        if (!isAtLeast18YearsOld(dateOfBirth)) {
-            throw new UnderageException("User must be at least 18 years old.");
+        if(!isValidAge(dateOfBirth)) {
+            throw new AgeException("User must be between 18 and 100 years old.");
         }
         Profile newProfile = new Profile.Builder()
                 .setId(profile.getId())
@@ -90,8 +98,43 @@ public class ProfileController {
         return ResponseEntity.ok(savedProfile);
     }
 
+    /* For testing only */
+    @PostMapping("/testAgent")
+    public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, @RequestParam String agentId) {
+        String token = TokenUtil.generateVerificationToken();
+        Date dateOfBirth = profile.getDateOfBirth();
+        if(!isValidAge(dateOfBirth)){
+            throw new AgeException("User must be between 18 and 100 years old.");
+        }
+        Profile newProfile = new Profile.Builder()
+                .setFirstName(profile.getFirstName())
+                .setLastName(profile.getLastName())
+                .setEmail(profile.getEmail())
+                .setPhone(profile.getPhone())
+                .setAddress(profile.getAddress())
+                .setCity(profile.getCity())
+                .setState(profile.getState())
+                .setZip(profile.getZip())
+                .setCountry(profile.getCountry())
+                .setDateOfBirth(profile.getDateOfBirth())
+                .setGender(profile.getGender())
+                .setVerificationToken(token)
+                .setEmailVerified(false)
+                .build();
+
+        Profile savedProfile = profileService.saveProfile(newProfile, agentId);
+//        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
+        String verificationLink = "localhost:8080/api/clients/verify?token=" + token;
+        log.info("Sending email");
+         emailService.sendVerificationEmail(savedProfile.getEmail(),
+         savedProfile.getFirstName(), verificationLink);
+
+        return ResponseEntity.ok(savedProfile);
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails, Authentication authentication) {
+    public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails,
+            Authentication authentication) {
         String agentId = ClaimsUtil.getAgentId(authentication);
         Optional<Profile> profile = profileService.getProfileById(id, agentId);
         if (profile.isPresent()) {
@@ -109,7 +152,7 @@ public class ProfileController {
                     .setGender(profileDetails.getGender())
                     .build();
 
-            profileService.saveProfile(updatedProfile, agentId);
+            profileService.updateProfile(id, updatedProfile, agentId);
             return ResponseEntity.ok(updatedProfile);
         } else {
             return ResponseEntity.notFound().build();
@@ -128,9 +171,8 @@ public class ProfileController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token, Authentication authentication) {
-        String agentId = ClaimsUtil.getAgentId(authentication);
-        Optional<Profile> optionalProfile = profileService.getProfileByVerificationToken(token, agentId);
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        Optional<Profile> optionalProfile = profileService.getProfileByVerificationToken(token);
         if (optionalProfile.isEmpty()) {
             return ResponseEntity.badRequest().body("Invalid verification token");
         }
@@ -141,11 +183,11 @@ public class ProfileController {
                 .setEmailVerified(true)
                 .build();
 
-        profileService.saveProfile(verifiedProfile, agentId);
+        profileService.saveProfile(verifiedProfile);
         return ResponseEntity.ok("Email successfully verified.");
     }
 
-    @PostMapping("/{clientId}/verify")
+    @PostMapping("/{clientId}/verifyNRIC")
     public ResponseEntity<String> verifyClientIdentity(
             @PathVariable Long clientId,
             @RequestParam("nricNumber") String nricNumber,
@@ -169,7 +211,8 @@ public class ProfileController {
                     .setVerificationStatus("PENDING")
                     .build();
             profileService.saveProfile(updatedProfile, agentId);
-            return ResponseEntity.badRequest().body("Invalid NRIC number provided. Verification status is set to PENDING.");
+            return ResponseEntity.badRequest()
+                    .body("Invalid NRIC number provided. Verification status is set to PENDING.");
         }
     }
 
@@ -178,10 +221,11 @@ public class ProfileController {
         return Pattern.matches(nricPattern, nricNumber);
     }
 
-    private boolean isAtLeast18YearsOld(Date dateOfBirth) {
+    private boolean isValidAge(Date dateOfBirth){
         LocalDate today = LocalDate.now();
         LocalDate dob = dateOfBirth.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        Period age = Period.between(dob, today);
-        return age.getYears() >= 18;
+        Period age = Period.between(dob,today);
+        return age.getYears() >= 18 && age.getYears() <= 100;
     }
+
 }

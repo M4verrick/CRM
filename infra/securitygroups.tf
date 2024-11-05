@@ -11,7 +11,6 @@ resource "aws_security_group" "rds_sg" {
     to_port          = 5432
     protocol         = "tcp"
     cidr_blocks      = ["10.0.0.0/16"] # Allow traffic from within the VPC (internal IP range)
-    security_groups = [module.eks.cluster_primary_security_group_id, module.eks.cluster_security_group_id, module.eks.node_security_group_id]
   }
 
   # Egress Rules: Define outbound traffic from RDS

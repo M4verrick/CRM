@@ -7,6 +7,7 @@ import com.itsag3t1.crm.model.ProfileAccountsDTO;
 import com.itsag3t1.crm.repository.AgentProfileRepository;
 import com.itsag3t1.crm.repository.ClientAccountRepository;
 import com.itsag3t1.crm.repository.ProfileRepository;
+import com.itsag3t1.crm.exception.DatabaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -15,7 +16,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import software.amazon.awssdk.profiles.ProfileProperty;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +35,8 @@ public class ProfileService {
     private final AgentProfileRepository agentProfileRepository;
 
     @Autowired
-    public ProfileService(ProfileRepository profileRepository, ClientAccountRepository clientAccountRepository, AgentProfileRepository agentProfileRepository) {
+    public ProfileService(ProfileRepository profileRepository, ClientAccountRepository clientAccountRepository,
+            AgentProfileRepository agentProfileRepository) {
         this.profileRepository = profileRepository;
         this.clientAccountRepository = clientAccountRepository;
         this.agentProfileRepository = agentProfileRepository;
@@ -41,7 +45,6 @@ public class ProfileService {
     public List<Profile> getAllProfiles() {
         return profileRepository.findAll();
     }
-
 
     public List<Profile> getAllProfilesByAgentId(String agentId) {
         try {
@@ -60,7 +63,6 @@ public class ProfileService {
         }
     }
 
-
     public Optional<Profile> getProfileById(Long id, String agentId) {
         try {
             // Check if the profile is associated with the given agentId
@@ -73,7 +75,8 @@ public class ProfileService {
                 MDC.put("agent_id", agentId);
                 MDC.put("profile_id", id.toString());
                 MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-                log.info("{} retrieved profile {} at {}", MDC.get("agent_id"), MDC.get("profile_id"), MDC.get("date_time"));
+                log.info("{} retrieved profile {} at {}", MDC.get("agent_id"), MDC.get("profile_id"),
+                        MDC.get("date_time"));
 
                 return profile;
             } else {
@@ -81,39 +84,47 @@ public class ProfileService {
                 MDC.put("agent_id", agentId);
                 MDC.put("profile_id", id.toString());
                 log.warn("Access denied for agent {} to profile {}", MDC.get("agent_id"), MDC.get("profile_id"));
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to access this profile.");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "You are not authorized to access this profile.");
             }
         } finally {
             MDC.clear();
         }
     }
 
-
-    public Optional<Profile> getProfileByVerificationToken(String token, String agentId) {
+    public Optional<Profile> getProfileByVerificationToken(String token) {
+        return profileRepository.findByVerificationToken(token);
+    }
+    @Transactional
+    public Profile saveProfile(Profile profile) {
         try {
-            Optional<Profile> profile = profileRepository.findByVerificationToken(token);
-            MDC.put("agent_id", agentId);
-            MDC.put("verification_token", token);
+            Profile savedProfile = profileRepository.save(profile);
+
+            MDC.put("profile_id", savedProfile.getId().toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
-            log.info("{} retrieved profile by token {} at {}", MDC.get("agent_id"), MDC.get("verification_token"), MDC.get("date_time"));
-            return profile;
+            log.info("Saved profile {} at {}", MDC.get("profile_id"), MDC.get("date_time"));
+
+            return savedProfile;
+        } catch (DataAccessException e) {
+            log.error("An error occurred while saving the profile: {}", e.getMessage(), e);
+            throw e;
         } finally {
             MDC.clear();
         }
     }
 
+    @Transactional
     public Profile saveProfile(Profile profile, String agentId) {
         try {
             Profile savedProfile = profileRepository.save(profile);
             // Retrieve or create the AgentProfile
-//            AgentProfile agentProfile = agentProfileRepository.findByAgentId(agentId)
-//                    .orElseGet(() -> {
-//                        AgentProfile newAgentProfile = new AgentProfile();
-//                        newAgentProfile.setAgentId(agentId);
-//                        newAgentProfile.setProfileId(profile.getId());
-//                        return agentProfileRepository.save(newAgentProfile);
-//                    });
-
+            if (!agentProfileRepository.existsByAgentIdAndProfileId(agentId, savedProfile.getId())) {
+                // Step 3: Create and save the AgentProfile with the generated `profile_id`
+                AgentProfile agentProfile = new AgentProfile();
+                agentProfile.setAgentId(agentId);
+                agentProfile.setProfileId(savedProfile.getId());
+                agentProfileRepository.save(agentProfile);
+            }
 
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", savedProfile.getId().toString());
@@ -129,16 +140,43 @@ public class ProfileService {
         }
     }
 
+    @Transactional
+    public Profile updateProfile(Long id, Profile updatedProfile, String agentId) {
+        // Check if the agent has access to the profile
+        if (!agentProfileRepository.existsByAgentIdAndProfileId(agentId, id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You are not authorized to access this profile.");
+        }
+        Optional<Profile> existingProfileOptional = profileRepository.findById(id);
+
+        if (existingProfileOptional.isPresent()) {
+            // Save the updated profile
+            profileRepository.save(updatedProfile);
+
+            // Log the update operation (if necessary)
+            MDC.put("agent_id", agentId);
+            MDC.put("profile_id", updatedProfile.getId().toString());
+            MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
+            log.info("{} updated profile {} at {}", MDC.get("agent_id"), MDC.get("profile_id"), MDC.get("date_time"));
+
+            return updatedProfile;
+        } else {
+            throw new DatabaseException("Profile not found with id: " + id, null);
+        }
+    }
+
     public void deleteProfile(Long id, String agentId) {
         try {
             MDC.put("agent_id", agentId);
             MDC.put("profile_id", id.toString());
             MDC.put("date_time", ISO_8601_FORMAT.format(new Date()));
 
-            long activeAccountCount = clientAccountRepository.countActiveAccountsByProfileId(id, ClientAccount.AccountStatus.ACTIVE);
+            long activeAccountCount = clientAccountRepository.countActiveAccountsByProfileId(id,
+                    ClientAccount.AccountStatus.ACTIVE);
             if (activeAccountCount > 0) {
                 log.info("Profile {} has active client accounts and cannot be deleted", id);
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Profile cannot be deleted due to active accounts.");
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Profile cannot be deleted due to active accounts.");
             }
 
             profileRepository.deleteById(id);
@@ -157,7 +195,7 @@ public class ProfileService {
 
         // Group accounts by profileId
         Map<Long, List<ClientAccount>> accountsByProfile = accounts.stream()
-                .collect(Collectors.groupingBy(ClientAccount::getProfileId));
+                .collect(Collectors.groupingBy(account -> account.getProfile().getId()));
 
         // Convert Map to List of ProfileAccountsDTO
         return accountsByProfile.entrySet().stream()

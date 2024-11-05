@@ -33,6 +33,10 @@ variable "addons" {
     enable_cert_manager                 = true
     enable_ingress_nginx                = true
     enable_external_secrets             = true
+    enable_aws_for_fluentbit            = true
+    enable_karpenter                    = true
+    enable_aws_cloudwatch_metrics       = true
+    enable_keda                         = true
   }
 }
 # Addons Git

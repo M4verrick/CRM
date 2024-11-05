@@ -4,6 +4,7 @@ metadata:
   namespace: itsag3t1-crm
   name: itsag3t1-crm-frontend
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app.kubernetes.io/name: itsag3t1-crm-frontend
@@ -11,13 +12,33 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: itsag3t1-crm-frontend
+        app: frontend
     spec:
+      nodeSelector:
+        type: karpenter
+      terminationGracePeriodSeconds: 0
       containers:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:621ddfa95dc1a041fd4fba5dbb96882935cdf542
         name: itsag3t1-crm-frontend
+        resources:
+          limits:
+            cpu: 800m
         ports:
         - containerPort: 3000
           name: http
+      topologySpreadConstraints:
+#        - labelSelector:
+#            matchLabels:
+#              app: frontend
+#          maxSkew: 1
+#          topologyKey: kubernetes.io/hostname
+#          whenUnsatisfiable: ScheduleAnyway
+        - labelSelector:
+            matchLabels:
+              app: frontend
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
 ---
 apiVersion: v1
 kind: Service

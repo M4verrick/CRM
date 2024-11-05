@@ -203,7 +203,7 @@ module "gitops_bridge_bootstrap" {
 ################################################################################
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "~> 1.0"
+  version = "~> 1.8"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
@@ -231,10 +231,36 @@ module "eks_blueprints_addons" {
   enable_aws_gateway_api_controller   = local.aws_addons.enable_aws_gateway_api_controller
   enable_ingress_nginx                = local.oss_addons.enable_ingress_nginx
 
+  ingress_nginx = {
+    values        = [templatefile("${path.module}/values.yaml", {})]
+  }
+
   external_dns_route53_zone_arns = [local.route53_zone_arn] # ArgoCD Server and UI domain name is registered in Route 53
+
+  karpenter_node = {
+    iam_role_use_name_prefix = false
+  }
 
   tags = local.tags
 }
+
+module "iam_assumable_role_keda" {
+  source      = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  create_role = true
+  role_name   = "keda-role-${local.name}"
+  tags = {
+    Role = "keda-role-${local.name}"
+  }
+  provider_url  = replace(module.eks.oidc_provider, "https://", "")
+  # provider_url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+  role_policy_arns = [
+    "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
+  ]
+  oidc_fully_qualified_subjects = [
+    "system:serviceaccount:keda:keda-operator",
+  ]
+}
+
 
 ################################################################################
 # EKS Cluster
@@ -242,7 +268,7 @@ module "eks_blueprints_addons" {
 #tfsec:ignore:aws-eks-enable-control-plane-logging
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.13"
+  version = "~> 20.23"
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
@@ -252,15 +278,18 @@ module "eks" {
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
 
+  authentication_mode                      = "API_AND_CONFIG_MAP"
+
   eks_managed_node_groups = {
-    initial = {
+    new = {
       instance_types = ["t3.small"]
 
       min_size     = 3
-      max_size     = 10
+      max_size     = 3
       desired_size = 3
     }
   }
+
   # EKS Addons
   cluster_addons = {
     vpc-cni = {
@@ -277,8 +306,32 @@ module "eks" {
         }
       })
     }
+    eks-pod-identity-agent = {}
+    kube-proxy = { most_recent = true }
+    # coredns = { most_recent = true }
   }
-  tags = local.tags
+
+  tags = merge(local.tags, {
+    # NOTE - if creating multiple security groups with this module, only tag the
+    # security group that Karpenter should utilize with the following tag
+    # (i.e. - at most, only one security group should have this tag in your account)
+    "karpenter.sh/discovery" = local.name
+  })
+}
+
+module "aws-auth" {
+  source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
+  version = "~> 20.0"
+
+  manage_aws_auth_configmap = true
+
+  aws_auth_roles = [
+    {
+      rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+      username = "system:node:{{EC2PrivateDNSName}}"
+      groups   = ["system:bootstrappers", "system:nodes"]
+    },
+  ]
 }
 
 ################################################################################
@@ -305,6 +358,8 @@ module "vpc" {
 
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = 1
+    # Tags subnets for Karpenter auto-discovery
+    "karpenter.sh/discovery" = local.name
   }
 
   tags = local.tags

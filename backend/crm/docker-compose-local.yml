@@ -9,10 +9,8 @@ services:
       - "8080:8080"
     depends_on:
       - db
-    environment:
-      - CLOUDWATCH_URI=http://localstack:4566
-      - AWS_ACCESS_KEY=test
-      - AWS_KEY_ID=test
+    env_file:
+      - .env
 
   db:
     image: postgres:16
