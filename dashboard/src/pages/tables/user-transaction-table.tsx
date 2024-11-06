@@ -12,18 +12,16 @@ import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
 
 const client = new CloudWatchLogsClient({
-  region: "ap-southeast-1",
+  region: import.meta.env.VITE_AWS_REGION,
   credentials: {
-    accessKeyId: "AKIAVD3BDD5QBC4X7FU2",
-    secretAccessKey: "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"
+    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
   }
 });
 
 async function getCloudWatchLogs() {
   const command = new FilterLogEventsCommand({
     logGroupName: "crm-logs",         // Specify the log group
-    // startTime: Date.now() - 60 * 60 * 1000,  // Adjust the time range (e.g., last hour)
-    // endTime: Date.now(),
     limit: 100,            // Set a limit for the number of logs returned
   });
 

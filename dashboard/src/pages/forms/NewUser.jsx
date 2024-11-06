@@ -12,16 +12,16 @@ const NewUser = () => {
   const createUserInCognito = async (userData) => {
     // Configure the AWS SDK with your credentials and region
     const cognitoIdentityServiceProvider = new CognitoIdentityServiceProvider({
-      region: 'ap-southeast-1',
+      region: import.meta.env.VITE_AWS_REGION,
       credentials: {
-        accessKeyId: 'AKIAVD3BDD5QBC4X7FU2',
-        secretAccessKey: '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'
+        accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+        secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
       }
     });
 
     // Set up the parameters for creating a new user
     const params = {
-      UserPoolId: 'ap-southeast-1_ya55bZ0sg',
+      UserPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
       Username: userData.email,
       TemporaryPassword: generateTemporaryPassword(),
       UserAttributes: [
@@ -52,7 +52,7 @@ const NewUser = () => {
       // If user creation was successful, add them to their group
       if (createUserResponse.User) {
         const addToGroupParams = {
-          UserPoolId: 'ap-southeast-1_ya55bZ0sg',
+          UserPoolId: import.meta.env.VITE_USER_POOL_ID,
           Username: userData.email,
           GroupName: userData.type // 'agent' or 'admin' from the form
         };

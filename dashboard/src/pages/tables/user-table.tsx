@@ -54,16 +54,16 @@ const transformUser = (user: AWSCognitoUserType, groups: AWSGroupType[] = []): C
 const fetchUsers = async (params?: ListUsersParams) => {
   try {
     const cognitoISP = new CognitoIdentityServiceProvider({
-      region: "ap-southeast-1",
+      region: import.meta.env.VITE_AWS_REGION,
       credentials: {
-        accessKeyId: "AKIAVD3BDD5QBC4X7FU2",
-        secretAccessKey: "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"
+        accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+        secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
       }
     });
 
     // fetch all users
     const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers(params || {
-      UserPoolId: "ap-southeast-1_ya55bZ0sg",
+      UserPoolId: import.meta.env.VITE_USER_POOL_ID,
       Limit: 20,
     }).promise();
 
@@ -74,7 +74,7 @@ const fetchUsers = async (params?: ListUsersParams) => {
       try {
         const groupsResponse: AWSAdminListGroupsForUserResponse = await cognitoISP.adminListGroupsForUser({
           Username: user.Username,
-          UserPoolId: params?.UserPoolId || "ap-southeast-1_ya55bZ0sg",
+          UserPoolId: params?.UserPoolId || import.meta.env.VITE_USER_POOL_ID,
         }).promise();
 
         return transformUser(user, groupsResponse.Groups || []);
@@ -209,7 +209,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
         edit
       </a>,
       <a
-        key="editable"
+        key="delete"
         onClick={() => {
           // action?.startEditable?.(record.id);
         }}
