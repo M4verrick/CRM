@@ -1,5 +1,5 @@
 const express = require('express');
-const { downloadFile } = require('../services/sftpService');
+const { downloadFile } = require('../services/sftpService2');
 const router = express.Router();
 
 router.get('/download-file', async (req, res) => {

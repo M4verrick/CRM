@@ -8,7 +8,7 @@ const targetPort = 22;           // Default SSH port
 const username = "ec2-user";     // Username, typically 'ec2-user' for Amazon Linux
 const privateKeyPath = "/home/ec2-user/.ssh/feature4"; // Path to your private key
 const remoteFilePath = "/home/ec2-user/files/transactions1.csv"; // File path on the target instance
-const localFilePath = path.join(__dirname, 'file_desti', 'a.txt'); // Local save path
+const localFilePath = path.join(__dirname, 'files'); // Local save path
 
 async function downloadFile() {
     try {
