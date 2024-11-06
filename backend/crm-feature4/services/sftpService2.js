@@ -13,7 +13,7 @@ const remoteDirectoryPath = "/home/ec2-user/files";    // Remote directory path
 const localDirectoryPath = path.join(__dirname, 'files'); // Local save directory
 
 // SQLite Configuration
-const dbPath = path.join(localDirectoryPath, 'downloaded_files.db');
+const dbPath = path.join(__dirname, 'downloaded_files.db');
 const db = new sqlite3.Database(dbPath);
 
 // Ensure the downloaded_files table exists
