@@ -1,10 +1,8 @@
-import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Dropdown, Space, Tag } from 'antd';
+import { ProTable } from '@ant-design/pro-components';
+import { Modal, message, Space, Tag } from 'antd';
 import React from 'react';
-
-// TODO: make the searchable params and edit function in Protable functional,
+import { useRef } from 'react';
 
 // cognito integration
 import { CognitoIdentityServiceProvider } from 'aws-sdk';
@@ -100,6 +98,71 @@ const fetchUsers = async (params?: ListUsersParams) => {
   }
 };
 
+// Handle functions in options column
+const handleEdit = async (record: CognitoUserTableItem) => {
+  const cognitoISP = new CognitoIdentityServiceProvider({
+    region: import.meta.env.VITE_AWS_REGION,
+    credentials: {
+      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+    }
+  });
+
+  try {
+    await cognitoISP.adminUpdateUserAttributes({
+      UserPoolId: import.meta.env.VITE_USER_POOL_ID,
+      Username: record.username,
+      UserAttributes: [
+        {
+          Name: 'given_name',
+          Value: record.given_name
+        },
+        {
+          Name: 'family_name',
+          Value: record.family_name
+        },
+        {
+          Name: 'email',
+          Value: record.email
+        }
+      ]
+    }).promise();
+    message.success('User updated successfully');
+  } catch (error) {
+    message.error('Failed to update user');
+    console.error('Error updating user:', error);
+  }
+};
+
+const handleDelete = async (record: CognitoUserTableItem) => {
+  Modal.confirm({
+    title: 'Are you sure you want to delete this user?',
+    content: `This will permanently delete user ${record.email}`,
+    okText: 'Yes',
+    okType: 'danger',
+    cancelText: 'No',
+    onOk: async () => {
+      const cognitoISP = new CognitoIdentityServiceProvider({
+        region: import.meta.env.VITE_AWS_REGION,
+        credentials: {
+          accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+          secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+        }
+      });
+
+      try {
+        await cognitoISP.adminDeleteUser({
+          UserPoolId: import.meta.env.VITE_USER_POOL_ID,
+          Username: record.username
+        }).promise();
+        message.success('User deleted successfully');
+      } catch (error) {
+        message.error('Failed to delete user');
+        console.error('Error deleting user:', error);
+      }
+    }
+  });
+};
 
 const columns: ProColumns<CognitoUserTableItem>[] = [
   {
@@ -128,6 +191,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Email Verified',
     dataIndex: 'emailVerified',
+    editable: false,
     valueEnum: {
       true: { text: 'true' },
       false: { text: 'false' },
@@ -136,6 +200,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Groups',
     dataIndex: 'groups',
+    editable: false,
     render: (_, record) => (
       <Space>
         {record.groups.map((group) => (
@@ -149,14 +214,15 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'User ID',
     dataIndex: 'userId',
+    editable: false,
     copyable: true,
     ellipsis: true,
     hideInTable: true,
-
   },
   {
     title: 'Enabled',
     dataIndex: 'enabled',
+    editable: false,
     filters: true,
     onFilter: true,
     valueEnum: {
@@ -167,6 +233,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Status',
     dataIndex: 'status',
+    editable: false,
     filters: true,
     onFilter: true,
     valueEnum: {
@@ -182,6 +249,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Created At',
     dataIndex: 'created',
+    editable: false,
     valueType: 'date',
     hideInSearch: true,
     hideInTable: true,
@@ -190,6 +258,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Last Modified',
     dataIndex: 'lastModified',
+    editable: false,
     hideInSearch: true,
     hideInTable: true,
     valueType: 'date',
@@ -198,44 +267,52 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Options',
     valueType: 'option',
+    editable: false,
     key: 'option',
     render: (text, record, _, action) => [
       <a
         key="editable"
-        onClick={() => {
-          // action?.startEditable?.(record.id);
+        onClick={ async() => {
+          action?.startEditable?.(record.userId);
         }}
       >
-        edit
+        Edit
       </a>,
       <a
         key="delete"
-        onClick={() => {
-          // action?.startEditable?.(record.id);
-        }}
+        onClick={() => handleDelete(record)}
       >
-        delete
+        Delete
       </a>,
     ],
-  },
+  }
 ];
 
 export default () => {
+  const actionRef = useRef<ActionType>();
   return (
     <ConfigProvider locale={enUS}>
       <ProTable<CognitoUserTableItem>
         columns={columns}
+        actionRef={actionRef}
         request={async (params, sort, filter) => {
           return fetchUsers({
             UserPoolId: import.meta.env.VITE_USER_POOL_ID,
             Limit: 20,
           });
         }}
+        editable={{
+          type: 'multiple',
+          onSave: async (rowKey, data, row) => {
+            await handleEdit(data);
+            actionRef.current?.reload();
+          },
+        }}
         pagination={{
           pageSize: 10,
           current: 1
         }}
-        rowKey="username"
+        rowKey="userId"
         search={{
           labelWidth: 'auto'
         }}
