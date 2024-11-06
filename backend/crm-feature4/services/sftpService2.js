@@ -46,7 +46,7 @@ function logDownloadedFile(filename) {
 
 // Main function to download new files from the remote directory
 async function downloadFile() {
-    try {ß
+    try {
         // Connect using the private key for authentication
         await sftp.connect({
             host: targetHost,
