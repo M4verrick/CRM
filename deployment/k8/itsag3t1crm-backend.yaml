@@ -70,3 +70,18 @@ spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: itsag3t1-crm-backend
+
+apiversion: v1
+kind: Service
+metadata:  
+  namespace: itsag3t1-crm  
+  name: itsag3t1-crm-feature4
+spec:  
+  ports:    
+    - name: http      
+      port: 80      
+      targetPort: 3000      
+      protocol: TCP  
+  type: ClusterIP  
+  selector:    
+    app.kubernetes.io/name: itsag3t1-crm-feature4

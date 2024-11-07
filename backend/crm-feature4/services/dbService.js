@@ -1,7 +1,7 @@
-const { Client } = require('pg');
+const { Client:PgClient } = require('pg');
 
 // Database configuration - replace with your actual RDS details
-const client = new Client({
+const client = new PgClient({
     host: 'my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com',
     user: 'crmdbadmin',
     password: '', // Add your actual password here or use environment variables for security
@@ -39,4 +39,39 @@ async function getDataFromRDS() {
 // Call the function to fetch data
 getDataFromRDS();
 
-module.exports = { getDataFromRDS };
+
+
+
+// Function to insert a single transaction record into the RDS database
+async function insertTransaction(record) {
+    const query = `
+        INSERT INTO transactions (id, client_id, transaction_type, amount, transaction_date, status)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        ON CONFLICT (id) DO UPDATE SET
+            client_id = EXCLUDED.client_id,
+            transaction_type = EXCLUDED.transaction_type,
+            amount = EXCLUDED.amount,
+            transaction_date = EXCLUDED.transaction_date,
+            status = EXCLUDED.status;
+    `;
+
+    const values = [
+        record.id,
+        record.client_id,
+        record.transaction_type,
+        record.amount,
+        record.transaction_date,
+        record.status
+    ];
+
+    try {
+        await client.query(query, values);
+        console.log(`Transaction ${record.id} inserted/updated successfully`);
+    } catch (error) {
+        console.error('Error inserting transaction:', error);
+        throw error;
+    }
+}
+
+
+module.exports = { getDataFromRDS,insertTransaction };
