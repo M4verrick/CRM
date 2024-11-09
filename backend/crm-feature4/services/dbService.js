@@ -36,8 +36,6 @@ async function getDataFromRDS() {
     }
 }
 
-// Call the function to fetch data
-getDataFromRDS();
 
 
 
