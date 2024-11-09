@@ -4,7 +4,7 @@ const { Client:PgClient,Pool } = require('pg');
 const pool = new Pool({
     host: 'my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com',
     user: 'crmdbadmin',
-    password: '', // Add your actual password here or use environment variables for security
+    password: 'pu8SH5GL42NoKzRG', // Add your actual password here or use environment variables for security
     database: 'crmdb',
     port: 5432,
     ssl: {

@@ -15,9 +15,9 @@ const remoteDirectoryPath = "/home/ec2-user/files";
 const localDirectoryPath = path.join(__dirname, 'files');
 
 // SQLite Configuration
+
 const dbPath = path.join(__dirname, 'downloaded_files.db');
 const db = new sqlite3.Database(dbPath);
-
 // Ensure the downloaded_files table exists
 db.run(`
     CREATE TABLE IF NOT EXISTS downloaded_files (
@@ -85,7 +85,7 @@ async function downloadFile() {
     const processedFiles = [];
     const insertedRecords = [];
     const fileProcessingPromises = []; // Array to hold file processing promises
-
+    const db = new sqlite3.Database(dbPath);
     try {
         await sftp.connect({
             host: targetHost,
