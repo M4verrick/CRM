@@ -1,5 +1,4 @@
-// api useHook
-import { useApi } from 'hooks/useApi';
+import api from 'services/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { Modal, message, Space, Tag } from 'antd';
@@ -37,6 +36,8 @@ const handleDelete = async (record: ClientTableItem) => {
     title: 'Are you sure you want to delete this user?',
     content: `This will permanently delete user ${record.email}`,
     okText: 'Yes',
+    okType: 'danger',
+    cancelText: 'No',
   });
 };
 
@@ -129,15 +130,14 @@ const columns: ProColumns<ClientTableItem>[] = [
 
 export default () => {
   const actionRef = useRef<ActionType>();
-  const { loading, error, get } = useApi();
   return (
     <ConfigProvider locale={enUS}>
       <ProTable<ClientTableItem>
         columns={columns}
         actionRef={actionRef}
         request={async (params, sort, filter) => {
-          const response = await get('/clients');
-          const data = response.data;
+          const response = api.getClients();
+          const data = (await response).data;
           console.log(data);
           return {
             data: data,
@@ -165,5 +165,4 @@ export default () => {
       />
     </ConfigProvider>
   );
-
 };

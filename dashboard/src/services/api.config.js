@@ -1,7 +1,7 @@
 // src/config/api.config.js
 const API_CONFIG = {
   development: {
-    baseURL: 'http://localhost:8080/api',
+    baseURL: 'http://localhost:8080',
     timeout: 5000,
   },
   production: {
