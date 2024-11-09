@@ -50,16 +50,57 @@ function logDownloadedFile(filename) {
 
 
 
-// Function to process CSV file and store data into RDS
-async function processCSVFile(localFilePath) {
-    return new Promise((resolve, reject) => {
-        const results = [];
+async function downloadFile() {
+    const processedFiles = [];
+    const insertedRecords = [];
 
-        // Step 1: Read and parse CSV file
+    try {
+        await sftp.connect({
+            host: targetHost,
+            port: targetPort,
+            username: username,
+            privateKey: fs.readFileSync(privateKeyPath)
+        });
+
+        const remoteFiles = await sftp.list(remoteDirectoryPath);
+
+        if (!fs.existsSync(localDirectoryPath)) {
+            fs.mkdirSync(localDirectoryPath, { recursive: true });
+        }
+
+        for (const file of remoteFiles) {
+            const filename = file.name;
+            const remoteFilePath = `${remoteDirectoryPath}/${filename}`;
+            const localFilePath = path.join(localDirectoryPath, filename);
+
+            if (!(await isFileDownloaded(filename))) {
+                await sftp.get(remoteFilePath, localFilePath);
+                await logDownloadedFile(filename);
+                
+                // Process CSV file and gather inserted records
+                const records = await processCSVFile(localFilePath);
+                insertedRecords.push(...records);
+
+                processedFiles.push(filename);
+            }
+        }
+    } catch (err) {
+        console.error("An error occurred:", err);
+        throw err;
+    } finally {
+        sftp.end();
+        db.close();
+    }
+
+    return { processedFiles, insertedRecords };
+}
+
+async function processCSVFile(localFilePath) {
+    const results = [];
+    return new Promise((resolve, reject) => {
         fs.createReadStream(localFilePath)
             .pipe(csv())
             .on('data', (row) => {
-                // Map CSV data to match the RDS table fields
                 results.push({
                     id: parseInt(row.ID, 10),
                     client_id: parseInt(row['Client ID'], 10),
@@ -70,14 +111,13 @@ async function processCSVFile(localFilePath) {
                 });
             })
             .on('end', async () => {
-                console.log(`CSV file ${localFilePath} successfully processed`);
-
-                // Step 2: Insert data into RDS
+                const insertedRecords = [];
                 try {
                     for (const record of results) {
                         await dbService.insertTransaction(record);
+                        insertedRecords.push(record); // Track each inserted record
                     }
-                    resolve();
+                    resolve(insertedRecords); // Resolve with all inserted records
                 } catch (error) {
                     console.error('Error storing data in RDS:', error);
                     reject(error);
@@ -90,56 +130,6 @@ async function processCSVFile(localFilePath) {
     });
 }
 
-
-
-
-
-
-// Main function to download new files from the remote directory
-async function downloadFile() {
-    try {
-        // Connect using the private key for authentication
-        await sftp.connect({
-            host: targetHost,
-            port: targetPort,
-            username: username,
-            privateKey: fs.readFileSync(privateKeyPath)
-        });
-
-        console.log(`Listing files in remote directory ${remoteDirectoryPath}...`);
-        const remoteFiles = await sftp.list(remoteDirectoryPath);
-
-        // Ensure local directory exists
-        if (!fs.existsSync(localDirectoryPath)) {
-            fs.mkdirSync(localDirectoryPath, { recursive: true });
-        }
-
-        for (const file of remoteFiles) {
-            const filename = file.name;
-            const remoteFilePath = `${remoteDirectoryPath}/${filename}`;
-            const localFilePath = path.join(localDirectoryPath, filename);
-
-            if (!(await isFileDownloaded(filename))) {
-                console.log(`Downloading new file: ${filename}...`);
-                await sftp.get(remoteFilePath, localFilePath);
-                console.log(`File ${filename} downloaded successfully!`);
-
-                // Log the downloaded file in SQLite
-                await logDownloadedFile(filename);
-
-                // Process the CSV file and store its content in RDS
-                await processCSVFile(localFilePath);
-            } else {
-                console.log(`Skipping already downloaded file: ${filename}`);
-            }
-        }
-    } catch (err) {
-        console.error("An error occurred:", err);
-    } finally {
-        sftp.end(); // End the SFTP session
-         // Close the database connection
-    }
-}
-
-// Run the function to download new files
-downloadFile();
+module.exports = {
+    downloadFile,
+};
