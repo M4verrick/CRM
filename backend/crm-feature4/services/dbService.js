@@ -27,6 +27,7 @@ async function getDataFromRDS() {
         result.rows.forEach(row => {
             console.log(row);
         });
+        return result;
 
     } catch (error) {
         console.error("Error fetching data from RDS:", error);
@@ -38,6 +39,20 @@ async function getDataFromRDS() {
 
 
 
+
+// Function to fetch transactions by client ID
+async function getTransactionsByClientId(clientId) {
+    try {
+        const client = await pool.connect();
+        const query = "SELECT * FROM transactions WHERE client_id = $1";
+        const result = await client.query(query, [clientId]);
+        client.release();
+        return result;
+    } catch (error) {
+        console.error("Error fetching transactions by client ID:", error);
+        throw error;
+    }
+}
 
 
 // Function to insert a single transaction record into the RDS database
@@ -73,4 +88,4 @@ async function insertTransaction(record) {
 }
 
 
-module.exports = { getDataFromRDS,insertTransaction };
+module.exports = { getDataFromRDS,getTransactionsByClientId,insertTransaction };
