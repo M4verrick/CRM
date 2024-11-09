@@ -1,236 +1,169 @@
-import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Dropdown, Space, Tag } from 'antd';
-import React from 'react';
-import { useRef } from 'react';
-import request from 'umi-request';
-
 // api useHook
 import { useApi } from 'hooks/useApi';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
+import { Modal, message, Space, Tag } from 'antd';
+import React from 'react';
+import { useRef } from 'react';
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
 
-// TODO: check what fields backend responds with
-
-
-// Define table items
-type GithubIssueItem = {
-  url: string;
-  id: number;
-  number: number;
-  title: string;
-  labels: {
-    name: string;
-    color: string;
-  }[];
+type ClientTableItem = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
   state: string;
-  comments: number;
-  created_at: string;
-  updated_at: string;
-  closed_at?: string;
+  country: string;
+  zip: string;
+  dateOfBirth: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
 };
 
-const columns: ProColumns<GithubIssueItem>[] = [
+// Handle functions in options column
+const handleEdit = async (record: ClientTableItem) => {
+  try {
+    message.success('User updated successfully');
+  } catch (error) {
+    message.error('Failed to update user');
+    console.error('Error updating user:', error);
+  }
+};
+
+const handleDelete = async (record: ClientTableItem) => {
+  Modal.confirm({
+    title: 'Are you sure you want to delete this user?',
+    content: `This will permanently delete user ${record.email}`,
+    okText: 'Yes',
+  });
+};
+
+const columns: ProColumns<ClientTableItem>[] = [
   {
     dataIndex: 'index',
     valueType: 'indexBorder',
-    width: 48,
+    width: 48
   },
   {
-    title: '标题',
-    dataIndex: 'title',
+    title: 'First Name',
+    dataIndex: 'firstName',
     copyable: true,
-    ellipsis: true,
-    tooltip: '标题过长会自动收缩',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
+    width: 140,
   },
   {
-    disable: true,
-    title: '状态',
+    title: 'Last Name',
+    dataIndex: 'lastName',
+    copyable: true,
+    width: 140,
+  },
+  {
+    title: 'Email',
+    dataIndex: 'email',
+    copyable: true,
+    ellipsis: true
+  },
+  {
+    title: 'Phone',
+    dataIndex: 'phone',
+    copyable: true,
+  },
+  {
+    title: 'Address',
+    dataIndex: 'address',
+    ellipsis: true,
+  },
+  {
+    title: 'City',
+    dataIndex: 'city',
+  },
+  {
+    title: 'State',
     dataIndex: 'state',
-    filters: true,
-    onFilter: true,
-    ellipsis: true,
-    valueType: 'select',
-    valueEnum: {
-      all: { text: '超长'.repeat(50) },
-      open: {
-        text: '未解决',
-        status: 'Error',
-      },
-      closed: {
-        text: '已解决',
-        status: 'Success',
-        disabled: true,
-      },
-      processing: {
-        text: '解决中',
-        status: 'Processing',
-      },
-    },
   },
   {
-    disable: true,
-    title: '标签',
-    dataIndex: 'labels',
-    search: false,
-    renderFormItem: (_, { defaultRender }) => {
-      return defaultRender(_);
-    },
-    render: (_, record) => (
-      <Space>
-        {record.labels.map(({ name, color }) => (
-          <Tag color={color} key={name}>
-            {name}
-          </Tag>
-        ))}
-      </Space>
-    ),
+    title: 'Country',
+    dataIndex: 'country',
   },
   {
-    title: '创建时间',
-    key: 'showTime',
-    dataIndex: 'created_at',
+    title: 'ZIP',
+    dataIndex: 'zip',
+  },
+  {
+    title: 'Date of Birth',
+    dataIndex: 'dateOfBirth',
     valueType: 'date',
-    sorter: true,
-    hideInSearch: true,
   },
   {
-    title: '创建时间',
-    dataIndex: 'created_at',
-    valueType: 'dateRange',
-    hideInTable: true,
-    search: {
-      transform: (value) => {
-        return {
-          startTime: value[0],
-          endTime: value[1],
-        };
-      },
-    },
+    title: 'Gender',
+    dataIndex: 'gender',
+    valueEnum: {
+      MALE: { text: 'Male' },
+      FEMALE: { text: 'Female' },
+      OTHER: { text: 'Other' },
+    }
   },
   {
-    title: '操作',
+    title: 'Options',
     valueType: 'option',
     key: 'option',
     render: (text, record, _, action) => [
       <a
         key="editable"
         onClick={() => {
-          action?.startEditable?.(record.id);
+          action?.startEditable?.(record.email);
         }}
       >
-        编辑
+        Edit
       </a>,
-      <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
-        查看
+      <a
+        key="delete"
+        onClick={() => handleDelete(record)}
+      >
+        Delete
       </a>,
-      <TableDropdown
-        key="actionGroup"
-        onSelect={() => action?.reload()}
-        menus={[
-          { key: 'copy', name: '复制' },
-          { key: 'delete', name: '删除' },
-        ]}
-      />,
     ],
-  },
+  }
 ];
 
 export default () => {
   const actionRef = useRef<ActionType>();
+  const { loading, error, get } = useApi();
   return (
-    <ProTable<GithubIssueItem>
-      columns={columns}
-      actionRef={actionRef}
-      cardBordered
-      request={async (params, sort, filter) => {
-        const { loading, error, get } = useApi();
-
-        return await get('clients');
-      }}
-      editable={{
-        type: 'multiple',
-      }}
-      columnsState={{
-        persistenceKey: 'pro-table-singe-demos',
-        persistenceType: 'localStorage',
-        defaultValue: {
-          option: { fixed: 'right', disable: true },
-        },
-        onChange(value) {
-          console.log('value: ', value);
-        },
-      }}
-      rowKey="id"
-      search={{
-        labelWidth: 'auto',
-      }}
-      options={{
-        setting: {
-          listsHeight: 400,
-        },
-      }}
-      form={{
-        // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
-        syncToUrl: (values, type) => {
-          if (type === 'get') {
-            return {
-              ...values,
-              created_at: [values.startTime, values.endTime],
-            };
-          }
-          return values;
-        },
-      }}
-      pagination={{
-        pageSize: 5,
-        onChange: (page) => console.log(page),
-      }}
-      dateFormatter="string"
-      headerTitle="高级表格"
-      toolBarRender={() => [
-        <Button
-          key="button"
-          icon={<PlusOutlined />}
-          onClick={() => {
+    <ConfigProvider locale={enUS}>
+      <ProTable<ClientTableItem>
+        columns={columns}
+        actionRef={actionRef}
+        request={async (params, sort, filter) => {
+          const response = await get('/clients');
+          const data = response.data;
+          console.log(data);
+          return {
+            data: data,
+            success: true,
+            total: data.length
+          };
+        }}
+        editable={{
+          type: 'multiple',
+          onSave: async (rowKey, data, row) => {
+            await handleEdit(data);
             actionRef.current?.reload();
-          }}
-          type="primary"
-        >
-          新建
-        </Button>,
-        <Dropdown
-          key="menu"
-          menu={{
-            items: [
-              {
-                label: '1st item',
-                key: '1',
-              },
-              {
-                label: '2nd item',
-                key: '2',
-              },
-              {
-                label: '3rd item',
-                key: '3',
-              },
-            ],
-          }}
-        >
-          <Button>
-            <EllipsisOutlined />
-          </Button>
-        </Dropdown>,
-      ]}
-    />
+          },
+        }}
+        pagination={{
+          pageSize: 10,
+          current: 1
+        }}
+        rowKey="userId"
+        search={{
+          labelWidth: 'auto'
+        }}
+        dateFormatter="string"
+        headerTitle="Client Profiles"
+      />
+    </ConfigProvider>
   );
-};
 
+};
