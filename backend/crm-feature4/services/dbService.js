@@ -1,7 +1,7 @@
-const { Client:PgClient } = require('pg');
+const { Client:PgClient,Pool } = require('pg');
 
 // Database configuration - replace with your actual RDS details
-const client = new PgClient({
+const pool = new Pool({
     host: 'my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com',
     user: 'crmdbadmin',
     password: '', // Add your actual password here or use environment variables for security
@@ -16,12 +16,12 @@ const client = new PgClient({
 async function getDataFromRDS() {
     try {
         // Connect to the RDS database
-        await client.connect();
+        const client = await pool.connect();
         console.log("Connected to RDS database");
 
         // Define and execute the query
         const query = "SELECT * FROM transactions"; // Replace with your table name
-        const result = await client.query(query);
+        const result = await pool.query(query);
 
         // Process and print each row from the result
         result.rows.forEach(row => {
@@ -31,7 +31,7 @@ async function getDataFromRDS() {
     } catch (error) {
         console.error("Error fetching data from RDS:", error);
     } finally {
-        await client.end(); // Close the client connection
+        //e the client connection
         console.log("Connection closed");
     }
 }
@@ -65,12 +65,13 @@ async function insertTransaction(record) {
     ];
 
     try {
-        await client.query(query, values);
+	
+        await pool.query(query, values);
         console.log(`Transaction ${record.id} inserted/updated successfully`);
     } catch (error) {
         console.error('Error inserting transaction:', error);
         throw error;
-    }
+    } 
 }
 
 

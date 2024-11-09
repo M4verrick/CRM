@@ -1,19 +1,18 @@
 const express = require('express');
 const sftpRoutes = require('./routes/sftpRoutes');
 const dbRoutes = require('./routes/dbRoutes');
-const dataRoutes = require('./routes/dataRoutes');
 
 
 const app = express();
 app.use('/sftp', sftpRoutes);
 app.use('/db', dbRoutes);
-app.use('/data', dataRoutes);
+
 
 
 
 app.get('/fetch-files', async (req, res) => {
     try {
-        await downloadAndProcessFiles();
+        await downloadFile();
         res.send("Files downloaded and processed.");
     } catch (error) {
         res.status(500).send("Error processing files: " + error.message);

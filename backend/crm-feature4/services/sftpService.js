@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const csv = require('csv-parser');
-
+const dbService = require('../services/dbService');
 // SFTP Configuration
 const sftp = new Client();
 const targetHost = "10.0.10.119"; // Private IP of the target instance
@@ -137,7 +137,7 @@ async function downloadFile() {
         console.error("An error occurred:", err);
     } finally {
         sftp.end(); // End the SFTP session
-        db.close(); // Close the database connection
+         // Close the database connection
     }
 }
 
