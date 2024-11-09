@@ -81,11 +81,10 @@ async function processCSVFile(localFilePath) {
             });
     });
 }
-
-// Main function to download new files from the remote directory
 async function downloadFile() {
     const processedFiles = [];
     const insertedRecords = [];
+    const fileProcessingPromises = []; // Array to hold file processing promises
 
     try {
         await sftp.connect({
@@ -113,23 +112,39 @@ async function downloadFile() {
 
                 await logDownloadedFile(filename);
 
-                const records = await processCSVFile(localFilePath);
-                insertedRecords.push(...records);
+                // Process CSV and store the resulting promise in the array
+                const processPromise = processCSVFile(localFilePath).then((records) => {
+                    insertedRecords.push(...records);
+                    processedFiles.push(filename);
+                });
 
-                processedFiles.push(filename);
+                fileProcessingPromises.push(processPromise); // Add promise to array
             }
         }
+
+        // Wait for all file processing to complete
+        await Promise.all(fileProcessingPromises);
     } catch (err) {
         console.error("An error occurred:", err);
         throw err;
     } finally {
-        sftp.end(); // Close SFTP connection
-        db.close(); // Close SQLite connection after all processing
-        console.log("Database and SFTP connections closed.");
+        // Close the SFTP connection
+        sftp.end();
+
+        // Close the database connection after all promises have resolved
+        db.close((err) => {
+            if (err) {
+                console.error("Error closing SQLite database:", err);
+            } else {
+                console.log("SQLite database connection closed.");
+            }
+        });
+        console.log("SFTP connection closed.");
     }
 
     return { processedFiles, insertedRecords };
 }
+
 
 module.exports = {
     downloadFile,
