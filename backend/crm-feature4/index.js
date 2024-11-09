@@ -1,23 +1,15 @@
 const express = require('express');
 const sftpRoutes = require('./routes/sftpRoutes');
 const dbRoutes = require('./routes/dbRoutes');
+// const dataRoutes = require('./routes/dataRoutes');
 
 
 const app = express();
-app.use('/sftp', sftpRoutes);
-app.use('/db', dbRoutes);
+app.use(express.json()); // For parsing JSON bodies
+app.use('/db', dbRoutes); // Database-related routes under /api/db
+app.use('/sftp', sftpRoutes); // SFTP-related routes under /api/sftp
 
 
-
-
-app.get('/fetch-files', async (req, res) => {
-    try {
-        await downloadFile();
-        res.send("Files downloaded and processed.");
-    } catch (error) {
-        res.status(500).send("Error processing files: " + error.message);
-    }
-});
 
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0',() => {
@@ -25,4 +17,5 @@ app.listen(PORT, '0.0.0.0',() => {
 });
 
 
-// app use vs app listen
+
+
