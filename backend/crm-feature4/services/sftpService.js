@@ -4,14 +4,15 @@ const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const csv = require('csv-parser');
 const dbService = require('../services/dbService');
+
 // SFTP Configuration
 const sftp = new Client();
-const targetHost = "10.0.10.119"; // Private IP of the target instance
-const targetPort = 22;            // Default SSH port
-const username = "ec2-user";      // Username, typically 'ec2-user' for Amazon Linux
-const privateKeyPath = "/home/ec2-user/.ssh/feature4"; // Path to your private key
-const remoteDirectoryPath = "/home/ec2-user/files";    // Remote directory path
-const localDirectoryPath = path.join(__dirname, 'files'); // Local save directory
+const targetHost = "10.0.10.119";
+const targetPort = 22;
+const username = "ec2-user";
+const privateKeyPath = "/home/ec2-user/.ssh/feature4";
+const remoteDirectoryPath = "/home/ec2-user/files";
+const localDirectoryPath = path.join(__dirname, 'files');
 
 // SQLite Configuration
 const dbPath = path.join(__dirname, 'downloaded_files.db');
@@ -45,11 +46,43 @@ function logDownloadedFile(filename) {
     });
 }
 
+// Function to process CSV file and store data into RDS
+async function processCSVFile(localFilePath) {
+    const results = [];
+    return new Promise((resolve, reject) => {
+        fs.createReadStream(localFilePath)
+            .pipe(csv())
+            .on('data', (row) => {
+                results.push({
+                    id: parseInt(row.ID, 10),
+                    client_id: parseInt(row['Client ID'], 10),
+                    transaction_type: row.Transaction === 'D' ? 'Deposit' : 'Withdrawal',
+                    amount: parseFloat(row.Amount),
+                    transaction_date: new Date(row.Date),
+                    status: row.Status
+                });
+            })
+            .on('end', async () => {
+                const insertedRecords = [];
+                try {
+                    for (const record of results) {
+                        await dbService.insertTransaction(record);
+                        insertedRecords.push(record);
+                    }
+                    resolve(insertedRecords);
+                } catch (error) {
+                    console.error('Error storing data in RDS:', error);
+                    reject(error);
+                }
+            })
+            .on('error', (error) => {
+                console.error('Error reading CSV file:', error);
+                reject(error);
+            });
+    });
+}
 
-
-
-
-
+// Main function to download new files from the remote directory
 async function downloadFile() {
     const processedFiles = [];
     const insertedRecords = [];
@@ -74,10 +107,12 @@ async function downloadFile() {
             const localFilePath = path.join(localDirectoryPath, filename);
 
             if (!(await isFileDownloaded(filename))) {
+                console.log(`Downloading new file: ${filename}...`);
                 await sftp.get(remoteFilePath, localFilePath);
+                console.log(`File ${filename} downloaded successfully!`);
+
                 await logDownloadedFile(filename);
-                
-                // Process CSV file and gather inserted records
+
                 const records = await processCSVFile(localFilePath);
                 insertedRecords.push(...records);
 
@@ -88,46 +123,12 @@ async function downloadFile() {
         console.error("An error occurred:", err);
         throw err;
     } finally {
-        sftp.end();
-        db.close();
+        sftp.end(); // Close SFTP connection
+        db.close(); // Close SQLite connection after all processing
+        console.log("Database and SFTP connections closed.");
     }
 
     return { processedFiles, insertedRecords };
-}
-
-async function processCSVFile(localFilePath) {
-    const results = [];
-    return new Promise((resolve, reject) => {
-        fs.createReadStream(localFilePath)
-            .pipe(csv())
-            .on('data', (row) => {
-                results.push({
-                    id: parseInt(row.ID, 10),
-                    client_id: parseInt(row['Client ID'], 10),
-                    transaction_type: row.Transaction === 'D' ? 'Deposit' : 'Withdrawal',
-                    amount: parseFloat(row.Amount),
-                    transaction_date: new Date(row.Date),
-                    status: row.Status
-                });
-            })
-            .on('end', async () => {
-                const insertedRecords = [];
-                try {
-                    for (const record of results) {
-                        await dbService.insertTransaction(record);
-                        insertedRecords.push(record); // Track each inserted record
-                    }
-                    resolve(insertedRecords); // Resolve with all inserted records
-                } catch (error) {
-                    console.error('Error storing data in RDS:', error);
-                    reject(error);
-                }
-            })
-            .on('error', (error) => {
-                console.error('Error reading CSV file:', error);
-                reject(error);
-            });
-    });
 }
 
 module.exports = {
