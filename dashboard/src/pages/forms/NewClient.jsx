@@ -111,14 +111,13 @@ const NewClient = () => {
                     placeholder="Choose date of birth"
                   />
                 </Form.Item>
-
-                <Form.Item name="gender" label="Gender" requiredMark="optional">
-                  <Select placeholder="Select your gender">
-                    <Select.Option value="MALE">Male</Select.Option>
-                    <Select.Option value="FEMALE">Female</Select.Option>
-                  </Select>
-                </Form.Item>
-
+                  <Form.Item name="gender" label="Gender" rules={[{ required: true }]} hasFeedback>
+                    <Select placeholder="Select your gender">
+                      <Select.Option value="MALE">Male</Select.Option>
+                      <Select.Option value="FEMALE">Female</Select.Option>
+                      <Select.Option value="OTHER">Other</Select.Option>
+                    </Select>
+                  </Form.Item>
                 <Form.Item
                   name="email"
                   label="Email"

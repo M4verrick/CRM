@@ -136,8 +136,8 @@ export default () => {
         columns={columns}
         actionRef={actionRef}
         request={async (params, sort, filter) => {
-          const response = api.getClients();
-          const data = (await response).data;
+          const response = await api.getClients();
+          const data = response.data || []; // Provide empty array as fallback
           console.log(data);
           return {
             data: data,
