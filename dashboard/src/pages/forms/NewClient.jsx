@@ -22,14 +22,14 @@ const NewClient = () => {
       };
 
       const userData = await api.createClientAccount(formattedValues);
-    
+
       if (userData) {
         messageApi.success('Client successfully registered!');
         form.resetFields();
       }
     } catch (err) {
       console.error('Failed to post a new client:', err);
-    
+
       // Handle different types of errors
       if (err.response) {
         // Server responded with error
@@ -100,8 +100,28 @@ const NewClient = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please provide your date of birth",
+                      message: "Please provide your date of birth"
                     },
+                    {
+                      // check if over 18 years old
+                      validator: (_, value) => {
+                        if (!value) return Promise.resolve();
+
+                        const today = new Date();
+                        const birthDate = value.toDate();
+                        const age = today.getFullYear() - birthDate.getFullYear();
+                        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+                        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                          age--;
+                        }
+
+                        if (age >= 18 ) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error('Client must be at least 18 years old'));
+                      }
+                    }
                   ]}
                   hasFeedback
                 >
@@ -109,145 +129,154 @@ const NewClient = () => {
                     style={{ width: "100%" }}
                     picker="date"
                     placeholder="Choose date of birth"
+                    disabledDate={(current) => {
+                      // Disable future dates and dates more than 100 years ago
+                      const today = new Date();
+                      const hundredYearsAgo = new Date();
+                      hundredYearsAgo.setFullYear(today.getFullYear() - 100);
+                      return current && (current.valueOf() > today.valueOf() || current.valueOf() < hundredYearsAgo.valueOf());
+                    }}
                   />
                 </Form.Item>
-                  <Form.Item name="gender" label="Gender" rules={[{ required: true }]} hasFeedback>
-                    <Select placeholder="Select your gender">
-                      <Select.Option value="MALE">Male</Select.Option>
-                      <Select.Option value="FEMALE">Female</Select.Option>
-                      <Select.Option value="OTHER">Other</Select.Option>
-                    </Select>
-                  </Form.Item>
-                <Form.Item
-                  name="email"
-                  label="Email"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter your email",
-                    },
-                    { type: "email", message: "Please enter a valid email" },
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="Email" />
-                </Form.Item>
 
-                <Form.Item
-                  name="phone"
-                  label="Phone"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Enter a phone number"
-                    },
-                    {
-                      pattern: /^\+?[1-9]\d{1,14}$/,
-                      message: "Please enter a valid phone number"
-                    }
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="Phone number (e.g. +1234567890)" />
-                </Form.Item>
+              <Form.Item name="gender" label="Gender" rules={[{ required: true }]} hasFeedback>
+                <Select placeholder="Select your gender">
+                  <Select.Option value="MALE">Male</Select.Option>
+                  <Select.Option value="FEMALE">Female</Select.Option>
+                  <Select.Option value="OTHER">Other</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter your email",
+                  },
+                  { type: "email", message: "Please enter a valid email" },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder="Email" />
+              </Form.Item>
 
-                <Form.Item
-                  name="address"
-                  label="Address"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Enter an address",
-                    },
-                    { whitespace: true },
-                    { min: 3 },
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="Address" />
-                </Form.Item>
+              <Form.Item
+                name="phone"
+                label="Phone"
+                rules={[
+                  {
+                    required: true,
+                    message: "Enter a phone number"
+                  },
+                  {
+                    // minimum 10 digits, maximum 15 digits
+                    pattern: /^\+?[1-9]\d{9,14}$/,
+                    message: "Please enter a valid phone number"
+                  }
+                ]}
+                hasFeedback
+              >
+                <Input placeholder="Phone number (e.g. +1234567890)" />
+              </Form.Item>
 
-                <Form.Item
-                  name="state"
-                  label="State"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Enter a state",
-                    },
-                    { whitespace: true },
-                    { min: 3 },
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="State" />
-                </Form.Item>
+              <Form.Item
+                name="address"
+                label="Address"
+                rules={[
+                  {
+                    required: true,
+                    message: "Enter an address",
+                  },
+                  { whitespace: true },
+                  { min: 3 },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder="Address" />
+              </Form.Item>
 
-                <Form.Item
-                  name="city"
-                  label="City"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Enter a city",
-                    },
-                    { whitespace: true },
-                    { min: 3 },
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="City" />
-                </Form.Item>
+              <Form.Item
+                name="state"
+                label="State"
+                rules={[
+                  {
+                    required: true,
+                    message: "Enter a state",
+                  },
+                  { whitespace: true },
+                  { min: 3 },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder="State" />
+              </Form.Item>
 
-                <Form.Item
-                  name="country"
-                  label="Country"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter a country",
-                    },
-                    { whitespace: true },
-                    { min: 3 },
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="Country" />
-                </Form.Item>
+              <Form.Item
+                name="city"
+                label="City"
+                rules={[
+                  {
+                    required: true,
+                    message: "Enter a city",
+                  },
+                  { whitespace: true },
+                  { min: 3 },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder="City" />
+              </Form.Item>
 
-                <Form.Item
-                  name="zip"
-                  label="Zip Code"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please enter zip code"
-                    },
-                    {
-                      pattern: /^\d{5,10}$/,
-                      message: "Please enter a valid zip code"
-                    }
-                  ]}
-                  hasFeedback
-                >
-                  <Input placeholder="Zip Code" />
-                </Form.Item>
+              <Form.Item
+                name="country"
+                label="Country"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter a country",
+                  },
+                  { whitespace: true },
+                  { min: 3 },
+                ]}
+                hasFeedback
+              >
+                <Input placeholder="Country" />
+              </Form.Item>
 
-                <Form.Item wrapperCol={{ span: 24 }}>
-                  <Button 
-                    block 
-                    type="primary" 
-                    htmlType="submit"
-                  >
-                    Register
-                  </Button>
-                </Form.Item>
-              </Form>
-            </header>
-          </div>
-        </Card>
-      </PageContainer>
-    </ConfigProvider>
+              <Form.Item
+                name="zip"
+                label="Zip Code"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter zip code"
+                  },
+                  {
+                    pattern: /^\d{5,10}$/,
+                    message: "Please enter a valid zip code"
+                  }
+                ]}
+                hasFeedback
+              >
+                <Input placeholder="Zip Code" />
+              </Form.Item>
+
+              <Form.Item wrapperCol={{ span: 24 }}>
+                <Button
+                  block
+                  type="primary"
+                  htmlType="submit"
+                >
+                  Register
+                </Button>
+              </Form.Item>
+            </Form>
+          </header>
+        </div>
+      </Card>
+    </PageContainer>
+    </ConfigProvider >
   );
 }
 
