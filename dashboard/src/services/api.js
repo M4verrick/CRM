@@ -18,7 +18,7 @@ export const api = {
 
   // Create Client
   createClientAccount: (accountData) => {
-    return apiClient.post('/api/clients', accountData);
+    return apiClient.post('/api/clients/createProfileAgent', accountData);
   },
 
   updateClient: (clientId, data) => {
