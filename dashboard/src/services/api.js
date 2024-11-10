@@ -6,8 +6,8 @@ export const api = {
     return apiClient.get('/api/clients/accountsById');
   },
 
-  // Get all client accounts associated with an agent
-  getClientAccounts: () => {
+  // Get all clients
+  getClients: () => {
     return apiClient.get('/api/clients');
   },
 
