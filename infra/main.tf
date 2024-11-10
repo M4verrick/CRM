@@ -247,7 +247,7 @@ locals {
         from_port   = 443
         to_port     = 443
         protocol    = "tcp"
-        cidr_block  = "10.0.0.0/16"
+        cidr_block  = "0.0.0.0/0"
       },
       {
         rule_number = 120
@@ -273,7 +273,7 @@ locals {
         from_port   = 443
         to_port     = 443
         protocol    = "tcp"
-        cidr_block  = "10.0.0.0/16"
+        cidr_block  = "0.0.0.0/0"
       },
       {
         rule_number = 120
