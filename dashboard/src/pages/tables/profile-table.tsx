@@ -8,6 +8,7 @@ import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
 
 type ClientTableItem = {
+  id: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -24,6 +25,21 @@ type ClientTableItem = {
 // Handle functions in options column
 const handleEdit = async (record: ClientTableItem) => {
   try {
+    const requestBody = {
+      firstName: record.firstName,
+      lastName: record.lastName,
+      email: record.email,
+      phone: record.phone,
+      address: record.address,
+      city: record.city,
+      state: record.state,
+      country: record.country,
+      zip: record.zip,
+      dateOfBirth: record.dateOfBirth,
+      gender: record.gender
+    };
+
+    await api.updateClient(record.id, record);
     message.success('User updated successfully');
   } catch (error) {
     message.error('Failed to update user');
@@ -34,10 +50,20 @@ const handleEdit = async (record: ClientTableItem) => {
 const handleDelete = async (record: ClientTableItem) => {
   Modal.confirm({
     title: 'Are you sure you want to delete this user?',
-    content: `This will permanently delete user ${record.email}`,
+    content: `This will permanently delete user ${record.id}`,
     okText: 'Yes',
     okType: 'danger',
     cancelText: 'No',
+    onOk: async () => {
+      await api.deleteClient(record.id);
+      try {
+        await api.deleteClient(record.id);
+        message.success('User deleted successfully');
+      } catch (error) {
+        message.error('Failed to delete client');
+        console.error('Error deleting client:', error);
+      }
+    }
   });
 };
 
@@ -64,6 +90,10 @@ const columns: ProColumns<ClientTableItem>[] = [
     dataIndex: 'email',
     copyable: true,
     ellipsis: true
+  },
+  {
+    title: 'Client Id',
+    dataIndex: 'id',
   },
   {
     title: 'Phone',
@@ -113,7 +143,7 @@ const columns: ProColumns<ClientTableItem>[] = [
       <a
         key="editable"
         onClick={() => {
-          action?.startEditable?.(record.email);
+          action?.startEditable?.(record.id);
         }}
       >
         Edit
