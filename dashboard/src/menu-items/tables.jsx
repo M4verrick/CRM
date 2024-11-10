@@ -24,6 +24,13 @@ const tables = {
       icon: icons.ChromeOutlined
     },
     {
+      id: 'account-table',
+      title: 'Manage Accounts',
+      type: 'item',
+      url: '/AccountTable',
+      icon: icons.ChromeOutlined
+    },
+    {
       id: 'user-table',
       title: 'Manage System Users',
       type: 'item',

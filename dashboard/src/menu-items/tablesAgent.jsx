@@ -24,6 +24,13 @@ const tablesAgent = {
       icon: icons.ChromeOutlined
     },
     {
+      id: 'account-table',
+      title: 'Manage Accounts',
+      type: 'item',
+      url: '/AccountTable',
+      icon: icons.ChromeOutlined
+    },
+    {
       id: 'client-transaction-table',
       title: 'Manage Transactions',
       type: 'item',
