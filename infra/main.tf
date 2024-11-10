@@ -148,26 +148,6 @@ locals {
   }
 
   network_acls = {
-    default_inbound = [
-      {
-        rule_number = 900
-        rule_action = "allow"
-        from_port   = 1024
-        to_port     = 65535
-        protocol    = "tcp"
-        cidr_block  = "0.0.0.0/0"
-      },
-    ]
-    default_outbound = [
-      {
-        rule_number = 900
-        rule_action = "allow"
-        from_port   = 32768
-        to_port     = 65535
-        protocol    = "tcp"
-        cidr_block  = "0.0.0.0/0"
-      },
-    ]
     public_inbound = [
       {
         rule_number = 100
@@ -186,14 +166,6 @@ locals {
         cidr_block  = "0.0.0.0/0"
       },
       {
-        rule_number = 120
-        rule_action = "allow"
-        from_port   = 22
-        to_port     = 22
-        protocol    = "tcp"
-        cidr_block  = "0.0.0.0/0"
-      },
-      {
         rule_number     = 130
         rule_action     = "allow"
         from_port       = 80
@@ -208,6 +180,14 @@ locals {
         to_port         = 443
         protocol        = "tcp"
         ipv6_cidr_block = "::/0"
+      },
+      {
+        rule_number = 900
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "10.0.0.0/16"
       },
     ]
     public_outbound = [
@@ -228,14 +208,6 @@ locals {
         cidr_block  = "0.0.0.0/0"
       },
       {
-        rule_number = 120
-        rule_action = "allow"
-        from_port   = 22
-        to_port     = 22
-        protocol    = "tcp"
-        cidr_block  = "10.0.100.0/22"
-      },
-      {
         rule_number     = 130
         rule_action     = "allow"
         from_port       = 80
@@ -250,7 +222,15 @@ locals {
         to_port         = 443
         protocol        = "tcp"
         ipv6_cidr_block = "::/0"
-      }
+      },
+      {
+        rule_number = 900
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
     ]
     private_inbound = [
       {
@@ -529,12 +509,12 @@ module "vpc" {
   database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr,8, k + 8)]
 
   public_dedicated_network_acl   = true
-  public_inbound_acl_rules       = concat(local.network_acls["default_inbound"], local.network_acls["public_inbound"])
-  public_outbound_acl_rules      = concat(local.network_acls["default_outbound"], local.network_acls["public_outbound"])
-  database_inbound_acl_rules = local.network_acls["database_inbound"]
-  database_outbound_acl_rules = local.network_acls["database_outbound"]
-  private_inbound_acl_rules = local.network_acls["private_inbound"]
-  private_outbound_acl_rules = local.network_acls["private_outbound"]
+  public_inbound_acl_rules       = local.network_acls["public_inbound"]
+  public_outbound_acl_rules      = local.network_acls["public_outbound"]
+  database_inbound_acl_rules     = local.network_acls["database_inbound"]
+  database_outbound_acl_rules    = local.network_acls["database_outbound"]
+  private_inbound_acl_rules      = local.network_acls["private_inbound"]
+  private_outbound_acl_rules     = local.network_acls["private_outbound"]
 
   private_dedicated_network_acl     = true
   database_dedicated_network_acl = true
