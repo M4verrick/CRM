@@ -1,7 +1,7 @@
 import api from 'services/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Modal, message, Space, Tag } from 'antd';
+import { Modal, message, Tag } from 'antd';
 import React from 'react';
 import { useRef } from 'react';
 import { ConfigProvider } from 'antd';
@@ -20,9 +20,12 @@ type ClientTableItem = {
   zip: string;
   dateOfBirth: string;
   gender: 'MALE' | 'FEMALE' | 'OTHER';
+  verificationToken: string;
+  verificationStatus: string;
+  clientAccounts: any[];
+  emailVerified: boolean;
 };
 
-// Handle functions in options column
 const handleEdit = async (record: ClientTableItem) => {
   try {
     const requestBody = {
@@ -55,7 +58,6 @@ const handleDelete = async (record: ClientTableItem) => {
     okType: 'danger',
     cancelText: 'No',
     onOk: async () => {
-      await api.deleteClient(record.id);
       try {
         await api.deleteClient(record.id);
         message.success('User deleted successfully');
@@ -69,31 +71,24 @@ const handleDelete = async (record: ClientTableItem) => {
 
 const columns: ProColumns<ClientTableItem>[] = [
   {
-    dataIndex: 'index',
-    valueType: 'indexBorder',
-    width: 48
+    title: 'Id',
+    dataIndex: 'id',
   },
   {
     title: 'First Name',
     dataIndex: 'firstName',
     copyable: true,
-    width: 140,
   },
   {
     title: 'Last Name',
     dataIndex: 'lastName',
     copyable: true,
-    width: 140,
   },
   {
     title: 'Email',
     dataIndex: 'email',
     copyable: true,
     ellipsis: true
-  },
-  {
-    title: 'Client Id',
-    dataIndex: 'id',
   },
   {
     title: 'Phone',
@@ -103,19 +98,28 @@ const columns: ProColumns<ClientTableItem>[] = [
   {
     title: 'Address',
     dataIndex: 'address',
-    ellipsis: true,
+    copyable: true,
   },
   {
     title: 'City',
     dataIndex: 'city',
+    hideInTable: true,
+    copyable: true,
+    ellipsis: true,
   },
   {
     title: 'State',
     dataIndex: 'state',
+    hideInTable: true,
+    copyable: true,
+    ellipsis: true,
   },
   {
     title: 'Country',
     dataIndex: 'country',
+    hideInTable: true,
+    copyable: true,
+    ellipsis: true,
   },
   {
     title: 'ZIP',
@@ -134,6 +138,24 @@ const columns: ProColumns<ClientTableItem>[] = [
       FEMALE: { text: 'Female' },
       OTHER: { text: 'Other' },
     }
+  },
+  {
+    title: 'Verification Status',
+    dataIndex: 'verificationStatus',
+    render: (status) => (
+      <Tag color={status === 'PENDING' ? 'orange' : 'green'}>
+        {status}
+      </Tag>
+    ),
+  },
+  {
+    title: 'Email Verified',
+    dataIndex: 'emailVerified',
+    render: (verified) => (
+      <Tag color={verified ? 'green' : 'red'}>
+        {verified ? 'Verified' : 'Not Verified'}
+      </Tag>
+    ),
   },
   {
     title: 'Options',
@@ -158,22 +180,48 @@ const columns: ProColumns<ClientTableItem>[] = [
   }
 ];
 
+const fetchClients = async (params: {
+  pageSize?: number;
+  current?: number;
+  keyword?: string;
+}) => {
+  try {
+    const response = await api.getClients();
+    
+    // Assuming response is the array of clients
+    const data = Array.isArray(response) ? response : [];
+    
+    // Handle pagination
+    const startIndex = ((params.current || 1) - 1) * (params.pageSize || 10);
+    const endIndex = startIndex + (params.pageSize || 10);
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    return {
+      data: paginatedData,
+      success: true,
+      total: data.length
+    };
+  } catch (error) {
+    console.error('Error fetching clients:', error);
+    message.error('Failed to fetch clients');
+    return {
+      data: [],
+      success: false,
+      total: 0
+    };
+  }
+};
+
 export default () => {
   const actionRef = useRef<ActionType>();
+
   return (
     <ConfigProvider locale={enUS}>
       <ProTable<ClientTableItem>
         columns={columns}
         actionRef={actionRef}
         request={async (params, sort, filter) => {
-          const response = await api.getClients();
-          const data = response.data || []; // Provide empty array as fallback
-          console.log(data);
-          return {
-            data: data,
-            success: true,
-            total: data.length
-          };
+          return fetchClients(params);
         }}
         editable={{
           type: 'multiple',
@@ -186,7 +234,7 @@ export default () => {
           pageSize: 10,
           current: 1
         }}
-        rowKey="userId"
+        rowKey="id"
         search={{
           labelWidth: 'auto'
         }}

@@ -40,6 +40,7 @@ const createApiClient = () => {
         }
 
         // Add the access token to the request
+        console.log(`Bearer ${AccessToken}`)
         config.headers.Authorization = `Bearer ${AccessToken}`;
       }
 
