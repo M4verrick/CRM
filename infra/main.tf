@@ -536,7 +536,7 @@ module "vpc" {
   private_inbound_acl_rules = local.network_acls["private_inbound"]
   private_outbound_acl_rules = local.network_acls["private_outbound"]
 
-  private_dedicated_network_acl     = false
+  private_dedicated_network_acl     = true
   database_dedicated_network_acl = true
 
   manage_default_network_acl = true
