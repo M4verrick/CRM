@@ -27,7 +27,12 @@ export const api = {
 
   deleteClient: (clientId) => {
     return apiClient.delete(`/api/clients/${clientId}`);
-  }
+  },
+
+  // api/clients/verify -> verify email of client
+  verifyClient: () => {
+    return apiClient.get(`/api/clients/verify`);
+  },
 
 };
 
