@@ -208,6 +208,14 @@ locals {
         cidr_block  = "0.0.0.0/0"
       },
       {
+        rule_number = 120
+        rule_action = "allow"
+        from_port   = 22,
+        to_port     = 22,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
         rule_number     = 130
         rule_action     = "allow"
         from_port       = 80
@@ -283,6 +291,14 @@ locals {
         protocol    = "tcp"
         cidr_block  = "10.0.0.0/16"
       },
+      {
+        rule_number = 130
+        rule_action = "allow"
+        from_port   = 22,
+        to_port     = 22,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      }
     ]
     database_inbound = [
       {
@@ -440,7 +456,7 @@ module "eks" {
   authentication_mode                      = "API_AND_CONFIG_MAP"
 
   eks_managed_node_groups = {
-    new = {
+    crm = {
       instance_types = ["t3.small"]
 
       min_size     = 2
