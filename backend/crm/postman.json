@@ -1,0 +1,1018 @@
+{
+	"info": {
+		"_postman_id": "375cc293-42e2-4cdb-bc0d-c7200548c0a0",
+		"name": "CS301 Backend Feature 2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33213128"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "https://cognito-idp.ap-southeast-1.amazonaws.com/",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-amz-json-1.1",
+								"type": "text"
+							},
+							{
+								"key": "X-Amz-Target",
+								"value": "AWSCognitoIdentityProviderService.InitiateAuth",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"AuthParameters\" : {\r\n        \"USERNAME\" : \"tesipo@gmail.com\",\r\n        \"PASSWORD\" : \"Thisisnewtesipo!23\"\r\n    },\r\n    \"AuthFlow\" : \"USER_PASSWORD_AUTH\",\r\n    \"ClientId\" : \"46d0ev383r0i600e39nh43k9ac\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://cognito-idp.ap-southeast-1.amazonaws.com/",
+							"protocol": "https",
+							"host": [
+								"cognito-idp",
+								"ap-southeast-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "profile",
+			"item": [
+				{
+					"name": "Verify Token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiIzZmY3MmZlOC0zOTg0LTQ0YmMtYjhlNS02YTI0NDM3YTUwMTMiLCJldmVudF9pZCI6ImI1MjU2MWYzLWQzNmMtNDczNy05MGZiLWNhMjEzM2Y3MjI2YSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MjM3OTIsImV4cCI6MTczMDYyNzM5MiwiaWF0IjoxNzMwNjIzNzkyLCJqdGkiOiJiMjlhZmI5OS1lNGJiLTQ4MDQtODgwYy0zMTAyMGEzOTQ5YjEiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.J_C5WVQMjg1zvG8j5iGhVDjxbSnJ9iGWid6komUER1dNkIbEWussbpC2ki7rQZNFvsI4gXYhaUIrGv3ogHmiwPu57fApl1giHZ7i-EKG_SAyzv7I-UEgr1c5l3SPPCBq8H63c2LTwl-LPylnloXYLMKrxTKcvCFf2p6Tu3I1DFaL7cYLY6sFATUDcniNdQwdbtw_9aWRZGL6-ZW-hF_6vekvMtg2ZJwuGEIYgEkfme4rAvT2KlKOoveK13Dnu1q1QeUbHaJYyHJaPo9-Dfztav9_hDsLAbgaafm6cuq-z6Vg8sN2nEIjP5zjoSlnGQArN8mkRpXLmv7UNQzvvYZoaw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/clients/verify?token=BwdfX1bVIa12_SK37nv8HGa8JvDNwfNB",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients",
+								"verify"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "BwdfX1bVIa12_SK37nv8HGa8JvDNwfNB"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all client accounts grouped by profile ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiIzNGJiNDRiOC04ZjVhLTRmMTMtYjg3ZC05NWI3ZGY2NWRiZTEiLCJldmVudF9pZCI6Ijk3NmUxNTYyLWU2YWMtNDk2OS1iMzZlLWEzNzU5ZmMxOGI0MCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA3MDkzNDQsImV4cCI6MTczMDcxMjk0NCwiaWF0IjoxNzMwNzA5MzQ0LCJqdGkiOiJkZGNiM2ViNS0yNjlmLTQ2OGQtOTM2OC02MzQ2OTgzMjcxMzUiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.QcE0dpSSnptN7OEq7P1i0GncCjlzKJTe2Up2CoHC6N8-GLdqP5zz31c1XhqbCEzddOP-e8eFh-jFhTBfuq4FoXm7A8kmaZHcBQbJKtqCRlViDFsbtsXudq5uXvXJTw1nbaXt07W8-y6gDwR2OtLLYCk21SiIqQriIpQPMBLAzKObGBrB05HvveLUuFqy5bhKEzX9AcBnVXsi9ahO1AObuhccS2PI4QXdsvNHtGr8tog4rPEI8VZ7piMd5_DTEkY_iXJ34Nzd4ItgUThSNxomfqlM4oB2QTwOUpiYmlXERpnpN9IeY3h7kxr_CLQjMv36T8AurPujwDK4DtCtKVgHyQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/clients/accountsById",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients",
+								"accountsById"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all clients associated with an agent",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiIzNGJiNDRiOC04ZjVhLTRmMTMtYjg3ZC05NWI3ZGY2NWRiZTEiLCJldmVudF9pZCI6Ijk3NmUxNTYyLWU2YWMtNDk2OS1iMzZlLWEzNzU5ZmMxOGI0MCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA3MDkzNDQsImV4cCI6MTczMDcxMjk0NCwiaWF0IjoxNzMwNzA5MzQ0LCJqdGkiOiJkZGNiM2ViNS0yNjlmLTQ2OGQtOTM2OC02MzQ2OTgzMjcxMzUiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.QcE0dpSSnptN7OEq7P1i0GncCjlzKJTe2Up2CoHC6N8-GLdqP5zz31c1XhqbCEzddOP-e8eFh-jFhTBfuq4FoXm7A8kmaZHcBQbJKtqCRlViDFsbtsXudq5uXvXJTw1nbaXt07W8-y6gDwR2OtLLYCk21SiIqQriIpQPMBLAzKObGBrB05HvveLUuFqy5bhKEzX9AcBnVXsi9ahO1AObuhccS2PI4QXdsvNHtGr8tog4rPEI8VZ7piMd5_DTEkY_iXJ34Nzd4ItgUThSNxomfqlM4oB2QTwOUpiYmlXERpnpN9IeY3h7kxr_CLQjMv36T8AurPujwDK4DtCtKVgHyQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/clients (Need to pass in an Authentication object in the request)",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients (Need to pass in an Authentication object in the request)"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Testing purposes only",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/clients/test/?agentId=AGENT_001",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"clients",
+										"test",
+										""
+									],
+									"query": [
+										{
+											"key": "agentId",
+											"value": "AGENT_001"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 03 Nov 2024 06:32:39 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"profileId\": 1,\n        \"accounts\": [\n            {\n                \"accountId\": 1,\n                \"profileId\": 1,\n                \"accountType\": \"SAVINGS\",\n                \"accountStatus\": \"ACTIVE\",\n                \"openingDate\": \"2023-01-01\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR001\",\n                \"initialDeposit\": 1000\n            },\n            {\n                \"accountId\": 2,\n                \"profileId\": 1,\n                \"accountType\": \"CHECKING\",\n                \"accountStatus\": \"INACTIVE\",\n                \"openingDate\": \"2022-01-01\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR001\",\n                \"initialDeposit\": 500\n            }\n        ]\n    },\n    {\n        \"profileId\": 2,\n        \"accounts\": [\n            {\n                \"accountId\": 3,\n                \"profileId\": 2,\n                \"accountType\": \"BUSINESS\",\n                \"accountStatus\": \"PENDING\",\n                \"openingDate\": \"2023-02-01\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR002\",\n                \"initialDeposit\": 1500\n            }\n        ]\n    },\n    {\n        \"profileId\": 3,\n        \"accounts\": [\n            {\n                \"accountId\": 4,\n                \"profileId\": 3,\n                \"accountType\": \"SAVINGS\",\n                \"accountStatus\": \"ACTIVE\",\n                \"openingDate\": \"2021-05-15\",\n                \"currency\": \"EUR\",\n                \"branchId\": \"BR003\",\n                \"initialDeposit\": 2000\n            }\n        ]\n    },\n    {\n        \"profileId\": 4,\n        \"accounts\": [\n            {\n                \"accountId\": 5,\n                \"profileId\": 4,\n                \"accountType\": \"CHECKING\",\n                \"accountStatus\": \"ACTIVE\",\n                \"openingDate\": \"2020-09-30\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR004\",\n                \"initialDeposit\": 250\n            },\n            {\n                \"accountId\": 6,\n                \"profileId\": 4,\n                \"accountType\": \"SAVINGS\",\n                \"accountStatus\": \"ACTIVE\",\n                \"openingDate\": \"2021-09-30\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR004\",\n                \"initialDeposit\": 3000\n            }\n        ]\n    },\n    {\n        \"profileId\": 5,\n        \"accounts\": [\n            {\n                \"accountId\": 7,\n                \"profileId\": 5,\n                \"accountType\": \"SAVINGS\",\n                \"accountStatus\": \"INACTIVE\",\n                \"openingDate\": \"2019-07-01\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR005\",\n                \"initialDeposit\": 1200\n            },\n            {\n                \"accountId\": 8,\n                \"profileId\": 5,\n                \"accountType\": \"BUSINESS\",\n                \"accountStatus\": \"PENDING\",\n                \"openingDate\": \"2023-03-01\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR005\",\n                \"initialDeposit\": 800\n            }\n        ]\n    },\n    {\n        \"profileId\": 6,\n        \"accounts\": [\n            {\n                \"accountId\": 9,\n                \"profileId\": 6,\n                \"accountType\": \"SAVINGS\",\n                \"accountStatus\": \"ACTIVE\",\n                \"openingDate\": \"2022-11-10\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR006\",\n                \"initialDeposit\": 500\n            },\n            {\n                \"accountId\": 10,\n                \"profileId\": 6,\n                \"accountType\": \"CHECKING\",\n                \"accountStatus\": \"INACTIVE\",\n                \"openingDate\": \"2021-11-10\",\n                \"currency\": \"USD\",\n                \"branchId\": \"BR006\",\n                \"initialDeposit\": 750\n            }\n        ]\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get a client by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/clients/{clientId}",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients",
+								"{clientId}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "client",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"First\",\r\n    \"lastName\": \"Last\",\r\n    \"email\": \"testno2@example.com\",\r\n    \"phone\": \"+1234567890\",\r\n    \"address\": \"123 Elm Street\",\r\n    \"city\": \"Sample City\",\r\n    \"state\": \"SC\",\r\n    \"country\": \"CountryName\",\r\n    \"zip\": \"12345\",\r\n    \"dateOfBirth\": \"2000-01-01\",\r\n    \"gender\": \"MALE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/clients",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Example",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiJkM2Y3ZTY3NC0xYTVmLTRmZTMtYTIyNy1hYTY1NjNjOTZkMGYiLCJldmVudF9pZCI6ImYyZjgwNjk3LWYyM2UtNGMwMC04MTE4LWMxYmQwNWQ4MDdhZSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTA1MTIsImV4cCI6MTczMDYxNDExMiwiaWF0IjoxNzMwNjEwNTEyLCJqdGkiOiI1NmNlODc3Ni0wOWMxLTQyODUtYjYzZS1mYmIxNDFjZDhiYjQiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.G7rnYb5ZKA5_XEpmxPQv9qrU8oE2fyZ-4xMxnu92uE9xlF-3X2EHwC13Tfq3yJ0KCx2I_Wd_TSY3vqp9Rscmn6B6jzdW6kAdfkZZWPfFwIA1oLWVBgdVPSoOvt8xgXqYq-nEepQDmsDJhO8czmlKDh9wj1RHgets0xXBYGQ46M7m2eO50cVY0oLIkyk7tlVpz7RAVw5mAHCjiHThBvFsXSxCw2nPQoEMu2HzjXVr2q7P9tnFE5mG7yAI9D4VLL7ALjVS9GmB3U5GqNnfoukEw_qgjIO28yhj9Vbhyua_G4Y1vpEizpPjivO5Oloyii_Fw6AVo_v5tFpZAbtfeaqMGA",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"First\",\r\n    \"lastName\": \"Last\",\r\n    \"email\": \"testno2@example.com\",\r\n    \"phone\": \"+1234567890\",\r\n    \"address\": \"123 Elm Street\",\r\n    \"city\": \"Sample City\",\r\n    \"state\": \"SC\",\r\n    \"country\": \"CountryName\",\r\n    \"zip\": \"12345\",\r\n    \"dateOfBirth\": \"2000-01-01\",\r\n    \"gender\": \"MALE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/clients/createProfileAgent (Need to pass in an Authentication object)",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"clients",
+										"createProfileAgent (Need to pass in an Authentication object)"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 03 Nov 2024 06:00:33 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 7,\n    \"firstName\": \"First\",\n    \"lastName\": \"Last\",\n    \"email\": \"testno2@example.com\",\n    \"phone\": \"+1234567890\",\n    \"address\": \"123 Elm Street\",\n    \"city\": \"Sample City\",\n    \"state\": \"SC\",\n    \"country\": \"CountryName\",\n    \"zip\": \"12345\",\n    \"dateOfBirth\": \"2000-01-01T00:00:00.000+00:00\",\n    \"gender\": \"MALE\",\n    \"verificationToken\": \"cirXTaH5yNNFviyTbdrEORqqLoU3JJsI\",\n    \"verificationStatus\": \"PENDING\",\n    \"emailVerified\": false\n}"
+						},
+						{
+							"name": "test",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"First\",\r\n    \"lastName\": \"Last\",\r\n    \"email\": \"testno2@example.com\",\r\n    \"phone\": \"+1234567890\",\r\n    \"address\": \"123 Elm Street\",\r\n    \"city\": \"Sample City\",\r\n    \"state\": \"SC\",\r\n    \"country\": \"CountryName\",\r\n    \"zip\": \"12345\",\r\n    \"dateOfBirth\": \"2000-01-01\",\r\n    \"gender\": \"MALE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/clients/testAgent?agentId=AGENT_001",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"clients",
+										"testAgent"
+									],
+									"query": [
+										{
+											"key": "agentId",
+											"value": "AGENT_001"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Verify NRIC",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiIzNGJiNDRiOC04ZjVhLTRmMTMtYjg3ZC05NWI3ZGY2NWRiZTEiLCJldmVudF9pZCI6Ijk3NmUxNTYyLWU2YWMtNDk2OS1iMzZlLWEzNzU5ZmMxOGI0MCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA3MDkzNDQsImV4cCI6MTczMDcxMjk0NCwiaWF0IjoxNzMwNzA5MzQ0LCJqdGkiOiJkZGNiM2ViNS0yNjlmLTQ2OGQtOTM2OC02MzQ2OTgzMjcxMzUiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.QcE0dpSSnptN7OEq7P1i0GncCjlzKJTe2Up2CoHC6N8-GLdqP5zz31c1XhqbCEzddOP-e8eFh-jFhTBfuq4FoXm7A8kmaZHcBQbJKtqCRlViDFsbtsXudq5uXvXJTw1nbaXt07W8-y6gDwR2OtLLYCk21SiIqQriIpQPMBLAzKObGBrB05HvveLUuFqy5bhKEzX9AcBnVXsi9ahO1AObuhccS2PI4QXdsvNHtGr8tog4rPEI8VZ7piMd5_DTEkY_iXJ34Nzd4ItgUThSNxomfqlM4oB2QTwOUpiYmlXERpnpN9IeY3h7kxr_CLQjMv36T8AurPujwDK4DtCtKVgHyQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/clients{profileId}/verifyNRIC",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients{profileId}",
+								"verifyNRIC"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "client",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"First\",\r\n    \"lastName\": \"The Great Change\",\r\n    \"email\": \"testno2@example.com\",\r\n    \"phone\": \"+1234567890\",\r\n    \"address\": \"123 Elm Street\",\r\n    \"city\": \"Sample City\",\r\n    \"state\": \"SC\",\r\n    \"country\": \"CountryName\",\r\n    \"zip\": \"12345\",\r\n    \"dateOfBirth\": \"2000-01-01\",\r\n    \"gender\": \"MALE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/clients/{profileID} -> need to pass in Authentication object too",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients",
+								"{profileID} -> need to pass in Authentication object too"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"firstName\": \"First\",\r\n    \"lastName\": \"The Great Change\",\r\n    \"email\": \"testno2@example.com\",\r\n    \"phone\": \"+1234567890\",\r\n    \"address\": \"123 Elm Street\",\r\n    \"city\": \"Sample City\",\r\n    \"state\": \"SC\",\r\n    \"country\": \"CountryName\",\r\n    \"zip\": \"12345\",\r\n    \"dateOfBirth\": \"2000-01-01\",\r\n    \"gender\": \"MALE\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/clients/7",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"clients",
+										"7"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 03 Nov 2024 06:27:49 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 7,\n    \"firstName\": \"First\",\n    \"lastName\": \"The Great Change\",\n    \"email\": \"testno2@example.com\",\n    \"phone\": \"+1234567890\",\n    \"address\": \"123 Elm Street\",\n    \"city\": \"Sample City\",\n    \"state\": \"SC\",\n    \"country\": \"CountryName\",\n    \"zip\": \"12345\",\n    \"dateOfBirth\": \"2000-01-01T00:00:00.000+00:00\",\n    \"gender\": \"MALE\",\n    \"verificationToken\": \"8-SW5rabGoA2NgDmMRD1pb4UE5rd20qj\",\n    \"verificationStatus\": \"PENDING\",\n    \"emailVerified\": false\n}"
+						}
+					]
+				},
+				{
+					"name": "client",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/clients/{profileId} -> Need to pass in Authentication object",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients",
+								"{profileId} -> Need to pass in Authentication object"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "client",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/clients/7",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"clients",
+										"7"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 03 Nov 2024 06:29:06 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "client accounts",
+			"item": [
+				{
+					"name": "all clients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/accounts/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"accounts",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/accounts/all",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"accounts",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 03 Nov 2024 06:34:02 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"accountId\": 1,\n        \"profileId\": 1,\n        \"accountType\": \"SAVINGS\",\n        \"accountStatus\": \"ACTIVE\",\n        \"openingDate\": \"2023-01-01\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR001\",\n        \"initialDeposit\": 1000\n    },\n    {\n        \"accountId\": 2,\n        \"profileId\": 1,\n        \"accountType\": \"CHECKING\",\n        \"accountStatus\": \"INACTIVE\",\n        \"openingDate\": \"2022-01-01\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR001\",\n        \"initialDeposit\": 500\n    },\n    {\n        \"accountId\": 3,\n        \"profileId\": 2,\n        \"accountType\": \"BUSINESS\",\n        \"accountStatus\": \"PENDING\",\n        \"openingDate\": \"2023-02-01\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR002\",\n        \"initialDeposit\": 1500\n    },\n    {\n        \"accountId\": 4,\n        \"profileId\": 3,\n        \"accountType\": \"SAVINGS\",\n        \"accountStatus\": \"ACTIVE\",\n        \"openingDate\": \"2021-05-15\",\n        \"currency\": \"EUR\",\n        \"branchId\": \"BR003\",\n        \"initialDeposit\": 2000\n    },\n    {\n        \"accountId\": 5,\n        \"profileId\": 4,\n        \"accountType\": \"CHECKING\",\n        \"accountStatus\": \"ACTIVE\",\n        \"openingDate\": \"2020-09-30\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR004\",\n        \"initialDeposit\": 250\n    },\n    {\n        \"accountId\": 6,\n        \"profileId\": 4,\n        \"accountType\": \"SAVINGS\",\n        \"accountStatus\": \"ACTIVE\",\n        \"openingDate\": \"2021-09-30\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR004\",\n        \"initialDeposit\": 3000\n    },\n    {\n        \"accountId\": 7,\n        \"profileId\": 5,\n        \"accountType\": \"SAVINGS\",\n        \"accountStatus\": \"INACTIVE\",\n        \"openingDate\": \"2019-07-01\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR005\",\n        \"initialDeposit\": 1200\n    },\n    {\n        \"accountId\": 8,\n        \"profileId\": 5,\n        \"accountType\": \"BUSINESS\",\n        \"accountStatus\": \"PENDING\",\n        \"openingDate\": \"2023-03-01\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR005\",\n        \"initialDeposit\": 800\n    },\n    {\n        \"accountId\": 9,\n        \"profileId\": 6,\n        \"accountType\": \"SAVINGS\",\n        \"accountStatus\": \"ACTIVE\",\n        \"openingDate\": \"2022-11-10\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR006\",\n        \"initialDeposit\": 500\n    },\n    {\n        \"accountId\": 10,\n        \"profileId\": 6,\n        \"accountType\": \"CHECKING\",\n        \"accountStatus\": \"INACTIVE\",\n        \"openingDate\": \"2021-11-10\",\n        \"currency\": \"USD\",\n        \"branchId\": \"BR006\",\n        \"initialDeposit\": 750\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "client",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"profileId\": 7,  // Profile ID associated with the client account\r\n  \"accountType\": \"SAVINGS\", // Options: SAVINGS, CHECKING, BUSINESS\r\n  \"accountStatus\": \"ACTIVE\", // Options: ACTIVE, INACTIVE, PENDING\r\n  \"currency\": \"USD\", // 3-letter currency code\r\n  \"branchId\": \"BR001\", // Branch ID up to 10 characters\r\n  \"initialDeposit\": 1000.0 // Initial deposit amount, must be 0 or higher\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/accounts",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"accounts"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"profileId\": 7,  // Profile ID associated with the client account\r\n  \"accountType\": \"SAVINGS\", // Options: SAVINGS, CHECKING, BUSINESS\r\n  \"accountStatus\": \"ACTIVE\", // Options: ACTIVE, INACTIVE, PENDING\r\n  \"currency\": \"USD\", // 3-letter currency code\r\n  \"branchId\": \"BR001\", // Branch ID up to 10 characters\r\n  \"initialDeposit\": 1000.0 // Initial deposit amount, must be 0 or higher\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/accounts",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"accounts"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 03 Nov 2024 07:03:57 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"accountId\": 11,\n    \"profileId\": 7,\n    \"accountType\": \"SAVINGS\",\n    \"accountStatus\": \"ACTIVE\",\n    \"openingDate\": \"2024-11-03T07:03:57.976+00:00\",\n    \"currency\": \"USD\",\n    \"branchId\": \"BR001\",\n    \"initialDeposit\": 1000\n}"
+						}
+					]
+				},
+				{
+					"name": "client",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/clients/7",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"clients",
+								"7"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "client",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiI2NGE3MWRkMC02NDAzLTRlYzYtYmMxZi04MjUyZDVmNjZkNDgiLCJldmVudF9pZCI6ImI1YWYwMGFiLWEzYjMtNGVmYi04MWE1LTAxNzc1ODY1OGJiZCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTQyMjAsImV4cCI6MTczMDYxNzgyMCwiaWF0IjoxNzMwNjE0MjIwLCJqdGkiOiJiNzNkMzFkMC0xNmUzLTRlODktYTE4NS1kOTc5MTc0MTY4MTkiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.olqbp1l3QB66RkULumUjpFyCPp_F5fRmThHJdoZW6zy4zU9qe5XAZry6uo7xlJNbOEUj6tWmckEZyJoq7kKsJ_w-qs7wUBEwkjdBZZU8Fl19NYaCSwipkPPccYvIjnr_T1qtZRr8Bq55zbkaBWx4p1xyX0Nw7MW3VsN87UFA-kJML6-GJbr9WqA1Aui0vT0zlxRkk6g7Owjid5O1SK-Ed-og4sczWj_SHBcOoIxc57hhfnUxnhwa9jVL5qTs1_hg1W_eRw8QqYUh3lFU8ZLLhSFf1NSyQy7TjHNHmwQGX_pqMh9JqCNCYXioA28AhlF4F8AlN5hc-euFH39QzH-4-w",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/clients/7",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"clients",
+										"7"
+									]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, no-store, max-age=0, must-revalidate"
+								},
+								{
+									"key": "Pragma",
+									"value": "no-cache"
+								},
+								{
+									"key": "Expires",
+									"value": "0"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "DENY"
+								},
+								{
+									"key": "Date",
+									"value": "Sun, 03 Nov 2024 06:29:06 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=60"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								}
+							],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		}
+	]
+}
