@@ -1,0 +1,745 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: CS301 Backend Feature 2
+  contact: {}
+host: virtserver.swaggerhub.com
+basePath: /TAYJINHENG_1/CS302_Feature2/1.0.0
+tags:
+- name: auth
+- name: profile
+- name: client accounts
+schemes:
+- https
+paths:
+  /:
+    post:
+      tags:
+      - auth
+      summary: https://cognito-idp.ap-southeast-1.amazonaws.com/
+      description: https://cognito-idp.ap-southeast-1.amazonaws.com/
+      operationId: httpsCognitoIdpApSoutheast1AmazonawsCom
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: X-Amz-Target
+        in: header
+        required: false
+        type: string
+      - in: body
+        name: body
+        required: false
+        schema:
+          $ref: '#/definitions/body'
+      responses:
+        "200":
+          description: https://cognito-idp.ap-southeast-1.amazonaws.com/
+          headers:
+            Connection:
+              type: string
+            Content-Length:
+              type: string
+            Date:
+              type: string
+            x-amzn-RequestId:
+              type: string
+          schema:
+            $ref: '#/definitions/inline_response_200'
+  /api/accounts:
+    post:
+      tags:
+      - client accounts
+      summary: client
+      description: client
+      operationId: client3
+      consumes:
+      - text/plain
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        required: false
+        schema:
+          type: string
+          format: binary
+      responses:
+        "201":
+          description: New Request
+          headers:
+            Cache-Control:
+              type: string
+            Connection:
+              type: string
+            Date:
+              type: string
+            Expires:
+              type: string
+            Keep-Alive:
+              type: string
+            Pragma:
+              type: string
+            Transfer-Encoding:
+              type: string
+            X-Content-Type-Options:
+              type: string
+            X-Frame-Options:
+              type: string
+            X-XSS-Protection:
+              type: string
+          schema:
+            $ref: '#/definitions/inline_response_201'
+  /api/accounts/all:
+    get:
+      tags:
+      - client accounts
+      summary: all clients
+      description: all clients
+      operationId: allClients
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        "200":
+          description: New Request
+          headers:
+            Cache-Control:
+              type: string
+            Connection:
+              type: string
+            Date:
+              type: string
+            Expires:
+              type: string
+            Keep-Alive:
+              type: string
+            Pragma:
+              type: string
+            Transfer-Encoding:
+              type: string
+            X-Content-Type-Options:
+              type: string
+            X-Frame-Options:
+              type: string
+            X-XSS-Protection:
+              type: string
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/inline_response_200_1'
+  /api/clients:
+    post:
+      tags:
+      - profile
+      summary: client
+      description: client
+      operationId: client
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: ""
+        in: query
+        required: false
+        type: string
+      - in: body
+        name: body
+        required: false
+        schema:
+          $ref: '#/definitions/body_1'
+      responses:
+        "200":
+          description: Example
+          headers:
+            Cache-Control:
+              type: string
+            Connection:
+              type: string
+            Date:
+              type: string
+            Expires:
+              type: string
+            Keep-Alive:
+              type: string
+            Pragma:
+              type: string
+            Transfer-Encoding:
+              type: string
+            X-Content-Type-Options:
+              type: string
+            X-Frame-Options:
+              type: string
+            X-XSS-Protection:
+              type: string
+          schema:
+            $ref: '#/definitions/inline_response_200_2'
+  /api/clients (Need to pass in an Authentication object in the request):
+    get:
+      tags:
+      - profile
+      summary: Get all clients associated with an agent
+      description: Get all clients associated with an agent
+      operationId: getAllClientsAssociatedWithAnAgent
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        "200":
+          description: Testing purposes only
+          headers:
+            Cache-Control:
+              type: string
+            Connection:
+              type: string
+            Date:
+              type: string
+            Expires:
+              type: string
+            Keep-Alive:
+              type: string
+            Pragma:
+              type: string
+            Transfer-Encoding:
+              type: string
+            X-Content-Type-Options:
+              type: string
+            X-Frame-Options:
+              type: string
+            X-XSS-Protection:
+              type: string
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/inline_response_200_3'
+  /api/accounts/{accountId}:
+    delete:
+      tags:
+      - client accounts
+      summary: client
+      description: client
+      operationId: client4
+      produces:
+      - text/plain
+      parameters:
+      - name: accountId
+        in: path
+        required: true
+        type: string
+      responses:
+        "204":
+          description: client
+          headers:
+            Cache-Control:
+              type: string
+            Connection:
+              type: string
+            Date:
+              type: string
+            Expires:
+              type: string
+            Keep-Alive:
+              type: string
+            Pragma:
+              type: string
+            X-Content-Type-Options:
+              type: string
+            X-Frame-Options:
+              type: string
+            X-XSS-Protection:
+              type: string
+  /api/clients/accountsById:
+    get:
+      tags:
+      - profile
+      summary: Get all client accounts grouped by profile ID
+      description: Get all client accounts grouped by profile ID
+      operationId: getAllClientAccountsGroupedByProfileId
+      parameters: []
+      responses:
+        "200":
+          description: ""
+  /api/clients/testAgent:
+    post:
+      tags:
+      - profile
+      summary: Example (for testing purposes only)
+      description: Example (for testing purposes only)
+      operationId: exampleForTestingPurposesOnly
+      consumes:
+      - application/json
+      parameters:
+      - name: agentId
+        in: query
+        required: false
+        type: string
+      - in: body
+        name: body
+        required: false
+        schema:
+          $ref: '#/definitions/body_2'
+      responses:
+        "200":
+          description: ""
+  /api/clients/verify:
+    get:
+      tags:
+      - profile
+      summary: Verify Token
+      description: Verify Token
+      operationId: verifyToken
+      parameters:
+      - name: token
+        in: query
+        required: false
+        type: string
+      responses:
+        "200":
+          description: ""
+  /api/clients/{clientId}:
+    get:
+      tags:
+      - profile
+      summary: Get a client by ID
+      description: Get a client by ID
+      operationId: getAClientById
+      parameters:
+      - name: clientId
+        in: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+  /api/clients/{profileID} -> need to pass in Authentication object too:
+    put:
+      tags:
+      - profile
+      summary: client
+      description: client
+      operationId: client1
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: profileID
+        in: path
+        required: true
+        type: string
+      - in: body
+        name: body
+        required: false
+        schema:
+          $ref: '#/definitions/body_3'
+      responses:
+        "200":
+          description: New Request
+          headers:
+            Cache-Control:
+              type: string
+            Connection:
+              type: string
+            Date:
+              type: string
+            Expires:
+              type: string
+            Keep-Alive:
+              type: string
+            Pragma:
+              type: string
+            Transfer-Encoding:
+              type: string
+            X-Content-Type-Options:
+              type: string
+            X-Frame-Options:
+              type: string
+            X-XSS-Protection:
+              type: string
+          schema:
+            $ref: '#/definitions/inline_response_200_4'
+  /api/clients/{profileId} -> Need to pass in Authentication object:
+    delete:
+      tags:
+      - profile
+      summary: client
+      description: client
+      operationId: client2
+      produces:
+      - text/plain
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        type: string
+      responses:
+        "204":
+          description: client
+          headers:
+            Cache-Control:
+              type: string
+            Connection:
+              type: string
+            Date:
+              type: string
+            Expires:
+              type: string
+            Keep-Alive:
+              type: string
+            Pragma:
+              type: string
+            X-Content-Type-Options:
+              type: string
+            X-Frame-Options:
+              type: string
+            X-XSS-Protection:
+              type: string
+  /api/clients{profileId}/verifyNRIC:
+    post:
+      tags:
+      - profile
+      summary: Verify NRIC
+      description: Verify NRIC
+      operationId: verifyNric
+      parameters:
+      - name: profileId
+        in: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+definitions:
+  body_3:
+    type: object
+    properties:
+      address:
+        type: string
+        example: 123 Elm Street
+      city:
+        type: string
+        example: Sample City
+      country:
+        type: string
+        example: CountryName
+      dateOfBirth:
+        type: string
+        example: 2000-01-01
+      email:
+        type: string
+        example: testno2@example.com
+      firstName:
+        type: string
+        example: First
+      gender:
+        type: string
+        example: MALE
+      lastName:
+        type: string
+        example: The Great Change
+      phone:
+        type: string
+        example: +1234567890
+      state:
+        type: string
+        example: SC
+      zip:
+        type: string
+        example: "12345"
+  body_1:
+    type: object
+    properties:
+      address:
+        type: string
+        example: 123 Elm Street
+      city:
+        type: string
+        example: Sample City
+      country:
+        type: string
+        example: CountryName
+      dateOfBirth:
+        type: string
+        example: 2000-01-01
+      email:
+        type: string
+        example: testno2@example.com
+      firstName:
+        type: string
+        example: First
+      gender:
+        type: string
+        example: MALE
+      lastName:
+        type: string
+        example: Last
+      phone:
+        type: string
+        example: +1234567890
+      state:
+        type: string
+        example: SC
+      zip:
+        type: string
+        example: "12345"
+  body_2:
+    type: object
+    properties:
+      address:
+        type: string
+        example: 123 Elm Street
+      city:
+        type: string
+        example: Sample City
+      country:
+        type: string
+        example: CountryName
+      dateOfBirth:
+        type: string
+        example: 2000-01-01
+      email:
+        type: string
+        example: testno2@example.com
+      firstName:
+        type: string
+        example: First
+      gender:
+        type: string
+        example: MALE
+      lastName:
+        type: string
+        example: Last
+      phone:
+        type: string
+        example: +1234567890
+      state:
+        type: string
+        example: SC
+      zip:
+        type: string
+        example: "12345"
+  inline_response_201:
+    type: object
+    properties:
+      accountId:
+        type: number
+        example: 11.0
+      accountStatus:
+        type: string
+        example: ACTIVE
+      accountType:
+        type: string
+        example: SAVINGS
+      branchId:
+        type: string
+        example: BR001
+      currency:
+        type: string
+        example: USD
+      initialDeposit:
+        type: number
+        example: 1000.0
+      openingDate:
+        type: string
+        example: 2024-11-03T07:03:57.976+00:00
+      profileId:
+        type: number
+        example: 7.0
+  inline_response_200_1:
+    type: object
+    properties:
+      accountId:
+        type: number
+        example: 1.0
+      accountStatus:
+        type: string
+        example: ACTIVE
+      accountType:
+        type: string
+        example: SAVINGS
+      branchId:
+        type: string
+        example: BR001
+      currency:
+        type: string
+        example: USD
+      initialDeposit:
+        type: number
+        example: 1000.0
+      openingDate:
+        type: string
+        example: 2023-01-01
+      profileId:
+        type: number
+        example: 1.0
+  inline_response_200:
+    type: object
+    properties:
+      AuthenticationResult:
+        $ref: '#/definitions/inline_response_200_AuthenticationResult'
+      ChallengeParameters:
+        type: object
+        properties: {}
+  inline_response_200_2:
+    type: object
+    properties:
+      address:
+        type: string
+        example: 123 Elm Street
+      city:
+        type: string
+        example: Sample City
+      country:
+        type: string
+        example: CountryName
+      dateOfBirth:
+        type: string
+        example: 2000-01-01T00:00:00.000+00:00
+      email:
+        type: string
+        example: testno2@example.com
+      emailVerified:
+        type: boolean
+        example: false
+      firstName:
+        type: string
+        example: First
+      gender:
+        type: string
+        example: MALE
+      id:
+        type: number
+        example: 7.0
+      lastName:
+        type: string
+        example: Last
+      phone:
+        type: string
+        example: +1234567890
+      state:
+        type: string
+        example: SC
+      verificationStatus:
+        type: string
+        example: PENDING
+      verificationToken:
+        type: string
+        example: cirXTaH5yNNFviyTbdrEORqqLoU3JJsI
+      zip:
+        type: string
+        example: "12345"
+  inline_response_200_3:
+    type: object
+    properties:
+      accounts:
+        type: array
+        example:
+        - accountId: 1
+          accountStatus: ACTIVE
+          accountType: SAVINGS
+          branchId: BR001
+          currency: USD
+          initialDeposit: 1000
+          openingDate: 2023-01-01
+          profileId: 1
+        - accountId: 2
+          accountStatus: INACTIVE
+          accountType: CHECKING
+          branchId: BR001
+          currency: USD
+          initialDeposit: 500
+          openingDate: 2022-01-01
+          profileId: 1
+        items:
+          $ref: '#/definitions/inline_response_200_1'
+      profileId:
+        type: number
+        example: 1.0
+  inline_response_200_4:
+    type: object
+    properties:
+      address:
+        type: string
+        example: 123 Elm Street
+      city:
+        type: string
+        example: Sample City
+      country:
+        type: string
+        example: CountryName
+      dateOfBirth:
+        type: string
+        example: 2000-01-01T00:00:00.000+00:00
+      email:
+        type: string
+        example: testno2@example.com
+      emailVerified:
+        type: boolean
+        example: false
+      firstName:
+        type: string
+        example: First
+      gender:
+        type: string
+        example: MALE
+      id:
+        type: number
+        example: 7.0
+      lastName:
+        type: string
+        example: The Great Change
+      phone:
+        type: string
+        example: +1234567890
+      state:
+        type: string
+        example: SC
+      verificationStatus:
+        type: string
+        example: PENDING
+      verificationToken:
+        type: string
+        example: 8-SW5rabGoA2NgDmMRD1pb4UE5rd20qj
+      zip:
+        type: string
+        example: "12345"
+  body:
+    type: object
+    properties:
+      AuthFlow:
+        type: string
+        example: USER_PASSWORD_AUTH
+      AuthParameters:
+        $ref: '#/definitions/_AuthParameters'
+      ClientId:
+        type: string
+        example: 46d0ev383r0i600e39nh43k9ac
+  inline_response_200_AuthenticationResult:
+    type: object
+    properties:
+      AccessToken:
+        type: string
+        example: eyJraWQiOiJNN2hDd2dDZVZFdlRcL0pPTmptS3NJVVBtRDZcL3QzY0FicXBudDBLaTkzbkU9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5hcC1zb3V0aGVhc3QtMS5hbWF6b25hd3MuY29tXC9hcC1zb3V0aGVhc3QtMV95YTU1Ylowc2ciLCJjbGllbnRfaWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsIm9yaWdpbl9qdGkiOiJkM2Y3ZTY3NC0xYTVmLTRmZTMtYTIyNy1hYTY1NjNjOTZkMGYiLCJldmVudF9pZCI6ImYyZjgwNjk3LWYyM2UtNGMwMC04MTE4LWMxYmQwNWQ4MDdhZSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3MzA2MTA1MTIsImV4cCI6MTczMDYxNDExMiwiaWF0IjoxNzMwNjEwNTEyLCJqdGkiOiI1NmNlODc3Ni0wOWMxLTQyODUtYjYzZS1mYmIxNDFjZDhiYjQiLCJ1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSJ9.G7rnYb5ZKA5_XEpmxPQv9qrU8oE2fyZ-4xMxnu92uE9xlF-3X2EHwC13Tfq3yJ0KCx2I_Wd_TSY3vqp9Rscmn6B6jzdW6kAdfkZZWPfFwIA1oLWVBgdVPSoOvt8xgXqYq-nEepQDmsDJhO8czmlKDh9wj1RHgets0xXBYGQ46M7m2eO50cVY0oLIkyk7tlVpz7RAVw5mAHCjiHThBvFsXSxCw2nPQoEMu2HzjXVr2q7P9tnFE5mG7yAI9D4VLL7ALjVS9GmB3U5GqNnfoukEw_qgjIO28yhj9Vbhyua_G4Y1vpEizpPjivO5Oloyii_Fw6AVo_v5tFpZAbtfeaqMGA
+      ExpiresIn:
+        type: number
+        example: 3600.0
+      IdToken:
+        type: string
+        example: eyJraWQiOiJDbnVTdHRmRXh3XC84cWxtTFFNZ0dJSXhITXRrdldRRFNnbGp1TFNKU0Zscz0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJlOTlhZTVmYy1mMDExLTcwMjItNWFhZi0wMmYwODk0OTNjNjkiLCJjb2duaXRvOmdyb3VwcyI6WyJyb290LWFkbWluIl0sImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuYXAtc291dGhlYXN0LTEuYW1hem9uYXdzLmNvbVwvYXAtc291dGhlYXN0LTFfeWE1NWJaMHNnIiwiY29nbml0bzp1c2VybmFtZSI6ImU5OWFlNWZjLWYwMTEtNzAyMi01YWFmLTAyZjA4OTQ5M2M2OSIsImdpdmVuX25hbWUiOiJoZWxsbyIsIm9yaWdpbl9qdGkiOiJkM2Y3ZTY3NC0xYTVmLTRmZTMtYTIyNy1hYTY1NjNjOTZkMGYiLCJhdWQiOiI0NmQwZXYzODNyMGk2MDBlMzluaDQzazlhYyIsImV2ZW50X2lkIjoiZjJmODA2OTctZjIzZS00YzAwLTgxMTgtYzFiZDA1ZDgwN2FlIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE3MzA2MTA1MTIsImV4cCI6MTczMDYxNDExMiwiaWF0IjoxNzMwNjEwNTEyLCJmYW1pbHlfbmFtZSI6IndvcmxkIiwianRpIjoiZjA2OWU5ZjctODBmYy00NWY0LWJiMGUtOGJkNjhkMTMyYjdhIiwiZW1haWwiOiJ0ZXNpcG9AZ21haWwuY29tIn0.X93kKDaJTjeDfZw3hxI_fwlQQ_z9X7EwECNyKfBzcJJPNZx4o2A82TyJm2twkEKoUoXiPk1Tbon8RrIRJcoyh_lVIRsZKt58tQ3mHGTPMdZ4Z8fD83eay1O3zQep1PH8nauQ4u-67o0DCEcCzBuD6OkGtceyYSWobPhCQju-kvUCH1ftesnXnGgXhkbvrXVyrtJWcFAxRwy9cjRSJReI0ZmY3td9A2DcB1ovT9GwUbl-POx55PpNoCVbe_EXLhdsjCjWKIuY0fcyux33jPtpk0LxNosQxqle014_A_wem9_yZ64WkH-7qXgRBkWRu0aSAcewr-I3hvJm9mw8QGi1tw
+      RefreshToken:
+        type: string
+        example: eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.VeNvEUmYNhABcTiwxLhRR3uS6jiX0opDsZ78arxJuC4Vy-lqLzoNevs72qAtKZyuMWoLXEC4tgvr2ahIGPQpuvVoUyerStJyDD2a3mzCflJwDLpF0tVJKeJLJ9XAWjaEJS6kAQRHcYV_LgZ9Y6wgf01I8ZXC1eMrpsj7HUcxv00lmrft3Ey_P526GxvUlXI_8l9aeRjMBZrKQYoDaDa8VAFmMwI2lOPVE5r8cG_KFecoyT_MKGhxUvKJ11B4uDbwvjSRyj7xmVzwhssCer9ZmL8wKvcEbCeD4YP0FCSgLCohXRWTLYJ4lOeRJuKAOl1Eb1dKMq3u7XU6qcv9v2uK8g.glyLLDgZNzGPBfgH.ooY3JwTnOCjWYTVekm927J0cj8279YYZ4U-V5EjCGaCia-hxtJ2_ppSpqZ49JDlMJB2ogsMPqSWtP_hhkwWNkM31rl_GL1bBIFNm-TYpj0k0geu7-6Mu3TDIXkLiuHaGQ2tUjujyGC-3Fe2gPpbIYN0KAiBAf56QlMSg_pqmKE5XVTQTUwwL3DYSnrF7jQ32Sh8o5F1A-i4Xw1soilgX5srwk5t35LiActnPmBJsXIAhH7x23RPr2pS9O4ffbh7j-ml-ZIctypeX8Vz4gZMyMQZd6RxEi3EmBEcxC0Ot4RE_YA_xKx8iTSHOpR61bWeEtjXQWAsI0LuTTU4rLyGWJ11W4NTb9QNJmPK1ltoQ-grOfMXM0Kh-DENiPxtree0UKU-ZW9_XkKjbFBDmUws-Vy2evmjDm8YeEkedEZmLvbsByBhfMQVkX7dNlCcwYDcEBxMZbrEA0OhpSABjvfs_kv4tTxBMgEx4Sb_W5baFMkl8OKIkuLthpx9GrtE74qTCbLTFqx37zdQ8YsVI1A2TsYHQ9sEPps20TOkYL7bNa1v_ZKc6f2_7q27vW4cBxHYw3kuBCpgsng3txWlfyfeAsHjOl-cN-JW8EeRX5kzlgU8Jg9xWwn9u6Re9ayEjOYGOmbrnNgOjaxK4atkGY6PnNUVIDrBxbwJlDz6ahSadTl2mCM0aj_7xr0zcJO5WYVAAuBqYRs1rcmo7GQ3nwigZpFlm33ooOlqmau4nkAMn8OnsyvRMVY_-boU7Me1GpdipGcK7rH4sxDpQuKkEiRobzdQ9ygo2MRZb0JjHMGMhxd--aBXPmNdpv9FE2ShMkyab-2Cfa8x-wDSvpJ95M1N_QwoMV54d-NjPt-Uoh7FrezbfOutBWv06AAWzNLEGJ-Va4RcrT8ZRBze2awDV6j276uKav228jj76S_HkE4kyuc4gUDFlAZ0zLJ5KTlvxoRVh047ivxAdiT09g57hlx_8-NU8Q1NlxlPpXgwO6gT-GjE_h6Rq1EwR1W919fyqFr2tnrXojlfbDszqbuYVwqM1ZniK-eccWeeYH-sojJ_1dPL0pvezVy7pnY5hUk9vYAIiJ8vAeEzEKs23Qon_XVFqq-rxpqxnpEUbAN10VomxK3wR0kdCgmYZn4AOZk2OiWiOECVoGj7pKCln_NwJjEpHKqlFsxaj2vCzSzD_wcUKAlVZIbv6eFS2iVRosEQ0FeBDYyU_9ion2qdlTgYGcv-cSJP_ufz0ANezSLD3P0GPs9Zt7HM0x7chioBenziHgVEepJfP4uj0BLvc_o5qBzLQ5RC_QKzLwH46lhtxeWNxW5AOIc_wfO2nLOnJPoa-_7xvl7bupU2ilA2JlnD9.IDoTIBijd_XvsI5w8_IS6w
+      TokenType:
+        type: string
+        example: Bearer
+  _AuthParameters:
+    type: object
+    properties:
+      PASSWORD:
+        type: string
+        example: testpw
+      USERNAME:
+        type: string
+        example: test@test.com
