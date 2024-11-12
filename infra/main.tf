@@ -150,14 +150,6 @@ locals {
   network_acls = {
     public_inbound = [
       {
-        rule_number = 100
-        rule_action = "allow"
-        from_port   = 80
-        to_port     = 80
-        protocol    = "tcp"
-        cidr_block  = "0.0.0.0/0"
-      },
-      {
         rule_number = 110
         rule_action = "allow"
         from_port   = 443
@@ -166,20 +158,12 @@ locals {
         cidr_block  = "0.0.0.0/0"
       },
       {
-        rule_number     = 130
-        rule_action     = "allow"
-        from_port       = 80
-        to_port         = 80
-        protocol        = "tcp"
-        ipv6_cidr_block = "::/0"
-      },
-      {
-        rule_number     = 140
-        rule_action     = "allow"
-        from_port       = 443
-        to_port         = 443
-        protocol        = "tcp"
-        ipv6_cidr_block = "::/0"
+        rule_number = 120
+        rule_action = "allow"
+        from_port   = 22,
+        to_port     = 22,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
       },
       {
         rule_number = 900
@@ -187,8 +171,8 @@ locals {
         from_port   = 1024
         to_port     = 65535
         protocol    = "tcp"
-        cidr_block  = "10.0.0.0/16"
-      },
+        cidr_block  = "0.0.0.0/0"
+      }
     ]
     public_outbound = [
       {
@@ -216,86 +200,86 @@ locals {
         cidr_block  = "0.0.0.0/0"
       },
       {
-        rule_number     = 130
-        rule_action     = "allow"
-        from_port       = 80
-        to_port         = 80
-        protocol        = "tcp"
-        ipv6_cidr_block = "::/0"
-      },
-      {
-        rule_number     = 140
-        rule_action     = "allow"
-        from_port       = 443
-        to_port         = 443
-        protocol        = "tcp"
-        ipv6_cidr_block = "::/0"
-      },
-      {
         rule_number = 900
         rule_action = "allow"
         from_port   = 1024
         to_port     = 65535
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
-      },
+      }
     ]
     private_inbound = [
       {
         rule_number = 100
         rule_action = "allow"
-        from_port   = 80
-        to_port     = 80
+        from_port   = 0
+        to_port     = 65535
         protocol    = "tcp"
         cidr_block  = "10.0.0.0/16"
       },
       {
         rule_number = 110
         rule_action = "allow"
-        from_port   = 443
-        to_port     = 443
-        protocol    = "tcp"
-        cidr_block  = "0.0.0.0/0"
+        from_port   = 0
+        to_port     = 65535
+        protocol    = "udp"
+        cidr_block  = "10.0.0.0/16"
       },
       {
-        rule_number = 120
+        rule_number = 200
         rule_action = "allow"
         from_port   = 1024,
         to_port     = 65535,
         protocol    = "tcp"
-        cidr_block  = "10.0.0.0/16"
-      },
+        cidr_block  = "0.0.0.0/0"
+      }
     ]
     private_outbound = [
       {
         rule_number = 100
         rule_action = "allow"
-        from_port   = 80
-        to_port     = 80
+        from_port   = 0
+        to_port     = 65535
         protocol    = "tcp"
         cidr_block  = "10.0.0.0/16"
       },
       {
         rule_number = 110
         rule_action = "allow"
-        from_port   = 443
-        to_port     = 443
-        protocol    = "tcp"
-        cidr_block  = "0.0.0.0/0"
+        from_port   = 0
+        to_port     = 65535
+        protocol    = "udp"
+        cidr_block  = "10.0.0.0/16"
       },
       {
         rule_number = 120
         rule_action = "allow"
-        from_port   = 1024,
-        to_port     = 65535,
-        protocol    = "tcp"
-        cidr_block  = "10.0.0.0/16"
-      },
-      {
-        rule_number = 130
-        rule_action = "allow"
         from_port   = 22,
         to_port     = 22,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 200
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 300
+        rule_action = "allow"
+        from_port   = 80,
+        to_port     = 80,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 400
+        rule_action = "allow"
+        from_port   = 443,
+        to_port     = 443,
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
       }
@@ -314,8 +298,8 @@ locals {
       {
         rule_number = 100
         rule_action = "allow"
-        from_port   = 5432
-        to_port     = 5432
+        from_port   = 1024
+        to_port     = 65535
         protocol    = "tcp"
         cidr_block  = "10.0.0.0/16"
       }
@@ -456,7 +440,7 @@ module "eks" {
   authentication_mode                      = "API_AND_CONFIG_MAP"
 
   eks_managed_node_groups = {
-    crm = {
+    new = {
       instance_types = ["t3.small"]
 
       min_size     = 2
