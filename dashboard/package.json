@@ -9,6 +9,7 @@
     "url": "https://codedthemes.com/"
   },
   "scripts": {
+    "optimize": "vite optimize",
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
