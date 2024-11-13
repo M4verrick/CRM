@@ -21,6 +21,14 @@ spec:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:08b370deaf43254ac56a4afc2987c136806c338b
         name: itsag3t1-crm-frontend
         env:
+          - name: VITE_APP_VERSION
+            value: v1.3.0
+          - name: GENERATE_SOURCEMAP
+            value: "false"
+          - name: PUBLIC_URL
+            value: "https://dashboard.io/home"
+          - name: VITE_APP_BASE_NAME
+            value: "/home"
           - name: VITE_ENV
             value: "production"
           - name: VITE_AWS_REGION
