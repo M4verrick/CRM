@@ -20,6 +20,19 @@ spec:
       containers:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:621ddfa95dc1a041fd4fba5dbb96882935cdf542
         name: itsag3t1-crm-frontend
+        env:
+          - name: VITE_ENV
+            value: "production"
+          - name: VITE_AWS_REGION
+            value: "ap-southeast-1"
+          - name: VITE_USER_POOL_ID
+            value: "ap-southeast-1_ya55bZ0sg"
+          - name: VITE_CLIENT_ID
+            value: "46d0ev383r0i600e39nh43k9ac"
+          - name: VITE_AWS_ACCESS_KEY_ID
+            value: "AKIAVD3BDD5QBC4X7FU2"
+          - name: VITE_AWS_SECRET_ACCESS_KEY
+            value: "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"
         resources:
           limits:
             cpu: 800m
