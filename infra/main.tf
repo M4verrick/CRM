@@ -3,11 +3,16 @@ provider "aws" {
 }
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
+data "aws_eks_cluster_auth" "example" {
+  name = module.eks.cluster_name
+}
+
 
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    token                  = data.aws_eks_cluster_auth.example.token
 
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
@@ -311,7 +316,7 @@ locals {
 # GitOps Bridge: Private ssh keys for git
 ################################################################################
 resource "kubernetes_namespace" "argocd" {
-  depends_on = [module.eks_blueprints_addons]
+  depends_on = [module.eks_blueprints_addons, module.aws-auth]
   metadata {
     name = "argocd"
   }
@@ -427,7 +432,7 @@ module "iam_assumable_role_keda" {
 #tfsec:ignore:aws-eks-enable-control-plane-logging
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.23"
+  version = "~> 20.29"
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
@@ -438,6 +443,8 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   authentication_mode                      = "API_AND_CONFIG_MAP"
+  enable_cluster_creator_admin_permissions = true
+
 
   eks_managed_node_groups = {
     new = {
@@ -476,6 +483,7 @@ module "eks" {
     # (i.e. - at most, only one security group should have this tag in your account)
     "karpenter.sh/discovery" = local.name
   })
+
 }
 
 module "aws-auth" {
@@ -541,6 +549,46 @@ module "vpc" {
   create_flow_log_cloudwatch_log_group  = true
   create_flow_log_cloudwatch_iam_role   = true
   flow_log_max_aggregation_interval     = 60
+
+  tags = local.tags
+}
+
+module "vpc_endpoints" {
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "~> 5.1"
+
+  vpc_id = module.vpc.vpc_id
+
+  # Security group
+  create_security_group      = true
+  security_group_name_prefix = "${local.name}-vpc-endpoints-"
+  security_group_description = "VPC endpoint security group"
+  security_group_rules = {
+    ingress_https = {
+      description = "HTTPS from VPC"
+      cidr_blocks = [module.vpc.vpc_cidr_block]
+    }
+  }
+
+  endpoints = merge({
+    s3 = {
+      service         = "s3"
+      service_type    = "Gateway"
+      route_table_ids = module.vpc.private_route_table_ids
+      tags = {
+        Name = "${local.name}-s3"
+      }
+    }
+  },
+    { for service in toset(["autoscaling", "ecr.api", "ecr.dkr", "ec2", "ec2messages", "elasticloadbalancing", "sts", "kms", "logs", "ssm", "ssmmessages"]) :
+      replace(service, ".", "_") =>
+      {
+        service             = service
+        subnet_ids          = module.vpc.private_subnets
+        private_dns_enabled = true
+        tags                = { Name = "${local.name}-${service}" }
+      }
+    })
 
   tags = local.tags
 }

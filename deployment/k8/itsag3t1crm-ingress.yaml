@@ -18,17 +18,10 @@ spec:
     - host: www.itsag3t1.com
       http:
         paths:
-          - path: /home
+          - path: /
             pathType: Prefix
             backend:
               service:
                 name: itsag3t1-crm-frontend
-                port:
-                  name: http
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: itsag3t1-crm-backend
                 port:
                   name: http
