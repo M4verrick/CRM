@@ -155,6 +155,14 @@ locals {
   network_acls = {
     public_inbound = [
       {
+        rule_number = 100
+        rule_action = "allow"
+        from_port   = 80,
+        to_port     = 80,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
         rule_number = 110
         rule_action = "allow"
         from_port   = 443
@@ -534,7 +542,7 @@ module "vpc" {
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 4)]
   database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr,8, k + 8)]
 
-  public_dedicated_network_acl   = true
+  public_dedicated_network_acl   = false
   public_inbound_acl_rules       = local.network_acls["public_inbound"]
   public_outbound_acl_rules      = local.network_acls["public_outbound"]
   database_inbound_acl_rules     = local.network_acls["database_inbound"]
@@ -542,7 +550,7 @@ module "vpc" {
   private_inbound_acl_rules      = local.network_acls["private_inbound"]
   private_outbound_acl_rules     = local.network_acls["private_outbound"]
 
-  private_dedicated_network_acl     = true
+  private_dedicated_network_acl     = false
   database_dedicated_network_acl = true
 
   manage_default_network_acl = true
