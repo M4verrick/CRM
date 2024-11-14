@@ -13,7 +13,6 @@ spec:
     - tags:
         karpenter.sh/discovery: itsag3t1-crm
     - tags:
-        elbv2.k8s.aws/cluster: itsag3t1-crm
         elbv2.k8s.aws/resource: backend-sg
   tags:
     karpenter.sh/discovery: itsag3t1-crm
