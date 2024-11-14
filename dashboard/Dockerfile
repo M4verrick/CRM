@@ -11,6 +11,9 @@ RUN apk add --no-cache xdg-utils
 
 COPY . .
 
+RUN rm -rf .env
+RUN rm -rf node_modules
+
 EXPOSE 3000
 
 CMD ["yarn", "start", "--host", "0.0.0.0"]
