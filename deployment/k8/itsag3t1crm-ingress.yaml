@@ -10,7 +10,7 @@ metadata:
     external-dns.alpha.kubernetes.io/hostname: www.itsag3t1.com
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/0aa56115-a50b-475b-b23f-fce4c253a526
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/03bcc639-d4b8-45d2-afa6-d8c76b51aa5a
     alb.ingress.kubernetes.io/target-node-labels: type=karpenter
 spec:
   ingressClassName: alb
