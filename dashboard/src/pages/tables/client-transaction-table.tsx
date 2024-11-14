@@ -1,9 +1,12 @@
 import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Dropdown, Space, Tag,Modal, message, } from 'antd';
+import { Button, Dropdown, Space, Tag, Modal, message, } from 'antd';
 import React, { useRef } from 'react';
 import api from 'services/api';
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
+
 // Define table items
 type TransactionItem = {
   id: number;
@@ -81,62 +84,64 @@ export default () => {
   const actionRef = useRef<ActionType>();
 
   return (
-    <ProTable<TransactionItem>
-      columns={columns}
-      actionRef={actionRef}
-      cardBordered
-      request={async (params, sort, filter) => {
-        console.log(sort, filter);
-        const response = await api.getTransactions(params); // call your API to fetch transactions
-        return {
-          data: response, // assumes response is an array of TransactionItem
-          success: true,
-        };
-      }}
-      editable={{
-        type: 'multiple',
-      }}
-      rowKey="id"
-      search={{
-        labelWidth: 'auto',
-      }}
-      options={{
-        setting: {
-          listsHeight: 400,
-        },
-      }}
-      pagination={{
-        pageSize: 5,
-        onChange: (page) => console.log(page),
-      }}
-      dateFormatter="string"
-      headerTitle="Transaction Table"
-      toolBarRender={() => [
-        <Button
-          key="button"
-          icon={<PlusOutlined />}
-          onClick={() => {
-            actionRef.current?.reload();
-          }}
-          type="primary"
-        >
-          New Transaction
-        </Button>,
-        <Dropdown
-          key="menu"
-          menu={{
-            items: [
-              { label: '1st item', key: '1' },
-              { label: '2nd item', key: '2' },
-              { label: '3rd item', key: '3' },
-            ],
-          }}
-        >
-          <Button>
-            <EllipsisOutlined />
-          </Button>
-        </Dropdown>,
-      ]}
-    />
+    <ConfigProvider locale={enUS}>
+      <ProTable<TransactionItem>
+        columns={columns}
+        actionRef={actionRef}
+        cardBordered
+        request={async (params, sort, filter) => {
+          console.log(sort, filter);
+          const response = await api.getTransactions(params); // call your API to fetch transactions
+          return {
+            data: response, // assumes response is an array of TransactionItem
+            success: true,
+          };
+        }}
+        editable={{
+          type: 'multiple',
+        }}
+        rowKey="id"
+        search={{
+          labelWidth: 'auto',
+        }}
+        options={{
+          setting: {
+            listsHeight: 400,
+          },
+        }}
+        pagination={{
+          pageSize: 5,
+          onChange: (page) => console.log(page),
+        }}
+        dateFormatter="string"
+        headerTitle="Transaction Table"
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              actionRef.current?.reload();
+            }}
+            type="primary"
+          >
+            New Transaction
+          </Button>,
+          <Dropdown
+            key="menu"
+            menu={{
+              items: [
+                { label: '1st item', key: '1' },
+                { label: '2nd item', key: '2' },
+                { label: '3rd item', key: '3' },
+              ],
+            }}
+          >
+            <Button>
+              <EllipsisOutlined />
+            </Button>
+          </Dropdown>,
+        ]}
+      />
+    </ConfigProvider>
   );
 };

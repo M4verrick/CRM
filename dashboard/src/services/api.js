@@ -2,7 +2,7 @@ import { apiClient } from './api.client';
 
 export const api = {
   // Profile Management
-  getProfileAccounts: () => {
+  getAccounts: () => {
     return apiClient.get('/api/clients/accountsById');
   },
 

@@ -1,197 +1,190 @@
-import api from 'services/api';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable } from '@ant-design/pro-components';
-import { Modal, message, Space, Tag } from 'antd';
+import api from "../../services/api"
+import type { ProColumns } from '@ant-design/pro-components';
+import { ActionType, ProTable } from '@ant-design/pro-components';
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
-import { useRef } from 'react';
-import { ConfigProvider } from 'antd';
+import { useRef } from "react";
+import { message, Button, ConfigProvider, Modal } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
+import { useLocation, useNavigate } from "react-router-dom";
 
-type ClientTableItem = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  country: string;
-  zip: string;
-  dateOfBirth: string;
-  gender: 'MALE' | 'FEMALE' | 'OTHER';
+// table item type
+type AccountTableItem = {
+  key: string;
+  profileId: number;
+  accountId: number;
+  accountType: string;
+  accountStatus: string;
+  openingDate: string;
+  currency: string;
+  branchId: string;
+  initialDeposit: number;
 };
 
-// Handle functions in options column
-const handleEdit = async (record: ClientTableItem) => {
-  try {
-    const requestBody = {
-      firstName: record.firstName,
-      lastName: record.lastName,
-      email: record.email,
-      phone: record.phone,
-      address: record.address,
-      city: record.city,
-      state: record.state,
-      country: record.country,
-      zip: record.zip,
-      dateOfBirth: record.dateOfBirth,
-      gender: record.gender
-    };
-
-    await api.updateClient(record.id, record);
-    message.success('User updated successfully');
-  } catch (error) {
-    message.error('Failed to update user');
-    console.error('Error updating user:', error);
-  }
-};
-
-const handleDelete = async (record: ClientTableItem) => {
-  Modal.confirm({
-    title: 'Are you sure you want to delete this user?',
-    content: `This will permanently delete user ${record.id}`,
-    okText: 'Yes',
-    okType: 'danger',
-    cancelText: 'No',
-    onOk: async () => {
-      await api.deleteClient(record.id);
-      try {
-        await api.deleteClient(record.id);
-        message.success('User deleted successfully');
-      } catch (error) {
-        message.error('Failed to delete client');
-        console.error('Error deleting client:', error);
-      }
-    }
-  });
-};
-
-const columns: ProColumns<ClientTableItem>[] = [
+// columns definition
+const columns: ProColumns<AccountTableItem>[] = [
   {
     dataIndex: 'index',
     valueType: 'indexBorder',
-    width: 48
+    width: 48,
   },
   {
-    title: 'First Name',
-    dataIndex: 'firstName',
-    copyable: true,
-    width: 140,
+    title: 'Profile ID',
+    dataIndex: 'profileId',
+    width: 100,
   },
   {
-    title: 'Last Name',
-    dataIndex: 'lastName',
-    copyable: true,
-    width: 140,
+    title: 'Account ID',
+    dataIndex: 'accountId',
+    width: 100,
   },
   {
-    title: 'Email',
-    dataIndex: 'email',
-    copyable: true,
-    ellipsis: true
+    title: 'Account Type',
+    dataIndex: 'accountType',
+    filters: true,
+    onFilter: true,
+    search: false,
+    width: 120,
+    valueEnum: {
+      SAVINGS: { text: 'Savings' },
+      CHECKING: { text: 'Checking' },
+      BUSINESS: { text: 'Business' },
+    },
   },
   {
-    title: 'Client Id',
-    dataIndex: 'id',
+    title: 'Status',
+    dataIndex: 'accountStatus',
+    filters: true,
+    onFilter: true,
+    search: false,
+    width: 100,
+    valueEnum: {
+      ACTIVE: { text: 'Active', status: 'Success' },
+      INACTIVE: { text: 'Inactive', status: 'Error' },
+      PENDING: { text: 'Pending', status: 'Processing' },
+    },
   },
   {
-    title: 'Phone',
-    dataIndex: 'phone',
-    copyable: true,
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    ellipsis: true,
-  },
-  {
-    title: 'City',
-    dataIndex: 'city',
-  },
-  {
-    title: 'State',
-    dataIndex: 'state',
-  },
-  {
-    title: 'Country',
-    dataIndex: 'country',
-  },
-  {
-    title: 'ZIP',
-    dataIndex: 'zip',
-  },
-  {
-    title: 'Date of Birth',
-    dataIndex: 'dateOfBirth',
+    title: 'Opening Date',
+    dataIndex: 'openingDate',
+    width: 120,
     valueType: 'date',
   },
   {
-    title: 'Gender',
-    dataIndex: 'gender',
-    valueEnum: {
-      MALE: { text: 'Male' },
-      FEMALE: { text: 'Female' },
-      OTHER: { text: 'Other' },
-    }
+    title: 'Currency',
+    dataIndex: 'currency',
+    width: 100,
   },
   {
-    title: 'Options',
-    valueType: 'option',
-    key: 'option',
-    render: (text, record, _, action) => [
-      <a
-        key="editable"
-        onClick={() => {
-          action?.startEditable?.(record.id);
-        }}
-      >
-        Edit
-      </a>,
-      <a
-        key="delete"
-        onClick={() => handleDelete(record)}
-      >
-        Delete
-      </a>,
-    ],
-  }
+    title: 'Branch ID',
+    dataIndex: 'branchId',
+    width: 100,
+  },
+  {
+    title: 'Initial Deposit',
+    dataIndex: 'initialDeposit',
+    width: 120,
+    valueType: 'money',
+  },
 ];
 
+// Fetch function, manages pagination and filtering
+const fetchAccounts = async (params: {
+  current?: number;
+  pageSize?: number;
+  profileId?: number;
+  accountId?: number;
+  accountType?: string;
+  accountStatus?: string;
+  openingDate?: string;
+  currency?: string;
+  branchId?: string;
+  initialDeposit?: number;
+}) => {
+  const data = await api.getAccounts();
+  // This would normally be an API call, but for this example we'll use static data
+  // const data: ProfileAccount[] = [];
+
+  // Transform the nested data structure into a flat array for the table
+  let flattenedData: AccountTableItem[] = data.flatMap(profile =>
+    profile.accounts.map(account => ({
+      key: account.accountId.toString(),
+      profileId: profile.profileId,
+      ...account,
+    }))
+  );
+
+    // Apply filters based on search params
+    if (params.profileId) {
+      flattenedData = flattenedData.filter(item => 
+        item.profileId == params.profileId);
+    }
+    if (params.accountId) {
+      flattenedData = flattenedData.filter(item => 
+        item.accountId == params.accountId);
+    }
+    if (params.accountType) {
+      flattenedData = flattenedData.filter(item => 
+        item.accountType.toLowerCase().includes(params.accountType!.toLowerCase())
+      );
+    }
+    if (params.accountStatus) {
+      flattenedData = flattenedData.filter(item =>
+        item.accountStatus.toLowerCase().includes(params.accountStatus!.toLowerCase())
+      );
+    }
+    if (params.openingDate) {
+      flattenedData = flattenedData.filter(item =>
+        item.openingDate.toLowerCase().includes(params.openingDate!.toLowerCase())
+      );
+    }
+    if (params.currency) {
+      flattenedData = flattenedData.filter(item =>
+        item.currency.toLowerCase().includes(params.currency!.toLowerCase())
+      );
+    }
+    if (params.branchId) {
+      flattenedData = flattenedData.filter(item =>
+        item.branchId.toLowerCase().includes(params.branchId!.toLowerCase())
+      );
+    }
+    if (params.initialDeposit) {
+      flattenedData
+      .filter(item => item.initialDeposit == params.initialDeposit)
+    };
+
+  // Handle pagination
+  const startIndex = ((params.current || 1) - 1) * (params.pageSize || 10);
+  const endIndex = startIndex + (params.pageSize || 10);
+
+  return {
+    data: flattenedData.slice(startIndex, endIndex),
+    total: flattenedData.length,
+    success: true,
+  };
+};
+
+// Update the ProTable component
 export default () => {
   const actionRef = useRef<ActionType>();
+
   return (
     <ConfigProvider locale={enUS}>
-      <ProTable<ClientTableItem>
+      <ProTable<AccountTableItem>
         columns={columns}
-        actionRef={actionRef}
-        request={async (params, sort, filter) => {
-          const response = await api.getClients();
-          const data = response.data || []; // Provide empty array as fallback
-          console.log(data);
-          return {
-            data: data,
-            success: true,
-            total: data.length
-          };
-        }}
-        editable={{
-          type: 'multiple',
-          onSave: async (rowKey, data, row) => {
-            await handleEdit(data);
-            actionRef.current?.reload();
-          },
-        }}
+        request={fetchAccounts}
+        rowKey="key"
         pagination={{
           pageSize: 10,
-          current: 1
+          showSizeChanger: true,
+          showQuickJumper: true,
         }}
-        rowKey="userId"
         search={{
-          labelWidth: 'auto'
+          labelWidth: 'auto',
+          defaultCollapsed: false,
         }}
         dateFormatter="string"
-        headerTitle="Client Profiles"
+        headerTitle="Bank Accounts"
       />
     </ConfigProvider>
   );
