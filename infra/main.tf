@@ -237,7 +237,7 @@ locals {
         to_port     = 65535,
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
-      }
+      },
     ]
     private_outbound = [
       {
