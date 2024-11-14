@@ -15,7 +15,8 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - http:
+    - host: www.itsag3t1.com
+      http:
         paths:
           - path: /
             pathType: Prefix
