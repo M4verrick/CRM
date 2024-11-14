@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY yarn.lock package.json ./
 
-RUN yarn install
+RUN yarn install && yarn upgrade
 
 # Install xdg-utils
 RUN apk add --no-cache xdg-utils
