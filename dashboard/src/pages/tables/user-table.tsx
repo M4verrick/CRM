@@ -49,7 +49,19 @@ const transformUser = (user: AWSCognitoUserType, groups: AWSGroupType[] = []): C
   };
 };
 
-const fetchUsers = async (params?: ListUsersParams) => {
+const fetchUsers = async (params: {
+  given_name?: string,
+  family_name?: string,
+  email?: string,
+  email_verified?: boolean,
+  userId?: string,
+  enabled?: boolean,
+  status?: string,
+  created?: Date;
+  lastModified?: Date;
+  groups?: string[]; 
+}
+) => {
   try {
     const cognitoISP = new CognitoIdentityServiceProvider({
       region: import.meta.env.VITE_AWS_REGION,
@@ -60,13 +72,13 @@ const fetchUsers = async (params?: ListUsersParams) => {
     });
 
     // fetch all users
-    const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers(params || {
+    const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers({
       UserPoolId: import.meta.env.VITE_USER_POOL_ID,
       Limit: 20,
     }).promise();
 
     // Fetch groups for each user. 2n+1 computational complexity.
-    const usersWithGroups = await Promise.all((response.Users || []).map(async (user) => {
+    let usersWithGroups = await Promise.all((response.Users || []).map(async (user) => {
       if (!user.Username) return transformUser(user);
 
       try {
@@ -81,6 +93,37 @@ const fetchUsers = async (params?: ListUsersParams) => {
         return transformUser(user);
       }
     }));
+
+    // Apply filters based on search params
+    if (params.given_name) {
+      usersWithGroups = usersWithGroups.filter(item => 
+        item.given_name.toLowerCase().includes(params.given_name!.toLowerCase()))
+    }
+    if (params.family_name) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.family_name.toLowerCase().includes(params.family_name!.toLowerCase()))
+    }
+    if (params.email) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.email.toLowerCase().includes(params.email!.toLowerCase()))
+    }
+    if (params.email_verified !== undefined) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.emailVerified === params.email_verified)
+    }
+    if (params.userId) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.userId.toLowerCase().includes(params.userId!.toLowerCase()))
+    }
+    if (params.enabled !== undefined) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.enabled === params.enabled)
+    }
+    if (params.status) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.status.toLowerCase().includes(params.status!.toLowerCase()))
+    }
+
 
     return {
       data: usersWithGroups,
@@ -216,6 +259,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     dataIndex: 'userId',
     editable: false,
     copyable: true,
+    search: false,
     ellipsis: true,
     hideInTable: true,
   },
@@ -224,6 +268,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     dataIndex: 'enabled',
     editable: false,
     filters: true,
+    search: false,
     onFilter: true,
     valueEnum: {
       true: { text: 'true' },
@@ -251,7 +296,6 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     dataIndex: 'created',
     editable: false,
     valueType: 'date',
-    hideInSearch: true,
     hideInTable: true,
     sorter: true
   },
@@ -259,7 +303,6 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
     title: 'Last Modified',
     dataIndex: 'lastModified',
     editable: false,
-    hideInSearch: true,
     hideInTable: true,
     valueType: 'date',
     sorter: true
@@ -295,12 +338,7 @@ export default () => {
       <ProTable<CognitoUserTableItem>
         columns={columns}
         actionRef={actionRef}
-        request={async (params, sort, filter) => {
-          return fetchUsers({
-            UserPoolId: import.meta.env.VITE_USER_POOL_ID,
-            Limit: 20,
-          });
-        }}
+        request={fetchUsers}
         editable={{
           type: 'multiple',
           onSave: async (rowKey, data, row) => {
