@@ -499,6 +499,8 @@ module "aws-auth" {
       groups   = ["system:bootstrappers", "system:nodes"]
     },
   ]
+
+  depends_on = [module.eks, module.eks_blueprints_addons]
 }
 
 ################################################################################
