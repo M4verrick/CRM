@@ -9,7 +9,6 @@
     "url": "https://codedthemes.com/"
   },
   "scripts": {
-    "optimize": "vite optimize",
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
@@ -18,9 +17,10 @@
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
-    "@ant-design/colors": "^7.0.2",
-    "@ant-design/icons": "^5.3.1",
-    "@ant-design/pro-components": "^2.7.19",
+    "@ant-design/colors": "^7.1.0",
+    "@ant-design/icons": "^5.5.1",
+    "@ant-design/pro-components": "^2.8.1",
+    "@aws-amplify/ui": "^6.6.5",
     "@aws-amplify/ui-react": "^6.5.4",
     "@aws-sdk/client-cloudwatch-logs": "^3.682.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.679.0",
@@ -38,7 +38,7 @@
     "@svgr/webpack": "^8.1.0",
     "@vitejs/plugin-react": "^4.2.1",
     "amazon-cognito-identity-js": "^6.3.12",
-    "antd": "^5.21.4",
+    "antd": "^5.22.0",
     "apexcharts": "^3.49.0",
     "aws-amplify": "^6.6.5",
     "aws-sdk": "^2.1691.0",

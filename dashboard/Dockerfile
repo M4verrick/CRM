@@ -1,10 +1,10 @@
-FROM node:21-alpine3.19
+FROM node:23-alpine3.19
 
 WORKDIR /app
 
 COPY yarn.lock package.json ./
 
-RUN yarn install && yarn upgrade
+RUN yarn install
 
 # Install xdg-utils
 RUN apk add --no-cache xdg-utils
