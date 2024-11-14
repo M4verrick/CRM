@@ -34,6 +34,19 @@ export const api = {
     return apiClient.get(`/api/clients/verify`);
   },
 
+  getTransactions: () => {
+    return apiClient.get(`/db/transactions`);
+  },
+
+  retrieveUpdatedTransaction: () => {
+    return apiClient.get(`/sftp/download-file`);
+  },
+
+  getTransactionsByClient: (clientId) => {
+    return apiClient.get(`/db/transactions/client/${clientId}`);
+  },
+
+
 };
 
 export default api;
