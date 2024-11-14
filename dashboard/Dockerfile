@@ -12,7 +12,6 @@ RUN apk add --no-cache xdg-utils
 COPY . .
 
 RUN rm -rf .env
-RUN rm -rf node_modules
 
 EXPOSE 3000
 
