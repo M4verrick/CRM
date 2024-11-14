@@ -14,8 +14,6 @@ spec:
         app.kubernetes.io/name: itsag3t1-crm-frontend
         app: frontend
     spec:
-      nodeSelector:
-        type: karpenter
       terminationGracePeriodSeconds: 0
       containers:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:d1928156dde67d3c11d9b6530ee8af8edd4762c0
