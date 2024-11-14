@@ -43,7 +43,7 @@ spec:
             value: "oL4qW45zOIWGdoOvS8HcRSzq/ADII/nqDKTmmdD8"
         resources:
           limits:
-            cpu: 800m
+            cpu: 1000m
         ports:
         - containerPort: 3000
           name: http
