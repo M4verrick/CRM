@@ -18,7 +18,7 @@ spec:
         type: karpenter
       terminationGracePeriodSeconds: 0
       containers:
-      - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:7fc4ae4ebd6c2a9b40580db3d31f7276d13ca260
+      - image: public.ecr.aws/t2p9h2o6/itsag3t1/frontend:621ddfa95dc1a041fd4fba5dbb96882935cdf542
         name: itsag3t1-crm-frontend
         env:
           - name: VITE_APP_VERSION
