@@ -38,6 +38,7 @@ export default defineConfig({
     port: 3000
   },
   optimizeDeps: {
-    exclude: ['node_modules/.vite']
+    exclude: ['node_modules/.vite'],
+    force: true
   }
 });
