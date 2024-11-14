@@ -4,7 +4,7 @@ metadata:
   namespace: itsag3t1-crm
   name: itsag3t1-crm-frontend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: itsag3t1-crm-frontend
