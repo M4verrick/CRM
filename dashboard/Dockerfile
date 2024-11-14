@@ -11,8 +11,6 @@ RUN apk add --no-cache xdg-utils
 
 COPY . .
 
-RUN rm -rf node_modules/.vite/
-
 EXPOSE 3000
 
 CMD ["yarn", "start", "--host", "0.0.0.0"]
