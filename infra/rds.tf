@@ -43,19 +43,19 @@ resource "aws_db_instance" "primary_rds" {
 }
 
 # Read Replica for read scaling (asynchronously replicates data from primary)
-resource "aws_db_instance" "read_replica_rds" {
-  identifier          = "my-read-replica"
-  storage_type        = "gp2"
-  instance_class      = "db.t3.micro"
-  storage_encrypted  = true
-  publicly_accessible = false
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  backup_retention_period     = 7
-  skip_final_snapshot         = true
-  replicate_source_db = aws_db_instance.primary_rds.identifier # Replicate from primary
-  depends_on = [aws_db_instance.primary_rds]  # Ensure primary instance is created first
-
-  tags = {
-    Name = "Read-Replica-RDS"
-  }
-}
+# resource "aws_db_instance" "read_replica_rds" {
+#   identifier          = "my-read-replica"
+#   storage_type        = "gp2"
+#   instance_class      = "db.t3.micro"
+#   storage_encrypted  = true
+#   publicly_accessible = false
+#   vpc_security_group_ids = [aws_security_group.rds_sg.id]
+#   backup_retention_period     = 7
+#   skip_final_snapshot         = true
+#   replicate_source_db = aws_db_instance.primary_rds.identifier # Replicate from primary
+#   depends_on = [aws_db_instance.primary_rds]  # Ensure primary instance is created first
+#
+#   tags = {
+#     Name = "Read-Replica-RDS"
+#   }
+# }
