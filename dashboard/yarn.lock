@@ -327,9 +327,9 @@
     rxjs "^7.8.1"
 
 "@aws-amplify/data-schema@^1.7.0":
-  version "1.13.4"
-  resolved "https://registry.yarnpkg.com/@aws-amplify/data-schema/-/data-schema-1.13.4.tgz#371c38ae8d12cf1ded180d09dd9a7538437409dc"
-  integrity sha512-vtwcu8SSg2iGaDF/uJ6eGf8kiZSxFWmDhYJ5bJ4vkv91y4na1nZCphv40ehyRdAiMKVKmdLuBhVmDxy5g1s8eA==
+  version "1.14.0"
+  resolved "https://registry.yarnpkg.com/@aws-amplify/data-schema/-/data-schema-1.14.0.tgz#22fc6cc32cadf87bbab7d717a720aa869b9c88c3"
+  integrity sha512-UiMu+ovADrKKMJartb0NTKoAKo2DYjF2abZKM//NTmeHFlh2+hAJrrT66jP3mnX2jTFZzgoBWPVtnSf9EbMhCw==
   dependencies:
     "@aws-amplify/data-schema-types" "*"
     "@smithy/util-base64" "^3.0.0"
@@ -5806,9 +5806,9 @@ formik@^2.4.5:
     tslib "^2.0.0"
 
 framer-motion@^11.0.8:
-  version "11.11.15"
-  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-11.11.15.tgz#f9a1c505adf84bf0184b6076e11464797cb86c02"
-  integrity sha512-fib+OpUe4nap4W1vhaDohnPU+42B5s1q+jNkNkb6TfzmDYtRhDyvn4mkRCAD5a2cQKOI3nJZP7yqGYtxnlmleg==
+  version "11.11.16"
+  resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-11.11.16.tgz#832a137e884e5856b2c6e030d311ae6885e60120"
+  integrity sha512-PAK9NkCdRuwNTkKh9chSHokvEkwLJ/JyePNG/Fgmk4ygeQmth8wneITlxQAykOeYWgRvetk1i22PcMiG/VRuWg==
   dependencies:
     tslib "^2.4.0"
 
