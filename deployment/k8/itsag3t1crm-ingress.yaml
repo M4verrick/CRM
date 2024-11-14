@@ -10,7 +10,7 @@ metadata:
     external-dns.alpha.kubernetes.io/hostname: www.itsag3t1.com
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/98d0b30c-cafe-4b2e-87e9-64c304b65801
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/0aa56115-a50b-475b-b23f-fce4c253a526
     alb.ingress.kubernetes.io/target-node-labels: type=karpenter
 spec:
   ingressClassName: alb
@@ -18,17 +18,10 @@ spec:
     - host: www.itsag3t1.com
       http:
         paths:
-          - path: /home
+          - path: /
             pathType: Prefix
             backend:
               service:
                 name: itsag3t1-crm-frontend
-                port:
-                  name: http
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: itsag3t1-crm-backend
                 port:
                   name: http

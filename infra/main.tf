@@ -3,11 +3,16 @@ provider "aws" {
 }
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
+data "aws_eks_cluster_auth" "example" {
+  name = module.eks.cluster_name
+}
+
 
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    token                  = data.aws_eks_cluster_auth.example.token
 
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
@@ -146,13 +151,172 @@ locals {
     Blueprint  = local.name
     GithubRepo = "github.com/gitops-bridge-dev/gitops-bridge"
   }
+
+  network_acls = {
+    public_inbound = [
+      {
+        rule_number = 110
+        rule_action = "allow"
+        from_port   = 443
+        to_port     = 443
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 120
+        rule_action = "allow"
+        from_port   = 22,
+        to_port     = 22,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 900
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      }
+    ]
+    public_outbound = [
+      {
+        rule_number = 100
+        rule_action = "allow"
+        from_port   = 80
+        to_port     = 80
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 110
+        rule_action = "allow"
+        from_port   = 443
+        to_port     = 443
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 120
+        rule_action = "allow"
+        from_port   = 22,
+        to_port     = 22,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 900
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      }
+    ]
+    private_inbound = [
+      {
+        rule_number = 100
+        rule_action = "allow"
+        from_port   = 0
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "10.0.0.0/16"
+      },
+      {
+        rule_number = 110
+        rule_action = "allow"
+        from_port   = 0
+        to_port     = 65535
+        protocol    = "udp"
+        cidr_block  = "10.0.0.0/16"
+      },
+      {
+        rule_number = 200
+        rule_action = "allow"
+        from_port   = 1024,
+        to_port     = 65535,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+    ]
+    private_outbound = [
+      {
+        rule_number = 100
+        rule_action = "allow"
+        from_port   = 0
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "10.0.0.0/16"
+      },
+      {
+        rule_number = 110
+        rule_action = "allow"
+        from_port   = 0
+        to_port     = 65535
+        protocol    = "udp"
+        cidr_block  = "10.0.0.0/16"
+      },
+      {
+        rule_number = 120
+        rule_action = "allow"
+        from_port   = 22,
+        to_port     = 22,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 200
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 300
+        rule_action = "allow"
+        from_port   = 80,
+        to_port     = 80,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 400
+        rule_action = "allow"
+        from_port   = 443,
+        to_port     = 443,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      }
+    ]
+    database_inbound = [
+      {
+        rule_number = 100
+        rule_action = "allow"
+        from_port   = 5432
+        to_port     = 5432
+        protocol    = "tcp"
+        cidr_block  = "10.0.0.0/16"
+      }
+    ]
+    database_outbound = [
+      {
+        rule_number = 100
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "10.0.0.0/16"
+      }
+    ]
+  }
 }
 
 ################################################################################
 # GitOps Bridge: Private ssh keys for git
 ################################################################################
 resource "kubernetes_namespace" "argocd" {
-  depends_on = [module.eks_blueprints_addons]
+  depends_on = [module.eks_blueprints_addons, module.aws-auth]
   metadata {
     name = "argocd"
   }
@@ -268,7 +432,7 @@ module "iam_assumable_role_keda" {
 #tfsec:ignore:aws-eks-enable-control-plane-logging
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.23"
+  version = "~> 20.29"
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
@@ -279,14 +443,16 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   authentication_mode                      = "API_AND_CONFIG_MAP"
+  enable_cluster_creator_admin_permissions = true
+
 
   eks_managed_node_groups = {
     new = {
       instance_types = ["t3.small"]
 
-      min_size     = 3
+      min_size     = 2
       max_size     = 3
-      desired_size = 3
+      desired_size = 2
     }
   }
 
@@ -317,6 +483,7 @@ module "eks" {
     # (i.e. - at most, only one security group should have this tag in your account)
     "karpenter.sh/discovery" = local.name
   })
+
 }
 
 module "aws-auth" {
@@ -332,6 +499,8 @@ module "aws-auth" {
       groups   = ["system:bootstrappers", "system:nodes"]
     },
   ]
+
+  depends_on = [module.eks, module.eks_blueprints_addons]
 }
 
 ################################################################################
@@ -349,6 +518,19 @@ module "vpc" {
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 4)]
   database_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr,8, k + 8)]
 
+  public_dedicated_network_acl   = true
+  public_inbound_acl_rules       = local.network_acls["public_inbound"]
+  public_outbound_acl_rules      = local.network_acls["public_outbound"]
+  database_inbound_acl_rules     = local.network_acls["database_inbound"]
+  database_outbound_acl_rules    = local.network_acls["database_outbound"]
+  private_inbound_acl_rules      = local.network_acls["private_inbound"]
+  private_outbound_acl_rules     = local.network_acls["private_outbound"]
+
+  private_dedicated_network_acl     = true
+  database_dedicated_network_acl = true
+
+  manage_default_network_acl = true
+
   enable_nat_gateway = true
   single_nat_gateway = true
 
@@ -361,6 +543,54 @@ module "vpc" {
     # Tags subnets for Karpenter auto-discovery
     "karpenter.sh/discovery" = local.name
   }
+
+  # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
+  vpc_flow_log_iam_role_name            = "vpc-complete-example-role"
+  vpc_flow_log_iam_role_use_name_prefix = false
+  enable_flow_log                       = true
+  create_flow_log_cloudwatch_log_group  = true
+  create_flow_log_cloudwatch_iam_role   = true
+  flow_log_max_aggregation_interval     = 60
+
+  tags = local.tags
+}
+
+module "vpc_endpoints" {
+  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+  version = "~> 5.1"
+
+  vpc_id = module.vpc.vpc_id
+
+  # Security group
+  create_security_group      = true
+  security_group_name_prefix = "${local.name}-vpc-endpoints-"
+  security_group_description = "VPC endpoint security group"
+  security_group_rules = {
+    ingress_https = {
+      description = "HTTPS from VPC"
+      cidr_blocks = [module.vpc.vpc_cidr_block]
+    }
+  }
+
+  endpoints = merge({
+    s3 = {
+      service         = "s3"
+      service_type    = "Gateway"
+      route_table_ids = module.vpc.private_route_table_ids
+      tags = {
+        Name = "${local.name}-s3"
+      }
+    }
+  },
+    { for service in toset(["autoscaling", "ecr.api", "ecr.dkr", "ec2", "ec2messages", "elasticloadbalancing", "sts", "kms", "logs", "ssm", "ssmmessages"]) :
+      replace(service, ".", "_") =>
+      {
+        service             = service
+        subnet_ids          = module.vpc.private_subnets
+        private_dns_enabled = true
+        tags                = { Name = "${local.name}-${service}" }
+      }
+    })
 
   tags = local.tags
 }
