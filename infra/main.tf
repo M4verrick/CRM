@@ -238,6 +238,22 @@ locals {
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
       },
+      {
+        rule_number = 300
+        rule_action = "allow"
+        from_port   = 80,
+        to_port     = 80,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
+      {
+        rule_number = 400
+        rule_action = "allow"
+        from_port   = 443,
+        to_port     = 443,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      }
     ]
     private_outbound = [
       {
