@@ -139,6 +139,9 @@ locals {
       workload_repo_basepath = local.gitops_workload_basepath
       workload_repo_path     = local.gitops_workload_path
       workload_repo_revision = local.gitops_workload_revision
+    },
+    {
+      ingress_nginx_service_type = "NodePort"
     }
   )
 
