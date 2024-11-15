@@ -1,21 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: itsag3t1-crm
-  name: itsag3t1-crm-ingress
+  name: alb-ingress-connect-nginx
+  namespace: ingress-nginx
   annotations:
-    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=60
     external-dns.alpha.kubernetes.io/hostname: www.itsag3t1.com
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:351854075744:certificate/c392efe8-3830-422e-a60a-a3c5656a5be6
-    alb.ingress.kubernetes.io/target-node-labels: type=karpenter
 spec:
   ingressClassName: alb
   rules:
+    - host: www.itsag3t1.com
     - http:
         paths:
           - path: /*
@@ -29,6 +31,6 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: ingress-nginx-controller # Make sure you name the service correctly by checking the name of it nginx ingress controller service nothing else
+                name: ingress-nginx-controller
                 port:
                   number: 80
