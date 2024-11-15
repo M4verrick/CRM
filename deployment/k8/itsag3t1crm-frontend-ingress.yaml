@@ -3,6 +3,9 @@ kind: Ingress
 metadata:
   name: itsag3t1-crm-frontend-ingress
   namespace: itsag3t1-crm
+  annotations:
+    nginx.ingress.kubernetes.io/add-base-url: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
 spec:
   ingressClassName: nginx
   rules:
