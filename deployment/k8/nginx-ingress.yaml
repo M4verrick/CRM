@@ -20,14 +20,14 @@ spec:
     - host: www.itsag3t1.com
     - http:
         paths:
-          - path: /*
+          - path: /
             pathType: ImplementationSpecific
             backend:
               service:
                 name: ssl-redirect
                 port:
                   name: use-annotation
-          - path: /*
+          - path: /
             pathType: ImplementationSpecific
             backend:
               service:
