@@ -43,16 +43,49 @@ public class ProfileController {
         return profileService.getAccountsGroupedByProfileId();
     }
 
-    @GetMapping
-    public List<Profile> getAllProfiles(Authentication authentication) {
-        String agentId = ClaimsUtil.getAgentId(authentication);
+    /* For testing only */
+    @GetMapping("/test/")
+    public List<Profile> getAllProfiles(@RequestParam String agentId) {
         log.info("Agent ID: {}", agentId);
         return profileService.getAllProfilesByAgentId(agentId);
     }
 
     /* For testing only */
-    @GetMapping("/test/")
-    public List<Profile> getAllProfiles(@RequestParam String agentId) {
+    @PostMapping("/testAgent")
+    public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, @RequestParam String agentId) {
+        String token = TokenUtil.generateVerificationToken();
+        Date dateOfBirth = profile.getDateOfBirth();
+        if (!isValidAge(dateOfBirth)) {
+            throw new AgeException("User must be between 18 and 100 years old.");
+        }
+        Profile newProfile = new Profile.Builder()
+                .setFirstName(profile.getFirstName())
+                .setLastName(profile.getLastName())
+                .setEmail(profile.getEmail())
+                .setPhone(profile.getPhone())
+                .setAddress(profile.getAddress())
+                .setCity(profile.getCity())
+                .setState(profile.getState())
+                .setZip(profile.getZip())
+                .setCountry(profile.getCountry())
+                .setDateOfBirth(profile.getDateOfBirth())
+                .setGender(profile.getGender())
+                .setVerificationToken(token)
+                .setEmailVerified(false)
+                .build();
+
+        Profile savedProfile = profileService.saveProfile(newProfile, agentId);
+//        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
+        String verificationLink = "localhost:8080/api/clients/verify?token=" + token;
+        log.info("Sending email");
+        emailService.sendVerificationEmail(savedProfile.getEmail(),
+                savedProfile.getFirstName(), verificationLink);
+
+        return ResponseEntity.ok(savedProfile);
+    }
+    @GetMapping
+    public List<Profile> getAllProfiles(Authentication authentication) {
+        String agentId = ClaimsUtil.getAgentId(authentication);
         log.info("Agent ID: {}", agentId);
         return profileService.getAllProfilesByAgentId(agentId);
     }
@@ -92,44 +125,12 @@ public class ProfileController {
 
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
         String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-//        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
+        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
 
-    /* For testing only */
-    @PostMapping("/testAgent")
-    public ResponseEntity<Profile> createProfile(@RequestBody Profile profile, @RequestParam String agentId) {
-        String token = TokenUtil.generateVerificationToken();
-        Date dateOfBirth = profile.getDateOfBirth();
-        if (!isValidAge(dateOfBirth)) {
-            throw new AgeException("User must be between 18 and 100 years old.");
-        }
-        Profile newProfile = new Profile.Builder()
-                .setFirstName(profile.getFirstName())
-                .setLastName(profile.getLastName())
-                .setEmail(profile.getEmail())
-                .setPhone(profile.getPhone())
-                .setAddress(profile.getAddress())
-                .setCity(profile.getCity())
-                .setState(profile.getState())
-                .setZip(profile.getZip())
-                .setCountry(profile.getCountry())
-                .setDateOfBirth(profile.getDateOfBirth())
-                .setGender(profile.getGender())
-                .setVerificationToken(token)
-                .setEmailVerified(false)
-                .build();
 
-        Profile savedProfile = profileService.saveProfile(newProfile, agentId);
-//        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        String verificationLink = "localhost:8080/api/clients/verify?token=" + token;
-        log.info("Sending email");
-        emailService.sendVerificationEmail(savedProfile.getEmail(),
-                savedProfile.getFirstName(), verificationLink);
-
-        return ResponseEntity.ok(savedProfile);
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Profile> updateProfile(@PathVariable Long id, @RequestBody Profile profileDetails,
