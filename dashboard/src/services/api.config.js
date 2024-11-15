@@ -5,7 +5,7 @@ const API_CONFIG = {
     timeout: 5000,
   },
   production: {
-    baseURL: 'https://itsag3t1.com/api',
+    baseURL: 'https://www.itsag3t1.com/api',
     timeout: 5000,
   },
 };
