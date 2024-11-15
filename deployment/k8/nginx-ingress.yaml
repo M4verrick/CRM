@@ -18,19 +18,12 @@ spec:
   ingressClassName: alb
   rules:
     - host: www.itsag3t1.com
-    - http:
+      http:
         paths:
           - path: /
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: ssl-redirect
-                port:
-                  name: use-annotation
-          - path: /
-            pathType: ImplementationSpecific
+            pathType: Prefix
             backend:
               service:
                 name: ingress-nginx-controller
                 port:
-                  number: 80
+                  name: http  # HTTP NodePort (30963)
