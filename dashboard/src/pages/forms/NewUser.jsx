@@ -21,7 +21,7 @@ const NewUser = () => {
 
     // Set up the parameters for creating a new user
     const params = {
-      UserPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
+      UserPoolId: import.meta.env.VITE_USER_POOL_ID,
       Username: userData.email,
       TemporaryPassword: generateTemporaryPassword(),
       UserAttributes: [
@@ -122,6 +122,7 @@ const NewUser = () => {
     <div className="Form">
       <header className="Form-header">
         <Form
+          form={form}
           autoComplete="off"
           labelCol={{ span: 10 }}
           wrapperCol={{ span: 24 }}

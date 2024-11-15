@@ -76,6 +76,7 @@ const NewAccount = () => {
     <div className="Form">
       <header className="Form-header">
         <Form
+          form={form}
           autoComplete="off"
           labelCol={{ span: 12 }}
           wrapperCol={{ span: 12 }}
