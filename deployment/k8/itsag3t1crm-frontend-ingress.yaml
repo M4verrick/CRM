@@ -1,9 +1,14 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: itsag3t1-crm-frontend-ingress
+  name: itsag3t1-crm-ingress
   namespace: itsag3t1-crm
   annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://www.itsag3t1.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Accept, Content-Type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "http-cookie"
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
@@ -20,5 +25,12 @@ spec:
             backend:
               service:
                 name: itsag3t1-crm-frontend
+                port:
+                  name: http
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: itsag3t1-crm-backend
                 port:
                   name: http
