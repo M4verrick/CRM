@@ -21,7 +21,7 @@ const NewClient = () => {
         dateOfBirth: values.dateOfBirth?.format('YYYY-MM-DD')
       };
 
-      const userData = await post('/clients', formattedValues);
+      const userData = await post('/clients/createProfileAgent', formattedValues);
       
       if (userData) {
         messageApi.success('Client successfully registered!');
