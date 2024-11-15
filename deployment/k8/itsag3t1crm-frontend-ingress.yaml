@@ -3,6 +3,12 @@ kind: Ingress
 metadata:
   name: itsag3t1-crm-frontend-ingress
   namespace: itsag3t1-crm
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "http-cookie"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
 spec:
   ingressClassName: nginx
   rules:
