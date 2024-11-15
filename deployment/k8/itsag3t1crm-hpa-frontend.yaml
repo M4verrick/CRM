@@ -4,8 +4,8 @@ metadata:
   namespace: itsag3t1-crm
   name: itsag3t1-crm-frontend-hpa
 spec:
-  minReplicas: 1
-  maxReplicas: 1
+  minReplicas: 2
+  maxReplicas: 2
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
