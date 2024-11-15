@@ -1,7 +1,9 @@
 import api from 'services/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Modal, message, Tag } from 'antd';
+import { Modal, message, Tag, Button } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { useRef } from 'react';
 import { ConfigProvider } from 'antd';
@@ -214,6 +216,7 @@ const fetchClients = async (params: {
 
 export default () => {
   const actionRef = useRef<ActionType>();
+  const navigate = useNavigate();
 
   return (
     <ConfigProvider locale={enUS}>
@@ -240,6 +243,20 @@ export default () => {
         }}
         dateFormatter="string"
         headerTitle="Client Profiles"
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              // add new user
+              navigate('/ClientForm');
+              actionRef.current?.reload();
+            }}
+            type="primary"
+          >
+            Add new client
+          </Button>
+        ]}
       />
     </ConfigProvider>
   );

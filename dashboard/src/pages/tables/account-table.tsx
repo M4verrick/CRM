@@ -6,7 +6,7 @@ import React from 'react';
 import { useRef } from "react";
 import { message, Button, ConfigProvider, Modal } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 // table item type
 type AccountTableItem = {
@@ -167,13 +167,14 @@ const fetchAccounts = async (params: {
 // Update the ProTable component
 export default () => {
   const actionRef = useRef<ActionType>();
+  const navigate = useNavigate();
 
   return (
     <ConfigProvider locale={enUS}>
       <ProTable<AccountTableItem>
         columns={columns}
         request={fetchAccounts}
-        rowKey="key"
+        rowKey="accountId"
         pagination={{
           pageSize: 10,
           showSizeChanger: true,
@@ -185,6 +186,20 @@ export default () => {
         }}
         dateFormatter="string"
         headerTitle="Bank Accounts"
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              // add new user
+              navigate('/UserForm');
+              actionRef.current?.reload();
+            }}
+            type="primary"
+          >
+            Add new user
+          </Button>
+        ]}
       />
     </ConfigProvider>
   );

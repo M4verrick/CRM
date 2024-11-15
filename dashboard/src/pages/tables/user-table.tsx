@@ -1,6 +1,8 @@
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Modal, message, Space, Tag } from 'antd';
+import { Modal, message, Tag, Button, Space } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { useRef } from 'react';
 
@@ -333,6 +335,8 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
 
 export default () => {
   const actionRef = useRef<ActionType>();
+  const navigate = useNavigate();
+
   return (
     <ConfigProvider locale={enUS}>
       <ProTable<CognitoUserTableItem>
@@ -356,6 +360,19 @@ export default () => {
         }}
         dateFormatter="string"
         headerTitle="Cognito Users"
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              // add new user
+              navigate('/UserForm');
+            }}
+            type="primary"
+          >
+            Add new user
+          </Button>
+        ]}
       />
     </ConfigProvider>
   );
