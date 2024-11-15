@@ -21,6 +21,11 @@ export const api = {
     return apiClient.post('/api/clients/createProfileAgent', accountData);
   },
 
+  // Create Account
+  createAccount: (accountData) => {
+    return apiClient.post('/api/accounts', accountData);
+  },
+
   updateClient: (clientId, data) => {
     return apiClient.put(`/api/clients/${clientId}`, data);
   },
