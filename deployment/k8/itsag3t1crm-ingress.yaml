@@ -16,13 +16,19 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-    - host: www.itsag3t1.com
-      http:
+    - http:
         paths:
-          - path: /
-            pathType: Prefix
+          - path: /*
+            pathType: ImplementationSpecific
             backend:
               service:
-                name: itsag3t1-crm-frontend
+                name: ssl-redirect
                 port:
-                  name: http
+                  name: use-annotation
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ingress-nginx-controller # Make sure you name the service correctly by checking the name of it nginx ingress controller service nothing else
+                port:
+                  number: 80
