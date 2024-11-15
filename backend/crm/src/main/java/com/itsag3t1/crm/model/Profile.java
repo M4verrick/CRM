@@ -1,6 +1,8 @@
 package com.itsag3t1.crm.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -13,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@JsonDeserialize(builder = Profile.Builder.class)
 @Table(name = "profiles")
 public class Profile {
     // Setters
@@ -148,6 +151,7 @@ public class Profile {
     }
 
     // Builder class
+    @JsonPOJOBuilder(withPrefix = "set")
     public static class Builder {
         private Long id;
         private String firstName;
