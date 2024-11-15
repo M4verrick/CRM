@@ -5,7 +5,7 @@ const API_CONFIG = {
     timeout: 5000,
   },
   production: {
-    baseURL: 'itsag3t1-crm-backend.itsag3t1-crm.svc.cluster.local:8080/api',
+    baseURL: 'http://itsag3t1-crm-backend.itsag3t1-crm.svc.cluster.local:8080/api',
     timeout: 5000,
   },
 };
