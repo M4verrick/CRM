@@ -28,7 +28,7 @@ spec:
           name: http
         env:
           - name: ALLOWED_ORIGINS
-            value: "http://www.itsag3t1.com"
+            value: "https://www.itsag3t1.com"
           - name: COGNITO_ISSUER_URL
             value: "https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_ya55bZ0sg"
           - name: DB_HOSTNAME
