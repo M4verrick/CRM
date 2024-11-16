@@ -3,11 +3,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
 import { Button, Dropdown, Space, Tag } from 'antd';
 import React from 'react';
-
-// TODO: make the searchable params functional
-
-// cloudwatch integration
-import { CloudWatchLogsClient, FilterLogEventsCommand } from "@aws-sdk/client-cloudwatch-logs";
+import { CloudWatchLogsClient, FilterLogEventsCommand, DescribeLogStreamsCommand } from "@aws-sdk/client-cloudwatch-logs";
 import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
 
@@ -19,40 +15,115 @@ const client = new CloudWatchLogsClient({
   }
 });
 
-async function getCloudWatchLogs() {
-  const command = new FilterLogEventsCommand({
-    logGroupName: "crm-logs",         // Specify the log group
-    limit: 100,            // Set a limit for the number of logs returned
-  });
+const LOG_GROUP_NAME = "/aws/eks/itsag3t1-crm/aws-fluentbit-logs-20241103110112589200000009/workload/itsag3t1-crm";
 
+async function getRecentBackendLogStreams() {
   try {
-    const response = await client.send(command);
-    response.events.forEach((event) => {
-      console.log(`Timestamp: ${new Date(event.timestamp)}, Message: ${event.message}`);
+    const command = new DescribeLogStreamsCommand({
+      logGroupName: LOG_GROUP_NAME,
+      orderBy: 'LastEventTime',
+      descending: true,
+      limit: 50 // Get the 50 most recent streams
     });
 
-    const logItems: LogsTableItem[] = response.events?.map((event) => {
-      // Parse the JSON message
-      let parsedMessage;
-      try {
-        // Double unescape approach
-        const unescapedMessage = event.message.replace(/\\\\/g, '\\');
-        parsedMessage = JSON.parse(JSON.parse(`"${unescapedMessage}"`));
-      } catch (error) {
-        console.error("Failed to parse log message:", error);
-        return null;  // Skip if parsing fails
+    const response = await client.send(command);
+    
+    // Filter streams for backend pods
+    return response.logStreams
+      ?.filter(stream => stream.logStreamName?.includes('backend'))
+      .slice(0, 20) // Take only the 20 most recent backend streams
+      .map(stream => stream.logStreamName)
+      .filter((name): name is string => name !== undefined) || [];
+
+  } catch (error) {
+    console.error("Error fetching log streams:", error);
+    return [];
+  }
+}
+
+async function fetchAllMatchingLogs(streamNames: string[], startTime?: number, endTime?: number) {
+  let allLogs: any[] = [];
+  let nextToken: string | undefined;
+
+  try {
+    do {
+      const command = new FilterLogEventsCommand({
+        logGroupName: LOG_GROUP_NAME,
+        logStreamNames: streamNames,
+        startTime,
+        endTime,
+        nextToken,
+        limit: 1000,
+        filterPattern: '{ $.log = "*logger_name*" && $.log = "*agent_id*" }' // Filter for logs containing our required fields
+      });
+
+      const response = await client.send(command);
+      
+      if (response.events) {
+        allLogs = [...allLogs, ...response.events];
       }
 
-      // Return as a LogsTableItem
-      return {
-        loggerName: parsedMessage.loggerName,
-        logLevel: parsedMessage.logLevel,
-        timestamp: new Date(parsedMessage.timestamp),
-        message: parsedMessage.message,
-        agent_id: parsedMessage.mdc.agent_id,
-        date_time: new Date(parsedMessage.mdc.date_time),
-      };
-    }).filter(item => item !== null) as LogsTableItem[];
+      nextToken = response.nextToken;
+    } while (nextToken);
+
+    return allLogs;
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    return [];
+  }
+}
+
+async function getCloudWatchLogs(params: any = {}) {
+  try {
+    // // Calculate time range (default to last 24 hours if not specified)
+    // const endTime = params.endTime || Date.now();
+    // const startTime = params.startTime || endTime - (24 * 60 * 60 * 1000); // 24 hours ago
+
+    // Get most recent backend streams
+    const backendStreams = await getRecentBackendLogStreams();
+    
+    if (backendStreams.length === 0) {
+      console.warn("No backend log streams found");
+      return { data: [], total: 0, success: true };
+    }
+
+    // Fetch all matching logs
+    // const logEvents = await fetchAllMatchingLogs(backendStreams, startTime, endTime);
+    const logEvents = await fetchAllMatchingLogs(backendStreams); // use without time range
+
+    const logItems: LogsTableItem[] = logEvents
+      .map((event) => {
+        try {
+          // Parse the outer JSON structure
+          const outerJson = JSON.parse(event.message?.trim() || '');
+          
+          // Parse the inner log JSON string
+          const logJson = JSON.parse(outerJson.log);
+          
+          // Get the kubernetes metadata
+          const k8sMeta = outerJson.kubernetes;
+
+          // Only return if it matches our expected format
+          if (!logJson.logger_name || !logJson.agent_id) {
+            return null;
+          }
+
+          return {
+            loggerName: logJson.logger_name,
+            logLevel: logJson.level,
+            timestamp: new Date(logJson['@timestamp']),
+            message: logJson.message,
+            agent_id: logJson.agent_id,
+            date_time: new Date(logJson.date_time),
+            podName: k8sMeta.pod_name,
+            containerName: k8sMeta.container_name,
+            namespace: k8sMeta.namespace_name
+          };
+        } catch (error) {
+          return null;
+        }
+      })
+      .filter((item): item is LogsTableItem => item !== null);
 
     return {
       data: logItems,
@@ -61,9 +132,13 @@ async function getCloudWatchLogs() {
     };
   } catch (error) {
     console.error("Error fetching logs:", error);
+    return {
+      data: [],
+      total: 0,
+      success: false
+    };
   }
 }
-
 
 type LogsTableItem = {
   loggerName: string;
@@ -72,8 +147,12 @@ type LogsTableItem = {
   message: string;
   agent_id: string;
   date_time: Date;
+  podName: string;
+  containerName: string;
+  namespace: string;
 };
 
+// Define the columns for the table
 const columns: ProColumns<LogsTableItem>[] = [
   {
     dataIndex: 'index',
@@ -81,37 +160,68 @@ const columns: ProColumns<LogsTableItem>[] = [
     width: 48
   },
   {
-    title: 'logger name',
+    title: 'Logger Name',
     dataIndex: 'loggerName',
     copyable: true,
+    search: true,
+    ellipsis: true,
   },
   {
     title: 'Agent ID',
     dataIndex: 'agent_id',
     copyable: true,
+    search: true,
   },
   {
     title: 'Log Level',
     dataIndex: 'logLevel',
-    hideInTable: true,
+    filters: [
+      { text: 'INFO', value: 'INFO' },
+      { text: 'ERROR', value: 'ERROR' },
+      { text: 'WARN', value: 'WARN' },
+    ],
+    filterMultiple: false,
   },
   {
     title: 'Message',
     dataIndex: 'message',
     copyable: true,
-    width: 200,
+    ellipsis: true,
+    search: true,
+  },
+  {
+    title: 'Pod Name',
+    dataIndex: 'podName',
+    copyable: true,
+    search: true,
+    ellipsis: true,
+    hideInTable: true,
+  },
+  {
+    title: 'Container',
+    dataIndex: 'containerName',
+    copyable: true,
+    search: true,
+    hideInTable: true,
+  },
+  {
+    title: 'Namespace',
+    dataIndex: 'namespace',
+    copyable: true,
+    hideInTable: true,
   },
   {
     title: 'Date Time',
     dataIndex: 'date_time',
-    valueType: 'date',
-    sorter: true
+    valueType: 'dateTime',
+    sorter: true,
+    search: true,
   },
   {
-    title: 'Time Stamp',
+    title: 'Timestamp',
     dataIndex: 'timestamp',
-    valueType: 'date',
-    sorter: true
+    valueType: 'dateTime',
+    sorter: true,
   },
 ];
 
@@ -121,20 +231,18 @@ export default () => {
       <ProTable<LogsTableItem>
         columns={columns}
         request={async (params, sort, filter) => {
-          return getCloudWatchLogs();
+          return getCloudWatchLogs(params);
         }}
         pagination={{
           pageSize: 10,
-          current: 1
         }}
-        rowKey="username"
+        rowKey={(record) => `${record.timestamp.getTime()}-${record.agent_id}-${record.podName}`}
         search={{
-          labelWidth: 'auto'
+          labelWidth: 'auto',
         }}
         dateFormatter="string"
-        headerTitle="CloudWatch logs"
+        headerTitle="CloudWatch User Logs"
       />
     </ConfigProvider>
   );
 };
-
