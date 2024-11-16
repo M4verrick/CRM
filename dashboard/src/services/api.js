@@ -35,8 +35,8 @@ export const api = {
   },
 
   // api/clients/verify -> verify email of client
-  verifyClient: () => {
-    return apiClient.get(`/api/clients/verify`);
+  verifyClient: (token) => {
+    return apiClient.get(`/api/clients/verify?token=${token}`);
   },
 
   getTransactions: () => {

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate} from 'react-router-dom';
+import { useSearchParams} from 'react-router-dom';
 import api from 'services/api';
-import { useApi } from 'hooks/useApi';
 
 // MUI Components
 import { Box, Typography, Container, CircularProgress, Paper, Alert } from '@mui/material';
@@ -10,18 +9,24 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const EmailVerification = () => {
     const [status, setStatus] = useState('verifying');
-    const { loading, error, post } = useApi();
-    const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState('');
+    const [searchParams] = useSearchParams(); // add in params for verify
 
     useEffect(() => {
         const verifyEmail = async () => {
             try {
-                const response = await api.verifyEmail();
-                if (!response.ok) {
+                const token = searchParams.get('token');
+                if (!token) {
+                    throw new Error('Verification token is missing');
+                }
+    
+                // Pass the token to the API
+                const response = await api.verifyClient(token);
+                if (response.ok) {
+                    setStatus('success');
+                } else {
                     throw new Error('Verification failed');
                 }
-                setStatus('success');
             } catch (err) {
                 setStatus('error');
                 setErrorMessage(err.message || 'Verification failed. An unexpected server error occurred.');
@@ -29,7 +34,7 @@ const EmailVerification = () => {
         };
 
         verifyEmail();
-    }, []);
+    }, [searchParams]);
 
     return (
         <Container maxWidth="sm">
