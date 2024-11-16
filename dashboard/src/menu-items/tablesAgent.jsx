@@ -1,10 +1,17 @@
 // assets
-import { ChromeOutlined, QuestionOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  UserOutlined,
+  ProfileOutlined,
+  BookOutlined
+} from '@ant-design/icons';
 
 // icons
 const icons = {
-  ChromeOutlined,
-  QuestionOutlined
+  BankOutlined,
+  UserOutlined,
+  ProfileOutlined,
+  BookOutlined
 };
 
 // ==============================|| MENU ITEMS - SAMPLE PAGE & DOCUMENTATION ||============================== //
@@ -21,21 +28,21 @@ const tablesAgent = {
       title: 'Manage Profiles',
       type: 'item',
       url: '/ProfileTable',
-      icon: icons.ChromeOutlined
+      icon: icons.ProfileOutlined
     },
     {
       id: 'account-table',
       title: 'Manage Accounts',
       type: 'item',
       url: '/AccountTable',
-      icon: icons.ChromeOutlined
+      icon: icons.BankOutlined
     },
     {
       id: 'client-transaction-table',
-      title: 'Manage Transactions',
+      title: 'Account Transactions',
       type: 'item',
       url: '/ClientTransactionTable',
-      icon: icons.ChromeOutlined
+      icon: icons.BookOutlined
     },
   ]
 };

@@ -30,6 +30,10 @@ import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import avatar1 from 'assets/images/users/avatar-1.png';
 
+// For logout
+import { useContext } from 'react';
+import { AccountContext } from 'contexts/Account';
+
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -71,6 +75,8 @@ export default function Profile() {
   };
 
   const iconBackColorOpen = 'grey.100';
+
+  const { logout } = useContext(AccountContext);
 
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
@@ -130,7 +136,7 @@ export default function Profile() {
                       </Grid>
                       <Grid item>
                         <Tooltip title="Logout">
-                          <IconButton size="large" sx={{ color: 'text.primary' }}>
+                          <IconButton onClick={logout} size="large" sx={{ color: 'text.primary' }}>
                             <LogoutOutlined />
                           </IconButton>
                         </Tooltip>

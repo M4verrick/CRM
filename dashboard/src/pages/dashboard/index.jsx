@@ -74,7 +74,7 @@ export default function DashboardDefault() {
         <AnalyticEcommerce title="Total Accounts" count={accountCount} percentage={100.0} extra="8,900" />
       </Grid>
       {/* row 2 */}
-      <Grid item xs={12} md={7} lg={8}>
+      {/* <Grid item xs={12} md={7} lg={8}>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
             <Typography variant="h5">Recent Activities</Typography>
@@ -84,7 +84,7 @@ export default function DashboardDefault() {
         <MainCard sx={{ mt: 2 }} content={false}>
           <OrdersTable />
         </MainCard>
-        </Grid>
+        </Grid> */}
 
       {/* row 3 */}
       <Grid item xs={12} md={7} lg={8}>
