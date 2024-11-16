@@ -29,3 +29,7 @@ make start-build-local
 ```sh
 make stop-local-clean
 ```
+
+## API Documentation
+
+API can be found in Swagger file "swagger.yaml" or in Postman Collection from "postman.json".

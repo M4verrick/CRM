@@ -11,10 +11,7 @@ spec:
         karpenter.sh/discovery: itsag3t1-crm
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: itsag3t1-crm
-    - tags:
-        elbv2.k8s.aws/cluster: itsag3t1-crm
-        elbv2.k8s.aws/resource: backend-sg
+        Name: itsag3t1-crm-node
   tags:
     karpenter.sh/discovery: itsag3t1-crm
 ---

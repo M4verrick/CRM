@@ -26,15 +26,14 @@ export default defineConfig({
     ]
   },
   server: {
-    // this ensures that the browser opens upon server start
-    open: true,
     // this sets a default port to 3000
     port: 3000
   },
   preview: {
-    // this ensures that the browser opens upon preview start
-    open: true,
     // this sets a default port to 3000
     port: 3000
+  },
+  optimizeDeps: {
+    force: true
   }
 });

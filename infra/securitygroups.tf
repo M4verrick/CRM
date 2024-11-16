@@ -15,10 +15,10 @@ resource "aws_security_group" "rds_sg" {
 
   # Egress Rules: Define outbound traffic from RDS
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"  # Allow all outbound traffic
-    cidr_blocks = ["0.0.0.0/0"]  # Open outbound traffic to any destination (safe for databases)
+    from_port   = 1024
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   tags = {
