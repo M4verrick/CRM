@@ -2,7 +2,7 @@
 
 ## Makefile Commands
 
-This project uses a `Makefile` to simplify common tasks. Below are the available commands:
+This project uses a `Makefile` to simplify common tasks. Below are the available commands (execute from crm directory):
 
 - Builds the project in the container and starts the application.
 
@@ -28,6 +28,12 @@ make start-build-local
 
 ```sh
 make stop-local-clean
+```
+
+- Runs tests.
+
+```sh
+make test
 ```
 
 ## API Documentation
