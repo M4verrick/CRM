@@ -43,10 +43,10 @@ spec:
             value: "oL4qW45zOIWGdoOvS8HcRSzq/ADII/nqDKTmmdD8"
         resources:
           requests:
-            cpu: 5m
+            cpu: 50m
             memory: 512Mi
           limits:
-            cpu: 10m
+            cpu: 100m
             memory: 1024Mi
         livenessProbe:
           httpGet:
