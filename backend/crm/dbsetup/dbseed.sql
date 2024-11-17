@@ -109,6 +109,8 @@ INSERT INTO transactions (client_id, transaction_type, amount, transaction_date,
 VALUES 
     (1, 'D', 1000.00, '2023-11-01', 'Completed'), 
     (2, 'W', 500.00, '2023-11-02', 'Pending'),    
-    (NULL, 'D', 2000.00, NULL, 'Completed'),      -- Client ID and Date are optional
-    (4, NULL, 250.00, '2023-11-04', 'Failed'),    -- Transaction type can be NULL
-    (5, 'D', NULL, '2023-11-05', 'Completed');    -- Amount can be NULL
+    (3, 'D', 2000.00, '2023-11-02', 'Completed'),     
+    (4, 'D, 250.00, '2023-11-04', 'Failed'),  
+    (5, 'D', 200.0, '2023-11-05', 'Completed'),
+    (6, 'D, 250.00, '2023-11-04', 'Failed'),  
+    (7, 'D, 250.00, '2023-11-04', 'Failed'),  
