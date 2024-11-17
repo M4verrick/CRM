@@ -11,7 +11,7 @@ RUN apk add --no-cache xdg-utils
 
 COPY . .
 
-RUN rm -rf .env
+# Remove rm -rf .env
 
 EXPOSE 3000
 
