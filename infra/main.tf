@@ -173,14 +173,14 @@ locals {
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
       },
-      # {
-      #   rule_number = 900
-      #   rule_action = "allow"
-      #   from_port   = 1024
-      #   to_port     = 65535
-      #   protocol    = "tcp"
-      #   cidr_block  = "0.0.0.0/0"
-      # }
+      {
+        rule_number = 900
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      }
     ]
     public_outbound = [
       # {
@@ -207,14 +207,14 @@ locals {
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
       },
-      # {
-      #   rule_number = 900
-      #   rule_action = "allow"
-      #   from_port   = 1024
-      #   to_port     = 65535
-      #   protocol    = "tcp"
-      #   cidr_block  = "0.0.0.0/0"
-      # }
+      {
+        rule_number = 900
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      }
     ]
     private_inbound = [
       {
@@ -233,14 +233,14 @@ locals {
         protocol    = "udp"
         cidr_block  = "10.0.0.0/16"
       },
-      # {
-      #   rule_number = 200
-      #   rule_action = "allow"
-      #   from_port   = 1024,
-      #   to_port     = 65535,
-      #   protocol    = "tcp"
-      #   cidr_block  = "0.0.0.0/0"
-      # },
+      {
+        rule_number = 200
+        rule_action = "allow"
+        from_port   = 1024,
+        to_port     = 65535,
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
     ]
     private_outbound = [
       {
@@ -267,14 +267,14 @@ locals {
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
       },
-      # {
-      #   rule_number = 200
-      #   rule_action = "allow"
-      #   from_port   = 1024
-      #   to_port     = 65535
-      #   protocol    = "tcp"
-      #   cidr_block  = "0.0.0.0/0"
-      # },
+      {
+        rule_number = 200
+        rule_action = "allow"
+        from_port   = 1024
+        to_port     = 65535
+        protocol    = "tcp"
+        cidr_block  = "0.0.0.0/0"
+      },
       # {
       #   rule_number = 300
       #   rule_action = "allow"
