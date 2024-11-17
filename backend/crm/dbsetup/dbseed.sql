@@ -92,3 +92,23 @@ VALUES (1, 'SAVINGS', 'ACTIVE', '2023-01-01', 'USD', 'BR001', 1000.00),
        (5, 'BUSINESS', 'PENDING', '2023-03-01', 'USD', 'BR005', 800.00),
        (6, 'SAVINGS', 'ACTIVE', '2022-11-10', 'USD', 'BR006', 500.00),
        (6, 'CHECKING', 'INACTIVE', '2021-11-10', 'USD', 'BR006', 750.00);
+
+
+DROP TABLE IF EXISTS transactions;
+
+CREATE TABLE transactions (
+    id BIGSERIAL PRIMARY KEY,                     -- Auto-incrementing transaction ID
+    client_id BIGINT,                             -- Nullable for now, no foreign key constraint
+    transaction_type CHAR(1),                     -- No strict validation on 'D' or 'W'
+    amount NUMERIC(15, 2),                        -- Allows any numeric value, no CHECK constraint
+    transaction_date DATE DEFAULT CURRENT_DATE,   -- Defaults to the current date if not provided
+    status VARCHAR(20)                            -- No strict validation on values
+);
+
+INSERT INTO transactions (client_id, transaction_type, amount, transaction_date, status)
+VALUES 
+    (1, 'D', 1000.00, '2023-11-01', 'Completed'), 
+    (2, 'W', 500.00, '2023-11-02', 'Pending'),    
+    (NULL, 'D', 2000.00, NULL, 'Completed'),      -- Client ID and Date are optional
+    (4, NULL, 250.00, '2023-11-04', 'Failed'),    -- Transaction type can be NULL
+    (5, 'D', NULL, '2023-11-05', 'Completed');    -- Amount can be NULL
