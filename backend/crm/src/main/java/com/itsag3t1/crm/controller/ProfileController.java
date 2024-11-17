@@ -76,13 +76,14 @@ public class ProfileController {
 
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
 //        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        String verificationLink = "localhost:8080/api/clients/verify?token=" + token;
-        log.info("Sending email");
-        emailService.sendVerificationEmail(savedProfile.getEmail(),
-                savedProfile.getFirstName(), verificationLink);
+//        String verificationLink = "localhost:8080/api/clients/verify?token=" + token;
+//        log.info("Sending email");
+//        emailService.sendVerificationEmail(savedProfile.getEmail(),
+//                savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
+
     @GetMapping
     public List<Profile> getAllProfiles(Authentication authentication) {
         String agentId = ClaimsUtil.getAgentId(authentication);
@@ -124,12 +125,11 @@ public class ProfileController {
                 .build();
 
         Profile savedProfile = profileService.saveProfile(newProfile, agentId);
-        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
-        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
+//        String verificationLink = "http://itsag3t1.com/api/clients/verify?token=" + token;
+//        emailService.sendVerificationEmail(savedProfile.getEmail(), savedProfile.getFirstName(), verificationLink);
 
         return ResponseEntity.ok(savedProfile);
     }
-
 
 
     @PutMapping("/{id}")
