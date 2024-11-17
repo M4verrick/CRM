@@ -50,13 +50,11 @@ To tear down all the resources and the EKS cluster, run the following command:
 
 ## Frontend:  
 
-Clone down this repository.  
-
 `cd dashboard`
 
-Set up your env. file with your own AWS Credentials and resource IDs.
+Set up your env. file with your own AWS Credentials and resource IDs. Ensure that you have the correct AWS credentials for AWS cognito and AWS CloudWatch Logs.
+You may use the .env.example file as a template.
 
-You may use the env.example file as a template.
 
 To Start Server on Docker:
 
@@ -66,6 +64,3 @@ To Start Server on Docker:
 To Visit App:
 
 `localhost:3000/home` 
-
-To tear down the docker image:
- `docker compose down`

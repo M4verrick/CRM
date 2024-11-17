@@ -10,6 +10,7 @@ import { useRef } from 'react';
 import { CognitoIdentityServiceProvider } from 'aws-sdk';
 import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
+import { includes } from 'lodash';
 
 // Import AWS types
 type AWSCognitoUserType = CognitoIdentityServiceProvider.UserType;
@@ -180,6 +181,11 @@ const handleEdit = async (record: CognitoUserTableItem) => {
 };
 
 const handleDelete = async (record: CognitoUserTableItem) => {
+  if (record.groups.includes('root-admin')) {
+    message.error('Cannot delete root admin user');
+    return;
+  }
+
   Modal.confirm({
     title: 'Are you sure you want to delete this user?',
     content: `This will permanently delete user ${record.email}`,
