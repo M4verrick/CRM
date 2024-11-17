@@ -42,14 +42,6 @@ Create Client Account
   "initialDeposit": 1000.0
 }
 ```
-{
-    "accountType": "SAVINGS",
-    "accountStatus": "ACTIVE",
-    "currency": "USD",
-    "branchId": "BR001",
-    "initialDeposit": 1000.50
-}
-```
 
 
 ## New Setup
