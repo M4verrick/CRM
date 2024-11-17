@@ -35,7 +35,7 @@ spec:
           values: ["c"]
         - key: "karpenter.k8s.aws/instance-cpu"
           operator: In
-          values: ["4"]
+          values: ["2"]
         - key: "karpenter.k8s.aws/instance-hypervisor"
           operator: In
           values: ["nitro"]
