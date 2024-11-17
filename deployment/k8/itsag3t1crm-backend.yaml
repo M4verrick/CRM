@@ -25,16 +25,16 @@ spec:
             cpu: 100m
         livenessProbe:
           httpGet:
-            - path: /actuator/health
-              port: 8080
+            path: /actuator/health
+            port: 8080
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
         readinessProbe:
           - httpGet:
-              - path: /actuator/health
-                port: 8080
+              path: /actuator/health
+              port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
