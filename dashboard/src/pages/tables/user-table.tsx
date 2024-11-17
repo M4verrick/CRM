@@ -1,15 +1,16 @@
-import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Dropdown, Space, Tag } from 'antd';
+import { ProTable } from '@ant-design/pro-components';
+import { Modal, message, Tag, Button, Space } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
-
-// TODO: make the searchable params and edit function in Protable functional,
+import { useRef } from 'react';
 
 // cognito integration
 import { CognitoIdentityServiceProvider } from 'aws-sdk';
 import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
+import { includes } from 'lodash';
 
 // Import AWS types
 type AWSCognitoUserType = CognitoIdentityServiceProvider.UserType;
@@ -51,30 +52,42 @@ const transformUser = (user: AWSCognitoUserType, groups: AWSGroupType[] = []): C
   };
 };
 
-const fetchUsers = async (params?: ListUsersParams) => {
+const fetchUsers = async (params: {
+  given_name?: string,
+  family_name?: string,
+  email?: string,
+  email_verified?: boolean,
+  userId?: string,
+  enabled?: boolean,
+  status?: string,
+  created?: Date;
+  lastModified?: Date;
+  groups?: string[]; 
+}
+) => {
   try {
     const cognitoISP = new CognitoIdentityServiceProvider({
-      region: "ap-southeast-1",
+      region: import.meta.env.VITE_AWS_REGION,
       credentials: {
-        accessKeyId: "AKIAVD3BDD5QBC4X7FU2",
-        secretAccessKey: "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"
+        accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+        secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
       }
     });
 
     // fetch all users
-    const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers(params || {
-      UserPoolId: "ap-southeast-1_ya55bZ0sg",
+    const response: AWSCognitoListUsersResponse = await cognitoISP.listUsers({
+      UserPoolId: import.meta.env.VITE_USER_POOL_ID,
       Limit: 20,
     }).promise();
 
     // Fetch groups for each user. 2n+1 computational complexity.
-    const usersWithGroups = await Promise.all((response.Users || []).map(async (user) => {
+    let usersWithGroups = await Promise.all((response.Users || []).map(async (user) => {
       if (!user.Username) return transformUser(user);
 
       try {
         const groupsResponse: AWSAdminListGroupsForUserResponse = await cognitoISP.adminListGroupsForUser({
           Username: user.Username,
-          UserPoolId: params?.UserPoolId || "ap-southeast-1_ya55bZ0sg",
+          UserPoolId: params?.UserPoolId || import.meta.env.VITE_USER_POOL_ID,
         }).promise();
 
         return transformUser(user, groupsResponse.Groups || []);
@@ -83,6 +96,37 @@ const fetchUsers = async (params?: ListUsersParams) => {
         return transformUser(user);
       }
     }));
+
+    // Apply filters based on search params
+    if (params.given_name) {
+      usersWithGroups = usersWithGroups.filter(item => 
+        item.given_name.toLowerCase().includes(params.given_name!.toLowerCase()))
+    }
+    if (params.family_name) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.family_name.toLowerCase().includes(params.family_name!.toLowerCase()))
+    }
+    if (params.email) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.email.toLowerCase().includes(params.email!.toLowerCase()))
+    }
+    if (params.email_verified !== undefined) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.emailVerified === params.email_verified)
+    }
+    if (params.userId) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.userId.toLowerCase().includes(params.userId!.toLowerCase()))
+    }
+    if (params.enabled !== undefined) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.enabled === params.enabled)
+    }
+    if (params.status) {
+      usersWithGroups = usersWithGroups.filter(item =>
+        item.status.toLowerCase().includes(params.status!.toLowerCase()))
+    }
+
 
     return {
       data: usersWithGroups,
@@ -100,6 +144,76 @@ const fetchUsers = async (params?: ListUsersParams) => {
   }
 };
 
+// Handle functions in options column
+const handleEdit = async (record: CognitoUserTableItem) => {
+  const cognitoISP = new CognitoIdentityServiceProvider({
+    region: import.meta.env.VITE_AWS_REGION,
+    credentials: {
+      accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+      secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+    }
+  });
+
+  try {
+    await cognitoISP.adminUpdateUserAttributes({
+      UserPoolId: import.meta.env.VITE_USER_POOL_ID,
+      Username: record.username,
+      UserAttributes: [
+        {
+          Name: 'given_name',
+          Value: record.given_name
+        },
+        {
+          Name: 'family_name',
+          Value: record.family_name
+        },
+        {
+          Name: 'email',
+          Value: record.email
+        }
+      ]
+    }).promise();
+    message.success('User updated successfully');
+  } catch (error) {
+    message.error('Failed to update user');
+    console.error('Error updating user:', error);
+  }
+};
+
+const handleDelete = async (record: CognitoUserTableItem) => {
+  if (record.groups.includes('root-admin')) {
+    message.error('Cannot delete root admin user');
+    return;
+  }
+
+  Modal.confirm({
+    title: 'Are you sure you want to delete this user?',
+    content: `This will permanently delete user ${record.email}`,
+    okText: 'Yes',
+    okType: 'danger',
+    cancelText: 'No',
+    onOk: async () => {
+      const cognitoISP = new CognitoIdentityServiceProvider({
+        region: import.meta.env.VITE_AWS_REGION,
+        credentials: {
+          accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+          secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+        }
+      });
+
+      try {
+        await cognitoISP.adminDeleteUser({
+          UserPoolId: import.meta.env.VITE_USER_POOL_ID,
+          Username: record.username
+        }).promise();
+        message.success('User deleted successfully');
+      } catch (error) {
+        message.error('Failed to delete user');
+        console.error('Error deleting user:', error);
+      }
+    }
+  });
+};
 
 const columns: ProColumns<CognitoUserTableItem>[] = [
   {
@@ -128,6 +242,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Email Verified',
     dataIndex: 'emailVerified',
+    editable: false,
     valueEnum: {
       true: { text: 'true' },
       false: { text: 'false' },
@@ -136,6 +251,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Groups',
     dataIndex: 'groups',
+    editable: false,
     render: (_, record) => (
       <Space>
         {record.groups.map((group) => (
@@ -149,15 +265,18 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'User ID',
     dataIndex: 'userId',
+    editable: false,
     copyable: true,
+    search: false,
     ellipsis: true,
     hideInTable: true,
-
   },
   {
     title: 'Enabled',
     dataIndex: 'enabled',
+    editable: false,
     filters: true,
+    search: false,
     onFilter: true,
     valueEnum: {
       true: { text: 'true' },
@@ -167,6 +286,7 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Status',
     dataIndex: 'status',
+    editable: false,
     filters: true,
     onFilter: true,
     valueEnum: {
@@ -182,15 +302,15 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Created At',
     dataIndex: 'created',
+    editable: false,
     valueType: 'date',
-    hideInSearch: true,
     hideInTable: true,
     sorter: true
   },
   {
     title: 'Last Modified',
     dataIndex: 'lastModified',
-    hideInSearch: true,
+    editable: false,
     hideInTable: true,
     valueType: 'date',
     sorter: true
@@ -198,49 +318,67 @@ const columns: ProColumns<CognitoUserTableItem>[] = [
   {
     title: 'Options',
     valueType: 'option',
+    editable: false,
     key: 'option',
     render: (text, record, _, action) => [
       <a
         key="editable"
-        onClick={() => {
-          // action?.startEditable?.(record.id);
+        onClick={ async() => {
+          action?.startEditable?.(record.userId);
         }}
       >
-        edit
+        Edit
       </a>,
       <a
-        key="editable"
-        onClick={() => {
-          // action?.startEditable?.(record.id);
-        }}
+        key="delete"
+        onClick={() => handleDelete(record)}
       >
-        delete
+        Delete
       </a>,
     ],
-  },
+  }
 ];
 
 export default () => {
+  const actionRef = useRef<ActionType>();
+  const navigate = useNavigate();
+
   return (
     <ConfigProvider locale={enUS}>
       <ProTable<CognitoUserTableItem>
         columns={columns}
-        request={async (params, sort, filter) => {
-          return fetchUsers({
-            UserPoolId: import.meta.env.VITE_USER_POOL_ID,
-            Limit: 20,
-          });
+        actionRef={actionRef}
+        request={fetchUsers}
+        editable={{
+          type: 'multiple',
+          onSave: async (rowKey, data, row) => {
+            await handleEdit(data);
+            actionRef.current?.reload();
+          },
         }}
         pagination={{
           pageSize: 10,
           current: 1
         }}
-        rowKey="username"
+        rowKey="userId"
         search={{
           labelWidth: 'auto'
         }}
         dateFormatter="string"
         headerTitle="Cognito Users"
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              // add new user
+              navigate('/UserForm');
+            }}
+            type="primary"
+          >
+            Add new user
+          </Button>
+        ]}
       />
     </ConfigProvider>
   );

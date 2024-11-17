@@ -40,4 +40,7 @@ make start-localstack:
 make stop-localstack:
 	docker-compose -f docker-compose-localstack.yml down -v
 
+test:
+	mvn test
+
 .PHONY: up down start-local stop-local start-build-local stop-clean-local clean-image start-localstack stop-localstack

@@ -183,14 +183,14 @@ locals {
       }
     ]
     public_outbound = [
-      {
-        rule_number = 100
-        rule_action = "allow"
-        from_port   = 80
-        to_port     = 80
-        protocol    = "tcp"
-        cidr_block  = "0.0.0.0/0"
-      },
+      # {
+      #   rule_number = 100
+      #   rule_action = "allow"
+      #   from_port   = 80
+      #   to_port     = 80
+      #   protocol    = "tcp"
+      #   cidr_block  = "0.0.0.0/0"
+      # },
       {
         rule_number = 110
         rule_action = "allow"
@@ -275,14 +275,14 @@ locals {
         protocol    = "tcp"
         cidr_block  = "0.0.0.0/0"
       },
-      {
-        rule_number = 300
-        rule_action = "allow"
-        from_port   = 80,
-        to_port     = 80,
-        protocol    = "tcp"
-        cidr_block  = "0.0.0.0/0"
-      },
+      # {
+      #   rule_number = 300
+      #   rule_action = "allow"
+      #   from_port   = 80,
+      #   to_port     = 80,
+      #   protocol    = "tcp"
+      #   cidr_block  = "0.0.0.0/0"
+      # },
       {
         rule_number = 400
         rule_action = "allow"
@@ -397,10 +397,6 @@ module "eks_blueprints_addons" {
   enable_velero                       = local.aws_addons.enable_velero
   enable_aws_gateway_api_controller   = local.aws_addons.enable_aws_gateway_api_controller
   enable_ingress_nginx                = local.oss_addons.enable_ingress_nginx
-
-  ingress_nginx = {
-    values        = [templatefile("${path.module}/values.yaml", {})]
-  }
 
   external_dns_route53_zone_arns = [local.route53_zone_arn] # ArgoCD Server and UI domain name is registered in Route 53
 

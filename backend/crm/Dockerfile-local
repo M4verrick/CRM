@@ -15,7 +15,7 @@ COPY src/ src/
 RUN apt-get update && apt-get install -y maven
 
 # Build the application
-RUN mvn clean package -DskipTests
+RUN mvn clean package
 
 # Expose the port the application will run on
 EXPOSE 8080
