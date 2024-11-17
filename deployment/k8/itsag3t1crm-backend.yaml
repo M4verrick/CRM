@@ -18,7 +18,7 @@ spec:
         type: karpenter
       terminationGracePeriodSeconds: 0
       containers:
-      - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:fe10c01072db0345e17c83b6158cecb7c6ad7d18
+      - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:d9e5d73c72246c5ac0a4ddfbe167dfb9a9dc9d44
         name: itsag3t1-crm-backend
         resources:
           limits:
