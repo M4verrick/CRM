@@ -197,6 +197,16 @@ const Account = (props) => {
         }
     }, []);
 
+    // get name
+    const getFullName = () => {
+        if (userAttributes) {
+            const firstName = userAttributes.given_name;
+            const lastName = userAttributes.family_name;
+            return { firstName, lastName };
+        }
+        return null;
+    };
+
     // Check if user has specific group/role
     const hasGroup = useCallback(async (group) => {
         const groups = await getUserGroups();
@@ -288,6 +298,7 @@ const Account = (props) => {
                 logout,
                 getUserGroups,
                 hasGroup,
+                getFullName,
                 refreshSession
             }}
         >
