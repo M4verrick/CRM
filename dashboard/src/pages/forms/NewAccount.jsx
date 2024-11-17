@@ -4,6 +4,7 @@ import { PageContainer } from '@ant-design/pro-components';
 import { Form, Button, DatePicker, Input, Select, Card, message } from "antd";
 import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
+import api from 'services/api';
 
 const { Option } = Select;
 
@@ -23,20 +24,27 @@ const currencies = [
   { code: "USD", name: "United States Dollar" }
 ];
 
-// api useHook
-import { useApi } from 'hooks/useApi';
-
-// TODO: backend handles invalid client ID? Test if it works. 
-// Edit fields to match endpoint
 const NewAccount = () => {
-  const { loading, error, post } = useApi();
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values) => {
+    console.log("Received values of form: ", values);
     try {
+      const formattedValues = {
+        "profile": {
+          "id": values.profileId,
+        },
+        "accountType": values.accountType,
+        "accountStatus": values.accountStatus,
+        "currency": values.currency,
+        "branchId": values.branchId,
+        "initialDeposit": values.initialDeposit,
+      }
 
-      const userData = await post('accounts', values);
+      console.log(formattedValues);
+
+      const userData = await api.createAccount(formattedValues);
       
       if (userData) {
         messageApi.success('Account successfully registered!');
@@ -62,11 +70,13 @@ const NewAccount = () => {
 
   return (
     <PageContainer>
+      {contextHolder}
     <Card>
     <ConfigProvider locale={enUS}>
     <div className="Form">
       <header className="Form-header">
         <Form
+          form={form}
           autoComplete="off"
           labelCol={{ span: 12 }}
           wrapperCol={{ span: 12 }}
@@ -76,7 +86,7 @@ const NewAccount = () => {
           }}
         >
           <Form.Item
-            name="clientID"
+            name="profileId"
             label="Client ID"
             rules={[
               {
@@ -84,7 +94,6 @@ const NewAccount = () => {
                 message: "Please enter your client ID",
               },
               { whitespace: false },
-              { min: 3 },
             ]}
             hasFeedback
           >
@@ -92,7 +101,7 @@ const NewAccount = () => {
           </Form.Item>
 
           <Form.Item 
-            name="type"
+            name="accountType"
             label="Account Type"
             rules={[
               {
@@ -103,13 +112,32 @@ const NewAccount = () => {
             hasFeedback
           >
             <Select placeholder="Select account type">
-              <Select.Option value="agent">Savings</Select.Option>
-              <Select.Option value="admin">Transactions</Select.Option>
+              <Select.Option value="SAVINGS">Savings</Select.Option>
+              <Select.Option value="CHECKING">Checking</Select.Option>
+              <Select.Option value="BUSINESS">Business</Select.Option>
             </Select>
           </Form.Item>
 
           <Form.Item 
-            name="type"
+            name="accountStatus"
+            label="Account Status"
+            rules={[
+              {
+                required: true,
+                message: "Please select account status",
+              }
+            ]}
+            hasFeedback
+          >
+            <Select placeholder="Select account type">
+              <Select.Option value="ACTIVE">Active</Select.Option>
+              <Select.Option value="INACTIVE">Inactive</Select.Option>
+              <Select.Option value="PENDING">Pending</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item 
+            name="currency"
             label="Currency Type"
             rules={[
               {
@@ -132,18 +160,18 @@ const NewAccount = () => {
           </Form.Item>
 
           <Form.Item
-            name="branchID"
-            label="Branch ID"
-            rules={[
-              {
-                required: true,
-                message: "Please enter your branch ID",
-              },
-              { whitespace: false },
-              { min: 3 },
-            ]}
-            hasFeedback
-          >
+                  name="branchId"
+                  label="Branch ID"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please enter your branch ID",
+                    },
+                    { whitespace: true },
+                    { min: 3 },
+                  ]}
+                  hasFeedback
+                >
             <Input placeholder="Type your branch ID" />
           </Form.Item>
 
@@ -152,12 +180,10 @@ const NewAccount = () => {
             label="Confirm initial deposit"
             rules={[
               {
-                type: "url",
                 required: true,
                 message: "Please enter your initial deposit",
               },
               { whitespace: false },
-              { min: 3 },
             ]}
             hasFeedback
           >
