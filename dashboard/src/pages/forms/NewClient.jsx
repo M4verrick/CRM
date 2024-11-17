@@ -6,30 +6,30 @@ import { ConfigProvider } from 'antd';
 import enUS from 'antd/lib/locale/en_US';
 
 // api useHook
-import { useApi } from 'hooks/useApi';
+import api from 'services/api';
 
 const NewClient = () => {
-  const { loading, error, post } = useApi();
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values) => {
     try {
-      // Format date before sending
+      // Format date and ensure phone number has + prefix
       const formattedValues = {
         ...values,
-        dateOfBirth: values.dateOfBirth?.format('YYYY-MM-DD')
+        dateOfBirth: values.dateOfBirth?.format('YYYY-MM-DD'),
+        phone: values.phone.startsWith('+') ? values.phone : `+${values.phone}`
       };
 
-      const userData = await post('/clients/createProfileAgent', formattedValues);
-      
+      const userData = await api.createClientAccount(formattedValues);
+
       if (userData) {
         messageApi.success('Client successfully registered!');
         form.resetFields();
       }
     } catch (err) {
       console.error('Failed to post a new client:', err);
-      
+
       // Handle different types of errors
       if (err.response) {
         // Server responded with error
@@ -100,8 +100,27 @@ const NewClient = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please provide your date of birth",
+                      message: "Please provide your date of birth"
                     },
+                    {
+                      validator: (_, value) => {
+                        if (!value) return Promise.resolve();
+
+                        const today = new Date();
+                        const birthDate = value.toDate();
+                        let age = today.getFullYear() - birthDate.getFullYear();
+                        const monthDiff = today.getMonth() - birthDate.getMonth();
+
+                        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                          age--;
+                        }
+
+                        if (age >= 18 && age <= 100) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error('Client must be at least 18 years old'));
+                      }
+                    }
                   ]}
                   hasFeedback
                 >
@@ -109,16 +128,22 @@ const NewClient = () => {
                     style={{ width: "100%" }}
                     picker="date"
                     placeholder="Choose date of birth"
+                    disabledDate={(current) => {
+                      const today = new Date();
+                      const hundredYearsAgo = new Date();
+                      hundredYearsAgo.setFullYear(today.getFullYear() - 100);
+                      return current && (current.valueOf() > today.valueOf() || current.valueOf() < hundredYearsAgo.valueOf());
+                    }}
                   />
                 </Form.Item>
 
-                <Form.Item name="gender" label="Gender" requiredMark="optional">
+                <Form.Item name="gender" label="Gender" rules={[{ required: true }]} hasFeedback>
                   <Select placeholder="Select your gender">
                     <Select.Option value="MALE">Male</Select.Option>
                     <Select.Option value="FEMALE">Female</Select.Option>
+                    <Select.Option value="OTHER">Other</Select.Option>
                   </Select>
                 </Form.Item>
-
                 <Form.Item
                   name="email"
                   label="Email"
@@ -140,14 +165,17 @@ const NewClient = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Enter a phone number",
+                      message: "Enter a phone number"
                     },
-                    { whitespace: true },
-                    { min: 3 },
+                    {
+                      // minimum 10 digits, maximum 15 digits
+                      pattern: /^\+?[1-9]\d{9,14}$/,
+                      message: "Please enter a valid phone number"
+                    }
                   ]}
                   hasFeedback
                 >
-                  <Input placeholder="Phone number" />
+                  <Input placeholder="Phone number (e.g. +1234567890)" />
                 </Form.Item>
 
                 <Form.Item
@@ -216,28 +244,29 @@ const NewClient = () => {
 
                 <Form.Item
                   name="zip"
-                  label="Postal Code"
+                  label="Zip Code"
                   rules={[
                     {
                       required: true,
-                      message: "Please enter postal code",
+                      message: "Please enter zip code"
                     },
-                    { whitespace: false },
-                    { min: 3 },
+                    {
+                      pattern: /^\d{5,10}$/,
+                      message: "Please enter a valid zip code"
+                    }
                   ]}
                   hasFeedback
                 >
-                  <Input placeholder="Postal Code" />
+                  <Input placeholder="Zip Code" />
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ span: 24 }}>
-                  <Button 
-                    block 
-                    type="primary" 
+                  <Button
+                    block
+                    type="primary"
                     htmlType="submit"
-                    loading={loading}
                   >
-                    {loading ? 'Registering...' : 'Register'}
+                    Register
                   </Button>
                 </Form.Item>
               </Form>
@@ -245,7 +274,7 @@ const NewClient = () => {
           </div>
         </Card>
       </PageContainer>
-    </ConfigProvider>
+    </ConfigProvider >
   );
 }
 
