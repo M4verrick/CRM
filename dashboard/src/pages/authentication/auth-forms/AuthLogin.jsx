@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { AccountContext } from 'contexts/Account.jsx';  // Add .jsx extension
+import React, { useContext, useState } from 'react';
+import { AccountContext } from 'contexts/Account';
 
 import { useLocation, useNavigate, Link as RouterLink } from 'react-router-dom';
 
@@ -28,10 +28,14 @@ import AnimateButton from 'components/@extended/AnimateButton';
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
+import { Modal, Form, Input, message } from 'antd';
 
 export default function AuthLogin() {
   const [checked, setChecked] = React.useState(false);
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const { forgotPassword } = useContext(AccountContext);
+  
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -45,6 +49,16 @@ export default function AuthLogin() {
   const { authenticate } = useContext(AccountContext);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleForgotPassword = async () => {
+    try {
+      await forgotPassword(resetEmail);
+      message.success('Password reset link sent to your email');
+      setIsModalVisible(false);
+    } catch (error) {
+      message.error(error.message || 'Failed to send reset link');
+    }
+  };
 
   return (
     <>
@@ -148,7 +162,15 @@ export default function AuthLogin() {
                     }
                     label={<Typography variant="h6">Keep me sign in</Typography>}
                   />
-                  <Link variant="h6" component={RouterLink} color="text.primary">
+                  <Link 
+                    variant="h6" 
+                    component={RouterLink} 
+                    color="text.primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsModalVisible(true);
+                    }}
+                  >
                     Forgot Password?
                   </Link>
                 </Stack>
@@ -169,6 +191,28 @@ export default function AuthLogin() {
           </form>
         )}
       </Formik>
+      <Modal
+        title="Reset Password"
+        open={isModalVisible}
+        onOk={handleForgotPassword}
+        onCancel={() => setIsModalVisible(false)}
+      >
+        <Form layout="vertical">
+          <Form.Item
+            label="Email Address"
+            rules={[
+              { required: true, message: 'Please enter your email' },
+              { type: 'email', message: 'Please enter a valid email' }
+            ]}
+          >
+            <Input 
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              placeholder="Enter your email"
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }
