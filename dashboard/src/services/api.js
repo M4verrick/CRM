@@ -26,6 +26,11 @@ export const api = {
     return apiClient.post('/api/accounts', accountData);
   },
 
+  // Delete Client
+  deleteAccount: (accountId) => {
+    return apiClient.delete(`/api/accounts/${accountId}`);
+  },
+
   updateClient: (clientId, data) => {
     return apiClient.put(`/api/clients/${clientId}`, data);
   },

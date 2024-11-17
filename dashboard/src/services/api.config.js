@@ -5,7 +5,7 @@ const API_CONFIG = {
     timeout: 5000,
   },
   production: {
-    baseURL: 'https://www.itsag3t1.com/api',
+    baseURL: 'https://www.itsag3t1.com',
     timeout: 5000,
   },
   feature4: {
@@ -15,7 +15,7 @@ const API_CONFIG = {
 };
 
 export const getApiConfig = () => {
-  const environment = import.meta.env.VITE_ENV || 'development';
+  const environment = import.meta.env.VITE_ENV || 'production';
   console.log("Environment: ", environment);
   // return API_CONFIG["feature4"];
   return API_CONFIG[environment];

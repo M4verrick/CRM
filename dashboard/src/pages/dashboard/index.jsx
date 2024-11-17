@@ -1,7 +1,7 @@
 // material-ui
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';  
+import Typography from '@mui/material/Typography';
 
 // project import
 import MainCard from 'components/MainCard';
@@ -11,6 +11,7 @@ import OrdersTable from './ActivitiesTable';
 
 import React from 'react';
 import { api } from 'services/api';
+import { useAccount } from 'contexts/Account.jsx';
 
 // avatar style
 const avatarSX = {
@@ -34,6 +35,8 @@ const actionSX = {
 export default function DashboardDefault() {
   const [clientCount, setClientCount] = React.useState();
   const [accountCount, setAccountCount] = React.useState();
+  const { hasGroup } = useAccount();
+  const [role, setRole] = React.useState();
 
   React.useEffect(() => {
     const getClientCount = async () => {
@@ -57,15 +60,36 @@ export default function DashboardDefault() {
         return 0;
       };
     };
+
+    const checkRoles = async () => {
+      const adminCheck = await hasGroup('admin');
+      const rootAdminCheck = await hasGroup('root-admin');
+
+      // no need to check for status here, handled by await
+      if ((adminCheck) ||
+        (rootAdminCheck)) {
+        console.log('Admin')
+        console.log('adminCheck:', adminCheck);
+        console.log('rootAdminCheck:', rootAdminCheck);
+        setRole('Admin');
+      } else {
+        console.log('Agent')
+        console.log('adminCheck:', adminCheck);
+        console.log('rootAdminCheck:', rootAdminCheck);
+        setRole('Agent');
+      }
+    };
+
+    checkRoles();
     getClientCount();
     getAccountCount();
   });
 
   return (
-      <Grid container rowSpacing={4.5} columnSpacing={2.75}>
+    <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       {/* row 1 */}
       <Grid item xs={12} sx={{ mb: -2.25 }}>
-      <Typography variant="h5">Admin Dashboard</Typography>
+        <Typography variant="h5">{role} Dashboard</Typography>
       </Grid>
       <Grid item xs={12} sm={6} md={4} lg={3}>
         <AnalyticEcommerce title="Total Clients" count={clientCount} percentage={100.0} extra="8,900" />
