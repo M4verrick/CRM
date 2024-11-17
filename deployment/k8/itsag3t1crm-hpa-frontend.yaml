@@ -10,4 +10,4 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: itsag3t1-crm-frontend
-  targetCPUUtilizationPercentage: 80
+  targetCPUUtilizationPercentage: 60
