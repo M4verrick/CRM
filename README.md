@@ -24,7 +24,7 @@ Create Client Profile
     "phone": "+1234567890",
     "address": "123 Elm Street",
     "city": "Sample City",
-    "state": "SC",
+    "state": "SCC",
     "country": "CountryName",
     "zip": "12345",
     "dateOfBirth": "2000-01-01",
