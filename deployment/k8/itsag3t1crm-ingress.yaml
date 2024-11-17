@@ -20,7 +20,7 @@ spec:
     - host: www.itsag3t1.com
       http:
         paths:
-          - path: /home
+          - path: /
             pathType: Prefix
             backend:
               service:
