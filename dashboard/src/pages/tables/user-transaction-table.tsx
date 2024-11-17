@@ -17,23 +17,39 @@ const client = new CloudWatchLogsClient({
 
 const LOG_GROUP_NAME = "/aws/eks/itsag3t1-crm/aws-fluentbit-logs-20241103110112589200000009/workload/itsag3t1-crm";
 
-async function getRecentBackendLogStreams() {
+async function getRecentBackendLogStreams(nextToken?: string) {
   try {
-    const command = new DescribeLogStreamsCommand({
-      logGroupName: LOG_GROUP_NAME,
-      orderBy: 'LastEventTime',
-      descending: true,
-      limit: 50 // Get the 50 most recent streams
-    });
-
-    const response = await client.send(command);
+    const allStreams: string[] = [];
     
-    // Filter streams for backend pods
-    return response.logStreams
-      ?.filter(stream => stream.logStreamName?.includes('backend'))
-      .slice(0, 20) // Take only the 20 most recent backend streams
-      .map(stream => stream.logStreamName)
-      .filter((name): name is string => name !== undefined) || [];
+    do {
+      const command = new DescribeLogStreamsCommand({
+        logGroupName: LOG_GROUP_NAME,
+        orderBy: 'LastEventTime',
+        descending: true,
+        nextToken,
+        limit: 50 // limit per request for AWS CloudWatch Logs
+      });
+
+      const response = await client.send(command);
+      
+      // Filter for backend streams
+      const backendStreams = response.logStreams
+        ?.filter(stream => stream.logStreamName?.includes('backend'))
+        .map(stream => stream.logStreamName)
+        .filter((name): name is string => name !== undefined) || [];
+      
+      // Add backend streams to the list
+      allStreams.push(...backendStreams);
+      
+      // Update nextToken for next iteration
+      nextToken = response.nextToken;
+      
+      // Continue until no more streams or we have enough data
+      // You might want to add a reasonable upper limit here
+      // e.g., if (allStreams.length >= 1000) break;
+    } while (nextToken);
+
+    return allStreams;
 
   } catch (error) {
     console.error("Error fetching log streams:", error);
@@ -47,23 +63,34 @@ async function fetchAllMatchingLogs(streamNames: string[], startTime?: number, e
 
   try {
     do {
-      const command = new FilterLogEventsCommand({
-        logGroupName: LOG_GROUP_NAME,
-        logStreamNames: streamNames,
-        startTime,
-        endTime,
-        nextToken,
-        limit: 1000,
-        filterPattern: '{ $.log = "*logger_name*" && $.log = "*agent_id*" }' // Filter for logs containing our required fields
-      });
+      // Split stream names into chunks of 100 (AWS limit)
+      for (let i = 0; i < streamNames.length; i += 100) {
+        const streamChunk = streamNames.slice(i, i + 100);
+        
+        let chunkNextToken: string | undefined;
+        
+        do {
+          const command = new FilterLogEventsCommand({
+            logGroupName: LOG_GROUP_NAME,
+            logStreamNames: streamChunk,
+            startTime,
+            endTime,
+            nextToken: chunkNextToken,
+            limit: 10000, // Increased to maximum allowed value
+            filterPattern: '{ $.log = "*logger_name*" && $.log = "*agent_id*" }'
+          });
 
-      const response = await client.send(command);
-      
-      if (response.events) {
-        allLogs = [...allLogs, ...response.events];
+          const response = await client.send(command);
+          
+          if (response.events) {
+            allLogs = [...allLogs, ...response.events];
+          }
+
+          chunkNextToken = response.nextToken;
+        } while (chunkNextToken);
       }
 
-      nextToken = response.nextToken;
+      nextToken = undefined; // We've processed all chunks
     } while (nextToken);
 
     return allLogs;
@@ -79,7 +106,7 @@ async function getCloudWatchLogs(params: any = {}) {
     // const endTime = params.endTime || Date.now();
     // const startTime = params.startTime || endTime - (24 * 60 * 60 * 1000); // 24 hours ago
 
-    // Get most recent backend streams
+    // Get all backend streams
     const backendStreams = await getRecentBackendLogStreams();
     
     if (backendStreams.length === 0) {
@@ -87,7 +114,7 @@ async function getCloudWatchLogs(params: any = {}) {
       return { data: [], total: 0, success: true };
     }
 
-    // Fetch all matching logs
+    // Fetch all matching logs without time range
     // const logEvents = await fetchAllMatchingLogs(backendStreams, startTime, endTime);
     const logEvents = await fetchAllMatchingLogs(backendStreams); // use without time range
 
@@ -155,26 +182,24 @@ type LogsTableItem = {
 // Define the columns for the table
 const columns: ProColumns<LogsTableItem>[] = [
   {
-    dataIndex: 'index',
-    valueType: 'indexBorder',
-    width: 48
-  },
-  {
     title: 'Logger Name',
     dataIndex: 'loggerName',
     copyable: true,
     search: true,
     ellipsis: true,
+    hideInTable: true,
   },
   {
     title: 'Agent ID',
     dataIndex: 'agent_id',
+    width: 100,
     copyable: true,
     search: true,
   },
   {
     title: 'Log Level',
     dataIndex: 'logLevel',
+    width: 100,
     filters: [
       { text: 'INFO', value: 'INFO' },
       { text: 'ERROR', value: 'ERROR' },
@@ -186,7 +211,6 @@ const columns: ProColumns<LogsTableItem>[] = [
     title: 'Message',
     dataIndex: 'message',
     copyable: true,
-    ellipsis: true,
     search: true,
   },
   {
@@ -214,6 +238,7 @@ const columns: ProColumns<LogsTableItem>[] = [
     title: 'Date Time',
     dataIndex: 'date_time',
     valueType: 'dateTime',
+    width: 150,
     sorter: true,
     search: true,
   },
@@ -221,6 +246,7 @@ const columns: ProColumns<LogsTableItem>[] = [
     title: 'Timestamp',
     dataIndex: 'timestamp',
     valueType: 'dateTime',
+    hideInTable: true,
     sorter: true,
   },
 ];
