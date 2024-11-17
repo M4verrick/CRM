@@ -24,7 +24,7 @@ Create Client Profile
     "phone": "+1234567890",
     "address": "123 Elm Street",
     "city": "Sample City",
-    "state": "SC",
+    "state": "SCC",
     "country": "CountryName",
     "zip": "12345",
     "dateOfBirth": "2000-01-01",
@@ -42,6 +42,13 @@ Create Client Account
   "initialDeposit": 1000.0
 }
 ```
+{
+    "accountType": "SAVINGS",
+    "accountStatus": "ACTIVE",
+    "currency": "USD",
+    "branchId": "BR001",
+    "initialDeposit": 1000.50
+}
 ```
 
 
