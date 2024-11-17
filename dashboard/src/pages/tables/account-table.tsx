@@ -86,7 +86,39 @@ const columns: ProColumns<AccountTableItem>[] = [
     width: 120,
     valueType: 'money',
   },
+  {
+    title: 'Options',
+    valueType: 'option',
+    key: 'option',
+    render: (text, record, _, action) => [
+      <a
+        key="delete"
+        onClick={() => handleDelete(record)}
+      >
+        Delete
+      </a>,
+    ],
+  }
 ];
+
+const handleDelete = async (record: AccountTableItem) => {
+  Modal.confirm({
+    title: 'Are you sure you want to delete this account?',
+    content: `This will permanently delete account ${record.accountId}`,
+    okText: 'Yes',
+    okType: 'danger',
+    cancelText: 'No',
+    onOk: async () => {
+      try {
+        await api.deleteAccount(record.accountId);
+        message.success('Account deleted successfully');
+      } catch (error) {
+        message.error('Failed to delete account. Users can only delete accounts for clients they are responsible for.');
+        console.error('Error deleting account:', error);
+      }
+    }
+  });
+};
 
 // Fetch function, manages pagination and filtering
 const fetchAccounts = async (params: {
