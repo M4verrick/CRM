@@ -179,8 +179,12 @@ public class ProfileService {
                         "Profile cannot be deleted due to active accounts.");
             }
 
-            profileRepository.deleteById(id);
-            log.info("Profile {} deleted successfully", id);
+            Optional<Profile> profile = profileRepository.findById(id);
+            if (profile.isPresent()) {
+                // Profile and associated accounts will be deleted automatically due to cascade
+                profileRepository.deleteById(id);
+                log.info("Profile {} and associated client accounts deleted successfully", id);}
+
         } catch (DataAccessException e) {
             log.error("An error occurred while deleting the profile: {}", e.getMessage(), e);
             throw e;
