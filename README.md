@@ -31,16 +31,19 @@ Create Client Profile
     "gender": "MALE"
 }
 ```
-
-Get Client Profile
-
-Delete Client Profile
-
-Get Client Account
+Create Client Account
+```
+{
+  "profileId": 7,  // use an existing profileId
+  "accountType": "SAVINGS",
+  "accountStatus": "ACTIVE",
+  "currency": "USD",
+  "branchId": "BR001",
+  "initialDeposit": 1000.0
+}
 ```
 ```
 
-Delete Client Account
 
 ## New Setup
 Prequisites:
