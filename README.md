@@ -1,30 +1,71 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=15618307&assignment_repo_type=AssignmentRepo)
-# Project
-This repository contains your submissions for the project.
+# Project Group 3 Team 1 
 
-Note that this repo is writable by you. Any changes you or your team members made in this repo can be pushed to origin.
+## Testing 
 
-If you have changes or discover issues, you can also create an issue.
+Login credentials you can use to test the application:
 
-## Installation and Setup Instructions
+- Email: tesipo@gmail.com
+- Password: Thisisnewtesipo!23
 
-#### Frontend:  
+Create Client Profile Test Data
 
-Clone down this repository. You will need `node` and `npm` installed globally on your machine.  
+Get Client Profile
+
+Delete Client Profile
+
+Get Client Account
+
+Delete Client Account
+
+## New Setup
+Prequisites:
+- Terraform
+- AWS CLI
+- Kubectl
+- Set up AWS CLI with your credentials - https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html
+
+1. Go to /infra directory
+2. Go to variables.tf and update the following variables:
+    - aws_region - to your desired region
+2. Run `terraform init`
+3. Run `terraform apply --auto-approve`
+
+## Configure Kubectl
+Retrieve `kubectl` config, then execute the output command:
+```shell
+terraform output -raw configure_kubectl
+```
+
+## Access ArgoCD
+Access ArgoCD's UI, run the command from the output:
+```shell
+terraform output -raw access_argocd
+```
+
+## Destroy the EKS Cluster
+To tear down all the resources and the EKS cluster, run the following command:
+```shell
+./destroy.sh
+```
+
+## Frontend:  
+
+Clone down this repository.  
 
 `cd dashboard`
 
 Set up your env. file with your own AWS Credentials and resource IDs.
+
 You may use the env.example file as a template.
 
-Installation:
+To Start Server on Docker:
 
-`npm install`
-
-To Start Server Locally:
-
-`npm start`
+`docker compose build`
+`docker compose up`
 
 To Visit App:
 
 `localhost:3000/home` 
+
+To tear down the docker image:
+ `docker compose down`
