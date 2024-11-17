@@ -48,7 +48,7 @@ variable "gitops_addons_org" {
 variable "gitops_addons_repo" {
   description = "Git repository contains for addons"
   type        = string
-  default     = "gitops-bridge-argocd-control-plane-template"
+  default     = "project-2024-25t1-g3-t1-gitops-control-plane"
 }
 variable "gitops_addons_revision" {
   description = "Git repository revision/branch/ref for addons"
