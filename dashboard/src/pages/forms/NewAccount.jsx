@@ -56,7 +56,7 @@ const NewAccount = () => {
       // Handle different types of errors
       if (err.response) {
         // Server responded with error
-        const errorMessage = err.response.data?.message || 'Failed to register account. Please try again.';
+        const errorMessage = err.response.data?.message || 'Failed to register account. The client id you are trying to register an account for may not exist.';
         messageApi.error(errorMessage);
       } else if (err.request) {
         // Request made but no response
