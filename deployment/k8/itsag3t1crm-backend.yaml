@@ -21,8 +21,12 @@ spec:
       - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:a118931dbd57d3b9738860fa78f788536af949d3
         name: itsag3t1-crm-backend
         resources:
+          requests:
+            cpu: 5m
+            memory: 512Mi
           limits:
-            cpu: 100m
+            cpu: 10m
+            memory: 1024Mi
         livenessProbe:
           httpGet:
             path: /actuator/health
