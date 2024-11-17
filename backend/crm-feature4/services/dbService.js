@@ -4,7 +4,7 @@ const { Client:PgClient,Pool } = require('pg');
 const pool = new Pool({
     host: 'my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com',
     user: 'crmdbadmin',
-    password: '', // Add your actual password here or use environment variables for security
+    password: 'Yhld_i%BmU62gmiv', // Add your actual password here or use environment variables for security
     database: 'crmdb',
     port: 5432,
     ssl: {
@@ -43,6 +43,7 @@ async function getDataFromRDS() {
 // Function to fetch transactions by client ID
 async function getTransactionsByClientId(clientId) {
     try {
+	
         const client = await pool.connect();
         const query = "SELECT * FROM transactions WHERE client_id = $1";
         const result = await client.query(query, [clientId]);
@@ -56,19 +57,19 @@ async function getTransactionsByClientId(clientId) {
 
 async function getTransactionsByAgentId(agentId) {
     try {
+	
         const client = await pool.connect();
 
         // SQL query to join transactions and agent_profile and filter by agent_id
-        const query = `
-            SELECT t.*
-            FROM transactions t
-            INNER JOIN agent_profile ap ON t.client_id = ap.profile_id
-            WHERE ap.agent_id = $1
-        `;
-
-        // Execute the query with the provided agent_id
+        
+	const query = "SELECT t.* FROM transactions t INNER JOIN agent_profile ap ON t.client_id = ap.profile_id WHERE ap.agent_id = $1;";        // Execute the query with the provided agent_id
         const result = await client.query(query, [agentId]);
-        client.release();
+        // Process and print each row from the result
+        result.rows.forEach(row => {
+            console.log(row);
+        });
+	
+	client.release();
         return result.rows; // Return the rows containing the transactions
     } catch (error) {
         console.error("Error fetching transactions by agent ID:", error);
