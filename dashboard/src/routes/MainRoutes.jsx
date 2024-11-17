@@ -10,6 +10,7 @@ import { Navigate } from 'react-router-dom';
 // render pages
 const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/index')));
 const ProfileTable = Loadable(lazy(() => import('pages/tables/profile-table')));
+const AccountTable = Loadable(lazy(() => import('pages/tables/account-table')));
 const UserTable = Loadable(lazy(() => import('pages/tables/user-table')));
 const ClientTransactionTable = Loadable(lazy(() => import('pages/tables/client-transaction-table')));
 const UserTransactionTable = Loadable(lazy(() => import('pages/tables/user-transaction-table')));
@@ -70,6 +71,15 @@ const MainRoutes = {
         (
           <ProtectedRoute roles={['admin', 'root-admin']}>
             <UserTable />
+          </ProtectedRoute>
+        )
+    },
+    {
+      path: 'AccountTable',
+      element:
+        (
+          <ProtectedRoute >
+            <AccountTable />
           </ProtectedRoute>
         )
     },

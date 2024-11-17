@@ -1,10 +1,17 @@
 // assets
-import { ChromeOutlined, QuestionOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  UserOutlined,
+  ProfileOutlined,
+  BookOutlined
+} from '@ant-design/icons';
 
 // icons
 const icons = {
-  ChromeOutlined,
-  QuestionOutlined
+  BankOutlined,
+  UserOutlined,
+  ProfileOutlined,
+  BookOutlined
 };
 
 // ==============================|| MENU ITEMS - SAMPLE PAGE & DOCUMENTATION ||============================== //
@@ -17,32 +24,39 @@ const tables = {
   type: 'group',
   children: [
     {
-      id: 'profile-table',
-      title: 'Manage Profiles',
-      type: 'item',
-      url: '/ProfileTable',
-      icon: icons.ChromeOutlined
-    },
-    {
       id: 'user-table',
       title: 'Manage System Users',
       type: 'item',
       url: '/UserTable',
-      icon: icons.ChromeOutlined
+      icon: icons.UserOutlined
     },
     {
-      id: 'client-transaction-table',
-      title: 'Manage Transactions',
+      id: 'profile-table',
+      title: 'Manage Profiles',
       type: 'item',
-      url: '/ClientTransactionTable',
-      icon: icons.ChromeOutlined
+      url: '/ProfileTable',
+      icon: icons.ProfileOutlined
+    },
+    {
+      id: 'account-table',
+      title: 'Manage Accounts',
+      type: 'item',
+      url: '/AccountTable',
+      icon: icons.BankOutlined
     },
     {
       id: 'user-transaction-table',
-      title: 'Manage User Transactions',
+      title: 'User Transactions',
       type: 'item',
       url: '/UserTransactionTable',
-      icon: icons.ChromeOutlined
+      icon: icons.BookOutlined
+    },
+    {
+      id: 'client-transaction-table',
+      title: 'Account Transactions',
+      type: 'item',
+      url: '/ClientTransactionTable',
+      icon: icons.BookOutlined
     },
   ]
 };
