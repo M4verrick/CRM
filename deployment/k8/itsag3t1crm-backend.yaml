@@ -22,10 +22,10 @@ spec:
         name: itsag3t1-crm-backend
         resources:
           requests:
-            cpu: 5m
+            cpu: 250m
             memory: 512Mi
           limits:
-            cpu: 10m
+            cpu: 500m
             memory: 1024Mi
         livenessProbe:
           httpGet:
