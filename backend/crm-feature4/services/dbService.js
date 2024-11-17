@@ -54,6 +54,28 @@ async function getTransactionsByClientId(clientId) {
     }
 }
 
+async function getTransactionsByAgentId(agentId) {
+    try {
+        const client = await pool.connect();
+
+        // SQL query to join transactions and agent_profile and filter by agent_id
+        const query = `
+            SELECT t.*
+            FROM transactions t
+            INNER JOIN agent_profile ap ON t.client_id = ap.profile_id
+            WHERE ap.agent_id = $1
+        `;
+
+        // Execute the query with the provided agent_id
+        const result = await client.query(query, [agentId]);
+        client.release();
+        return result.rows; // Return the rows containing the transactions
+    } catch (error) {
+        console.error("Error fetching transactions by agent ID:", error);
+        throw error;
+    }
+}
+
 
 // Function to insert a single transaction record into the RDS database
 async function insertTransaction(record) {
@@ -88,4 +110,4 @@ async function insertTransaction(record) {
 }
 
 
-module.exports = { getDataFromRDS,getTransactionsByClientId,insertTransaction };
+module.exports = { getDataFromRDS,getTransactionsByAgentId,insertTransaction };
