@@ -32,16 +32,16 @@ spec:
       requirements:
         - key: "karpenter.k8s.aws/instance-category"
           operator: In
-          values: ["t"]
+          values: ["c"]
         - key: "karpenter.k8s.aws/instance-cpu"
           operator: In
-          values: ["2"]
+          values: ["4"]
         - key: "karpenter.k8s.aws/instance-hypervisor"
           operator: In
           values: ["nitro"]
         - key: "karpenter.k8s.aws/instance-generation"
           operator: Gt
-          values: ["3"]
+          values: ["2"]
         - key: "kubernetes.io/arch"
           operator: In
           values: ["amd64"]
