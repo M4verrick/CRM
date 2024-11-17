@@ -31,10 +31,12 @@ Prequisites:
 - AWS CLI
 - Kubectl
 - Set up AWS CLI with your credentials - https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html
+- SSH Key and updated in Github
 
 1. Go to /infra directory
 2. Go to variables.tf and update the following variables:
-    - aws_region - to your desired region
+    - region - to your desired region
+    - ssh_key_path - to your ssh key path to access Github
 2. Run `terraform init`
 3. Run `terraform apply --auto-approve`
 
