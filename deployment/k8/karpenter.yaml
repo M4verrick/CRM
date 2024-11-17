@@ -35,7 +35,7 @@ spec:
           values: ["t3"]
         - key: karpenter.k8s.aws/instance-size
           operator: In
-          values: ["small"]
+          values: ["small", "medium"]
         - key: "karpenter.k8s.aws/instance-hypervisor"
           operator: In
           values: ["nitro"]
