@@ -4,13 +4,13 @@ on:
   push:
     branches: [ "*" ]
     paths:
-      - 'backend/crm'
+      - 'backend/crm/**'
       - '.github/workflows/build-push-ecr-backend.yml'
       - '.github/workflows/test-push-backend.yml'
   pull_request:
     branches: [ "*" ]
     paths:
-      - 'backend/crm'
+      - 'backend/crm/**'
       - '.github/workflows/build-push-ecr-backend.yml'
       - '.github/workflows/test-push-backend.yml'
 
