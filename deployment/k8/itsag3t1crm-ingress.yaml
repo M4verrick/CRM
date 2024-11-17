@@ -14,20 +14,8 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
     nginx.ingress.kubernetes.io/limit-rps: "100"
-    nginx.ingress.kubernetes.io/server-snippet: |
-      error_page 500 502 503 504 = @retry;
-      proxy_intercept_errors on;
-      
-      location @retry {
-        proxy_next_upstream_tries   1;
-        proxy_set_header            Host www.itsag3t1.com;
-        proxy_set_header            Connection "";
-        proxy_set_header            X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header            X-Original-Forwarded-Host $http_x_forwarded_host;
-        proxy_set_header            X-Original-Forwarded-Proto $http_x_forwarded_proto;
-        proxy_pass                  $scheme://www.itsag3t1.com;
-        proxy_intercept_errors      off;
-      }
+    nginx.ingress.kubernetes.io/proxy-next-upstream: "error timeout http_500 http_502 http_503 http_504"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: "3"
 spec:
   ingressClassName: nginx
   rules:
