@@ -17,7 +17,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - http:
+    - host: www.itsag3t1.com
+      http:
         paths:
           - path: /
             pathType: Prefix
