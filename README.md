@@ -15,13 +15,30 @@
 - Manage Transactions (Feature 3)
 - Manage User Transactions (Feature 3)
 
-Create Client Profile Test Data
+Create Client Profile
+```
+{
+    "firstName": "First",
+    "lastName": "Last",
+    "email": "testno2@example.com",
+    "phone": "+1234567890",
+    "address": "123 Elm Street",
+    "city": "Sample City",
+    "state": "SC",
+    "country": "CountryName",
+    "zip": "12345",
+    "dateOfBirth": "2000-01-01",
+    "gender": "MALE"
+}
+```
 
 Get Client Profile
 
 Delete Client Profile
 
 Get Client Account
+```
+```
 
 Delete Client Account
 
