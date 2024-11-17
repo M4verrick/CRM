@@ -54,7 +54,7 @@ spec:
             port: 3000
           initialDelaySeconds: 60
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 15
           failureThreshold: 3
         readinessProbe:
           httpGet:
@@ -62,7 +62,7 @@ spec:
             port: 3000
           initialDelaySeconds: 60
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 15
           failureThreshold: 3
         ports:
         - containerPort: 3000

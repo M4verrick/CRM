@@ -33,7 +33,7 @@ spec:
             port: 8080
           initialDelaySeconds: 300
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 15
           failureThreshold: 3
         readinessProbe:
           httpGet:
@@ -41,7 +41,7 @@ spec:
             port: 8080
           initialDelaySeconds: 300
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 15
           failureThreshold: 3
         ports:
         - containerPort: 8080
