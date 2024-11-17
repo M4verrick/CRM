@@ -7,6 +7,12 @@ on:
       - 'backend/crm'
       - '.github/workflows/build-push-ecr-backend.yml'
       - '.github/workflows/test-push-backend.yml'
+  pull_request:
+    branches: [ "*" ]
+    paths:
+      - 'backend/crm'
+      - '.github/workflows/build-push-ecr-backend.yml'
+      - '.github/workflows/test-push-backend.yml'
 
 jobs:
   build:
