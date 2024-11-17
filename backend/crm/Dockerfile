@@ -9,7 +9,7 @@ COPY pom.xml /app/
 COPY src /app/src
 
 # Build the application
-RUN mvn -f /app/pom.xml clean package -DskipTests
+RUN mvn -f /app/pom.xml clean package
 
 # Use an official OpenJDK runtime as a parent image with Java 21
 FROM openjdk:21-jdk-slim

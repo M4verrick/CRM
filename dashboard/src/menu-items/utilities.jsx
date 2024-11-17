@@ -1,22 +1,14 @@
 // assets
 import {
-  AppstoreAddOutlined,
-  AntDesignOutlined,
-  BarcodeOutlined,
-  BgColorsOutlined,
-  FontSizeOutlined,
-  LoadingOutlined,
+  BankOutlined,
+  UserOutlined,
   ProfileOutlined
 } from '@ant-design/icons';
 
 // icons
 const icons = {
-  FontSizeOutlined,
-  BgColorsOutlined,
-  BarcodeOutlined,
-  AntDesignOutlined,
-  LoadingOutlined,
-  AppstoreAddOutlined,
+  BankOutlined,
+  UserOutlined,
   ProfileOutlined
 };
 
@@ -32,7 +24,7 @@ const utilities = {
       title: 'Add User',
       type: 'item',
       url: '/UserForm',
-      icon: icons.ProfileOutlined
+      icon: icons.UserOutlined
     },
     {
       id: 'clientform',
@@ -46,7 +38,7 @@ const utilities = {
       title: 'Add Account',
       type: 'item',
       url: '/AccountForm',
-      icon: icons.BarcodeOutlined
+      icon: icons.BankOutlined
     }
   ]
 };

@@ -18,11 +18,27 @@ spec:
         type: karpenter
       terminationGracePeriodSeconds: 0
       containers:
-      - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:e40f490bb1dc11865a96f49b9f4732458bb305a1
+      - image: public.ecr.aws/t2p9h2o6/itsag3t1/backend:a118931dbd57d3b9738860fa78f788536af949d3
         name: itsag3t1-crm-backend
         resources:
           limits:
-            cpu: 800m
+            cpu: 100m
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 300
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 300
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
         ports:
         - containerPort: 8080
           name: http
