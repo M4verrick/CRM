@@ -30,6 +30,10 @@ import SettingOutlined from '@ant-design/icons/SettingOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 import avatar1 from 'assets/images/users/avatar-1.png';
 
+// For logout
+import { useContext } from 'react';
+import { AccountContext } from 'contexts/Account';
+
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -71,6 +75,8 @@ export default function Profile() {
   };
 
   const iconBackColorOpen = 'grey.100';
+
+  const { logout } = useContext(AccountContext);
 
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
@@ -125,15 +131,12 @@ export default function Profile() {
                           <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
                           <Stack>
                             <Typography variant="h6">John Doe</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              UI/UX Designer
-                            </Typography>
                           </Stack>
                         </Stack>
                       </Grid>
                       <Grid item>
                         <Tooltip title="Logout">
-                          <IconButton size="large" sx={{ color: 'text.primary' }}>
+                          <IconButton onClick={logout} size="large" sx={{ color: 'text.primary' }}>
                             <LogoutOutlined />
                           </IconButton>
                         </Tooltip>
@@ -141,7 +144,7 @@ export default function Profile() {
                     </Grid>
                   </CardContent>
 
-                  <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                  {/* <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs variant="fullWidth" value={value} onChange={handleChange} aria-label="profile tabs">
                       <Tab
                         sx={{
@@ -168,13 +171,13 @@ export default function Profile() {
                         {...a11yProps(1)}
                       />
                     </Tabs>
-                  </Box>
+                  </Box>`
                   <TabPanel value={value} index={0} dir={theme.direction}>
                     <ProfileTab />
                   </TabPanel>
                   <TabPanel value={value} index={1} dir={theme.direction}>
                     <SettingTab />
-                  </TabPanel>
+                  </TabPanel> */}
                 </MainCard>
               </ClickAwayListener>
             </Paper>
