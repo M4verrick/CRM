@@ -47,3 +47,20 @@ To tear down all the resources and the EKS cluster, run the following command:
 ```shell
 ./destroy.sh
 ```
+
+## Frontend:  
+
+`cd dashboard`
+
+Set up your env. file with your own AWS Credentials and resource IDs. Ensure that you have the correct AWS credentials for AWS cognito and AWS CloudWatch Logs.
+You may use the .env.example file as a template.
+
+
+To Start Server on Docker:
+
+`docker compose build`
+`docker compose up`
+
+To Visit App:
+
+`localhost:3000/home` 
