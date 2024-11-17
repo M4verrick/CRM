@@ -1,11 +1,19 @@
 # Project Group 3 Team 1 
 
-## Testing 
+## Testing current setup
 
-Login credentials you can use to test the application:
-
+1. Go to https://www.itsag3t1.com/home
+2. Login using these credentials:
 - Email: tesipo@gmail.com
 - Password: Thisisnewtesipo!23
+3. Use the navigation tabs on the left
+- Add User (to add agents)
+- Add Client Profile (to add client profiles)
+- Add Account (to add client accounts)
+- Manage Profiles (Feature 2, view/delete profiles/accounts)
+- Manage System Users (Feature 1)
+- Manage Transactions (Feature 3)
+- Manage User Transactions (Feature 3)
 
 Create Client Profile Test Data
 
