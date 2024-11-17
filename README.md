@@ -38,6 +38,13 @@ Delete Client Profile
 
 Get Client Account
 ```
+{
+    "accountType": "SAVINGS",
+    "accountStatus": "ACTIVE",
+    "currency": "USD",
+    "branchId": "BR001",
+    "initialDeposit": 1000.50
+}
 ```
 
 Delete Client Account
