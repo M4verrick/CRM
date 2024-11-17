@@ -43,10 +43,10 @@ spec:
             value: "oL4qW45zOIWGdoOvS8HcRSzq/ADII/nqDKTmmdD8"
         resources:
           requests:
-            cpu: 250m
+            cpu: 800m
             memory: 512Mi
           limits:
-            cpu: 500m
+            cpu: 1000m
             memory: 1024Mi
         livenessProbe:
           httpGet:
@@ -54,7 +54,7 @@ spec:
             port: 3000
           initialDelaySeconds: 60
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 15
           failureThreshold: 3
         readinessProbe:
           httpGet:
@@ -62,7 +62,7 @@ spec:
             port: 3000
           initialDelaySeconds: 60
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 15
           failureThreshold: 3
         ports:
         - containerPort: 3000

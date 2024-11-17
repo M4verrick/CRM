@@ -22,10 +22,10 @@ spec:
         name: itsag3t1-crm-backend
         resources:
           requests:
-            cpu: 250m
+            cpu: 800m
             memory: 512Mi
           limits:
-            cpu: 500m
+            cpu: 1000m
             memory: 1024Mi
         livenessProbe:
           httpGet:
@@ -33,7 +33,7 @@ spec:
             port: 8080
           initialDelaySeconds: 300
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 15
           failureThreshold: 3
         readinessProbe:
           httpGet:
@@ -41,7 +41,7 @@ spec:
             port: 8080
           initialDelaySeconds: 300
           periodSeconds: 30
-          timeoutSeconds: 10
+          timeoutSeconds: 15
           failureThreshold: 3
         ports:
         - containerPort: 8080
