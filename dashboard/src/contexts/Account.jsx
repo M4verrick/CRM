@@ -10,6 +10,44 @@ const Account = (props) => {
     const [user, setUser] = useState(null);
     const [userAttributes, setUserAttributes] = useState(null);
 
+    // Function for forget password
+    const forgotPassword = async (email) => {
+        return new Promise((resolve, reject) => {
+            const user = new CognitoUser({
+                Username: email,
+                Pool
+            });
+
+            user.forgotPassword({
+                onSuccess: (data) => {
+                    resolve(data);
+                },
+                onFailure: (err) => {
+                    reject(err);
+                }
+            });
+        });
+    };
+
+    // Function for confirming the new password
+    const confirmPassword = async (email, code, newPassword) => {
+        return new Promise((resolve, reject) => {
+            const user = new CognitoUser({
+                Username: email,
+                Pool
+            });
+
+            user.confirmPassword(code, newPassword, {
+                onSuccess: () => {
+                    resolve();
+                },
+                onFailure: (err) => {
+                    reject(err);
+                }
+            });
+        });
+    };
+
     // Fixed getUserAttributes function
     const getUserAttributes = useCallback((cognitoUser) => {
         return new Promise((resolve, reject) => {
@@ -34,7 +72,7 @@ const Account = (props) => {
                         reject(err);
                         return;
                     }
-                    
+
                     if (!attributes) {
                         console.log("No attributes found");
                         resolve({});
@@ -46,7 +84,7 @@ const Account = (props) => {
                     attributes.forEach(attribute => {
                         userAttr[attribute.getName()] = attribute.getValue();
                     });
-                    
+
                     console.log("Successfully retrieved user attributes:", userAttr);
                     resolve(userAttr);
                 });
@@ -68,7 +106,7 @@ const Account = (props) => {
                 },
                 ChallengeParameters: {}
             };
-            
+
             localStorage.setItem('auth_tokens', JSON.stringify(authResult));
             return authResult;
         } catch (error) {
@@ -82,13 +120,13 @@ const Account = (props) => {
         try {
             setIsLoading(true);
             console.log("Starting auth initialization");
-    
+
             const cognitoUser = Pool.getCurrentUser();
             if (!cognitoUser) {
                 console.log("No current user found");
                 throw new Error("No user found");
             }
-    
+
             // Get session first
             const session = await new Promise((resolve, reject) => {
                 cognitoUser.getSession((err, session) => {
@@ -100,7 +138,7 @@ const Account = (props) => {
                     resolve(session);
                 });
             });
-    
+
             if (!session.isValid()) {
                 console.log("Session is invalid");
                 throw new Error("Invalid session");
@@ -110,9 +148,9 @@ const Account = (props) => {
             // Store the tokens on initialization
             storeAuthTokens(session);
             console.log("Tokens stored");
-    
+
             try {
-                const attributes = await getUserAttributes(cognitoUser);               
+                const attributes = await getUserAttributes(cognitoUser);
                 setUserAttributes(attributes);
                 setUser(cognitoUser);
                 setIsAuthenticated(true);
@@ -139,18 +177,18 @@ const Account = (props) => {
         try {
             setIsLoading(true);
             console.log("Starting authentication");
-    
+
             const user = new CognitoUser({
                 Username,
                 Pool,
                 Storage: window.localStorage
             });
-    
+
             const authDetails = new AuthenticationDetails({
                 Username,
                 Password
             });
-    
+
             const authResult = await new Promise((resolve, reject) => {
                 user.authenticateUser(authDetails, {
                     onSuccess: async (result) => {
@@ -169,11 +207,11 @@ const Account = (props) => {
                     }
                 });
             });
-    
+
             // Wait for auth state to be initialized
             await initializeAuth();
             return authResult;
-    
+
         } catch (error) {
             console.error("Authentication error:", error);
             throw error;
@@ -187,7 +225,7 @@ const Account = (props) => {
         try {
             const session = await getSession();
             if (!session) return [];
-            
+
             // Get groups from the JWT payload
             const payload = session.getIdToken().decodePayload();
             return payload['cognito:groups'] || [];
@@ -287,7 +325,7 @@ const Account = (props) => {
     }, [initializeAuth]);
 
     return (
-        <AccountContext.Provider 
+        <AccountContext.Provider
             value={{
                 isAuthenticated,
                 isLoading,
@@ -299,7 +337,9 @@ const Account = (props) => {
                 getUserGroups,
                 hasGroup,
                 getFullName,
-                refreshSession
+                refreshSession,
+                forgotPassword,
+                confirmPassword,
             }}
         >
             {props.children}
