@@ -119,13 +119,26 @@ export default () => {
           <Button
             key="button"
             icon={<PlusOutlined />}
-            onClick={() => {
-              actionRef.current?.reload();
+            onClick={async () => {
+              try {
+                console.log('called');
+                // Call the API to retrieve updated transactions
+                await api.retrieveUpdatedTransaction();
+
+                // Refresh the table
+                window.location.reload();
+                message.success('Transactions updated successfully');
+              } catch (error) {
+                // Handle any errors
+                message.error('Failed to retrieve updated transactions');
+                console.error('Error:', error);
+              }
             }}
             type="primary"
           >
-            New Transaction
-          </Button>,
+            Retrieve Transactions
+          </Button>
+          ,
           <Dropdown
             key="menu"
             menu={{

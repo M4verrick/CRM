@@ -14,6 +14,8 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
     nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/proxy-next-upstream: "error timeout http_500 http_502 http_503 http_504"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: "3"
 spec:
   ingressClassName: nginx
   rules:
@@ -32,5 +34,12 @@ spec:
             backend:
               service:
                 name: itsag3t1-crm-backend
+                port:
+                  name: http
+          - path: /transaction
+            pathType: Prefix
+            backend:
+              service:
+                name: itsag3t1-crm-backend-feature4
                 port:
                   name: http

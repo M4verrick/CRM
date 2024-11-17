@@ -76,7 +76,8 @@ export default function Profile() {
 
   const iconBackColorOpen = 'grey.100';
 
-  const { logout } = useContext(AccountContext);
+  const { getFullName, logout } = useContext(AccountContext);
+  const fullName = getFullName();
 
   return (
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
@@ -97,7 +98,7 @@ export default function Profile() {
         <Stack direction="row" spacing={1.25} alignItems="center" sx={{ p: 0.5 }}>
           <Avatar alt="profile user" src={avatar1} size="sm" />
           <Typography variant="subtitle1" sx={{ textTransform: 'capitalize' }}>
-            John Doe
+            {fullName.firstName} {fullName.lastName}
           </Typography>
         </Stack>
       </ButtonBase>
@@ -130,7 +131,7 @@ export default function Profile() {
                         <Stack direction="row" spacing={1.25} alignItems="center">
                           <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
                           <Stack>
-                            <Typography variant="h6">John Doe</Typography>
+                            <Typography variant="h6"> {fullName.firstName} {fullName.lastName} </Typography>
                           </Stack>
                         </Stack>
                       </Grid>

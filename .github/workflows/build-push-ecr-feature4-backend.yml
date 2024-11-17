@@ -1,0 +1,51 @@
+name: Build and Push to ECR Backend Feature 4
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'backend/crm-feature4/**'
+      - '.github/workflows/build-push-ecr-feature4-backend.yml'
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Build, tag, and push image to Amazon ECR for backend
+        id: build-image-backend
+        env:
+          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          REGISTRY_ALIAS: t2p9h2o6
+          IMAGE_TAG: ${{ github.sha }}                 # set this to your preferred AWS region, e.g. us-west-1
+          REPOSITORY: itsag3t1/feature4-backend
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG ./backend/crm-feature4
+          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+
+
