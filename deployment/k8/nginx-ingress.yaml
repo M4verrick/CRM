@@ -28,4 +28,4 @@ spec:
               service:
                 name: ingress-nginx-controller
                 port:
-                  name: http  # HTTP NodePort (30963)
+                  name: http
