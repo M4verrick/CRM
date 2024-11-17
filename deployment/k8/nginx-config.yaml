@@ -1,7 +1,19 @@
-kind: ConfigMap
 apiVersion: v1
-metadata:
-  name: ingress-nginx-nginx-ingress-controller
-  namespace: ingress-nginx
+kind: ConfigMap
 data:
+  allow-snippet-annotations: 'false'
   retry-non-idempotent: "true"
+metadata:
+  annotations:
+    argocd.argoproj.io/tracking-id: >-
+      addon-itsag3t1-crm-ingress-nginx:/ConfigMap:ingress-nginx/ingress-nginx-controller
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.10.0
+    helm.sh/chart: ingress-nginx-4.10.0
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
