@@ -1,122 +1,166 @@
-import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
+import api from 'services/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Dropdown, Space, Tag } from 'antd';
+import { ProTable } from '@ant-design/pro-components';
+import { Modal, message, Tag, Button } from 'antd';
+import { useNavigate } from "react-router-dom";
+import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
 import { useRef } from 'react';
-import request from 'umi-request';
+import { ConfigProvider } from 'antd';
+import enUS from 'antd/lib/locale/en_US';
 
-// api useHook
-import { useApi } from 'hooks/useApi';
-
-// TODO: check what fields backend responds with
-
-
-// Define table items
-type GithubIssueItem = {
-  url: string;
+type ClientTableItem = {
   id: number;
-  number: number;
-  title: string;
-  labels: {
-    name: string;
-    color: string;
-  }[];
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
   state: string;
-  comments: number;
-  created_at: string;
-  updated_at: string;
-  closed_at?: string;
+  country: string;
+  zip: string;
+  dateOfBirth: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  verificationToken: string;
+  verificationStatus: string;
+  clientAccounts: any[];
+  emailVerified: boolean;
 };
 
-const columns: ProColumns<GithubIssueItem>[] = [
+const handleEdit = async (record: ClientTableItem) => {
+  try {
+    const requestBody = {
+      firstName: record.firstName,
+      lastName: record.lastName,
+      email: record.email,
+      phone: record.phone,
+      address: record.address,
+      city: record.city,
+      state: record.state,
+      country: record.country,
+      zip: record.zip,
+      dateOfBirth: record.dateOfBirth,
+      gender: record.gender
+    };
+
+    await api.updateClient(record.id, record);
+    message.success('User updated successfully');
+  } catch (error) {
+    message.error('Failed to update user');
+    console.error('Error updating user:', error);
+  }
+};
+
+const handleDelete = async (record: ClientTableItem) => {
+  Modal.confirm({
+    title: 'Are you sure you want to delete this user?',
+    content: `This will permanently delete user ${record.id}`,
+    okText: 'Yes',
+    okType: 'danger',
+    cancelText: 'No',
+    onOk: async () => {
+      try {
+        await api.deleteClient(record.id);
+        message.success('User deleted successfully');
+      } catch (error) {
+        message.error('Failed to delete client');
+        console.error('Error deleting client:', error);
+      }
+    }
+  });
+};
+
+const columns: ProColumns<ClientTableItem>[] = [
   {
-    dataIndex: 'index',
-    valueType: 'indexBorder',
-    width: 48,
+    title: 'Id',
+    dataIndex: 'id',
   },
   {
-    title: '标题',
-    dataIndex: 'title',
+    title: 'First Name',
+    dataIndex: 'firstName',
+    copyable: true,
+  },
+  {
+    title: 'Last Name',
+    dataIndex: 'lastName',
+    copyable: true,
+  },
+  {
+    title: 'Email',
+    dataIndex: 'email',
+    copyable: true,
+    ellipsis: true
+  },
+  {
+    title: 'Phone',
+    dataIndex: 'phone',
+    copyable: true,
+  },
+  {
+    title: 'Address',
+    dataIndex: 'address',
+    copyable: true,
+  },
+  {
+    title: 'City',
+    dataIndex: 'city',
+    hideInTable: true,
     copyable: true,
     ellipsis: true,
-    tooltip: '标题过长会自动收缩',
-    formItemProps: {
-      rules: [
-        {
-          required: true,
-          message: '此项为必填项',
-        },
-      ],
-    },
   },
   {
-    disable: true,
-    title: '状态',
+    title: 'State',
     dataIndex: 'state',
-    filters: true,
-    onFilter: true,
+    hideInTable: true,
+    copyable: true,
     ellipsis: true,
-    valueType: 'select',
-    valueEnum: {
-      all: { text: '超长'.repeat(50) },
-      open: {
-        text: '未解决',
-        status: 'Error',
-      },
-      closed: {
-        text: '已解决',
-        status: 'Success',
-        disabled: true,
-      },
-      processing: {
-        text: '解决中',
-        status: 'Processing',
-      },
-    },
   },
   {
-    disable: true,
-    title: '标签',
-    dataIndex: 'labels',
-    search: false,
-    renderFormItem: (_, { defaultRender }) => {
-      return defaultRender(_);
-    },
-    render: (_, record) => (
-      <Space>
-        {record.labels.map(({ name, color }) => (
-          <Tag color={color} key={name}>
-            {name}
-          </Tag>
-        ))}
-      </Space>
+    title: 'Country',
+    dataIndex: 'country',
+    hideInTable: true,
+    copyable: true,
+    ellipsis: true,
+  },
+  {
+    title: 'ZIP',
+    dataIndex: 'zip',
+  },
+  {
+    title: 'Date of Birth',
+    dataIndex: 'dateOfBirth',
+    valueType: 'date',
+  },
+  {
+    title: 'Gender',
+    dataIndex: 'gender',
+    valueEnum: {
+      MALE: { text: 'Male' },
+      FEMALE: { text: 'Female' },
+      OTHER: { text: 'Other' },
+    }
+  },
+  {
+    title: 'Verification Status',
+    dataIndex: 'verificationStatus',
+    render: (status) => (
+      <Tag color={status === 'PENDING' ? 'orange' : 'green'}>
+        {status}
+      </Tag>
     ),
   },
   {
-    title: '创建时间',
-    key: 'showTime',
-    dataIndex: 'created_at',
-    valueType: 'date',
-    sorter: true,
-    hideInSearch: true,
+    title: 'Email Verified',
+    dataIndex: 'emailVerified',
+    render: (verified) => (
+      <Tag color={verified ? 'green' : 'red'}>
+        {verified ? 'Verified' : 'Not Verified'}
+      </Tag>
+    ),
   },
   {
-    title: '创建时间',
-    dataIndex: 'created_at',
-    valueType: 'dateRange',
-    hideInTable: true,
-    search: {
-      transform: (value) => {
-        return {
-          startTime: value[0],
-          endTime: value[1],
-        };
-      },
-    },
-  },
-  {
-    title: '操作',
+    title: 'Options',
     valueType: 'option',
     key: 'option',
     render: (text, record, _, action) => [
@@ -126,111 +170,94 @@ const columns: ProColumns<GithubIssueItem>[] = [
           action?.startEditable?.(record.id);
         }}
       >
-        编辑
+        Edit
       </a>,
-      <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
-        查看
+      <a
+        key="delete"
+        onClick={() => handleDelete(record)}
+      >
+        Delete
       </a>,
-      <TableDropdown
-        key="actionGroup"
-        onSelect={() => action?.reload()}
-        menus={[
-          { key: 'copy', name: '复制' },
-          { key: 'delete', name: '删除' },
-        ]}
-      />,
     ],
-  },
+  }
 ];
+
+const fetchClients = async (params: {
+  pageSize?: number;
+  current?: number;
+  keyword?: string;
+}) => {
+  try {
+    const response = await api.getClients();
+    
+    // Assuming response is the array of clients
+    const data = Array.isArray(response) ? response : [];
+    
+    // Handle pagination
+    const startIndex = ((params.current || 1) - 1) * (params.pageSize || 10);
+    const endIndex = startIndex + (params.pageSize || 10);
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    return {
+      data: paginatedData,
+      success: true,
+      total: data.length
+    };
+  } catch (error) {
+    console.error('Error fetching clients:', error);
+    message.error('Failed to fetch clients');
+    return {
+      data: [],
+      success: false,
+      total: 0
+    };
+  }
+};
 
 export default () => {
   const actionRef = useRef<ActionType>();
-  return (
-    <ProTable<GithubIssueItem>
-      columns={columns}
-      actionRef={actionRef}
-      cardBordered
-      request={async (params, sort, filter) => {
-        const { loading, error, get } = useApi();
+  const navigate = useNavigate();
 
-        return await get('clients');
-      }}
-      editable={{
-        type: 'multiple',
-      }}
-      columnsState={{
-        persistenceKey: 'pro-table-singe-demos',
-        persistenceType: 'localStorage',
-        defaultValue: {
-          option: { fixed: 'right', disable: true },
-        },
-        onChange(value) {
-          console.log('value: ', value);
-        },
-      }}
-      rowKey="id"
-      search={{
-        labelWidth: 'auto',
-      }}
-      options={{
-        setting: {
-          listsHeight: 400,
-        },
-      }}
-      form={{
-        // 由于配置了 transform，提交的参数与定义的不同这里需要转化一下
-        syncToUrl: (values, type) => {
-          if (type === 'get') {
-            return {
-              ...values,
-              created_at: [values.startTime, values.endTime],
-            };
-          }
-          return values;
-        },
-      }}
-      pagination={{
-        pageSize: 5,
-        onChange: (page) => console.log(page),
-      }}
-      dateFormatter="string"
-      headerTitle="高级表格"
-      toolBarRender={() => [
-        <Button
-          key="button"
-          icon={<PlusOutlined />}
-          onClick={() => {
+  return (
+    <ConfigProvider locale={enUS}>
+      <ProTable<ClientTableItem>
+        columns={columns}
+        actionRef={actionRef}
+        request={async (params, sort, filter) => {
+          return fetchClients(params);
+        }}
+        editable={{
+          type: 'multiple',
+          onSave: async (rowKey, data, row) => {
+            await handleEdit(data);
             actionRef.current?.reload();
-          }}
-          type="primary"
-        >
-          新建
-        </Button>,
-        <Dropdown
-          key="menu"
-          menu={{
-            items: [
-              {
-                label: '1st item',
-                key: '1',
-              },
-              {
-                label: '2nd item',
-                key: '2',
-              },
-              {
-                label: '3rd item',
-                key: '3',
-              },
-            ],
-          }}
-        >
-          <Button>
-            <EllipsisOutlined />
+          },
+        }}
+        pagination={{
+          pageSize: 10,
+          current: 1
+        }}
+        rowKey="id"
+        search={{
+          labelWidth: 'auto'
+        }}
+        dateFormatter="string"
+        headerTitle="Client Profiles"
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              // add new user
+              navigate('/ClientForm');
+              actionRef.current?.reload();
+            }}
+            type="primary"
+          >
+            Add new client
           </Button>
-        </Dropdown>,
-      ]}
-    />
+        ]}
+      />
+    </ConfigProvider>
   );
 };
-
