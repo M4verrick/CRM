@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'backend/crm-feature4'
+      - 'backend/crm-feature4/**'
       - '.github/workflows/build-push-ecr-feature4-backend.yml'
 
 env:
