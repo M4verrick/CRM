@@ -34,3 +34,10 @@ spec:
                 name: itsag3t1-crm-backend
                 port:
                   name: http
+          - path: /db/transaction/agent
+            pathType: Prefix
+            backend:
+              service:
+                name: itsag3t1-crm-backend-feature4
+                port:
+                  name: http
