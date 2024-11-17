@@ -33,7 +33,7 @@ const NewClient = () => {
       // Handle different types of errors
       if (err.response) {
         // Server responded with error
-        const errorMessage = err.response.data?.message || 'Failed to register client. Please try again.';
+        const errorMessage = err.response.data?.message || 'Failed to register client. This phone number or email may already be registered.';
         messageApi.error(errorMessage);
       } else if (err.request) {
         // Request made but no response
@@ -71,7 +71,11 @@ const NewClient = () => {
                       message: "Please enter first name",
                     },
                     { whitespace: true },
-                    { min: 3 },
+                    { min: 2, max: 50 },
+                    {
+                      pattern: /^[a-zA-Z\s]*$/,
+                      message: "First name must contain only alphabetic characters and spaces"
+                    }
                   ]}
                   hasFeedback
                 >
@@ -84,10 +88,14 @@ const NewClient = () => {
                   rules={[
                     {
                       required: true,
-                      message: "Please enter last name",
+                      message: "Please enter first name",
                     },
                     { whitespace: true },
-                    { min: 3 },
+                    { min: 2, max: 50 },
+                    {
+                      pattern: /^[a-zA-Z\s]*$/,
+                      message: "First name must contain only alphabetic characters and spaces"
+                    }
                   ]}
                   hasFeedback
                 >
@@ -187,7 +195,7 @@ const NewClient = () => {
                       message: "Enter an address",
                     },
                     { whitespace: true },
-                    { min: 3 },
+                    { min: 5, max: 100},
                   ]}
                   hasFeedback
                 >
@@ -203,7 +211,7 @@ const NewClient = () => {
                       message: "Enter a state",
                     },
                     { whitespace: true },
-                    { min: 3 },
+                    { min: 2, max: 50},
                   ]}
                   hasFeedback
                 >
@@ -219,7 +227,7 @@ const NewClient = () => {
                       message: "Enter a city",
                     },
                     { whitespace: true },
-                    { min: 3 },
+                    { min: 2, max: 50},
                   ]}
                   hasFeedback
                 >
@@ -235,7 +243,7 @@ const NewClient = () => {
                       message: "Please enter a country",
                     },
                     { whitespace: true },
-                    { min: 3 },
+                    { min: 2, max: 50},
                   ]}
                   hasFeedback
                 >
@@ -251,7 +259,7 @@ const NewClient = () => {
                       message: "Please enter zip code"
                     },
                     {
-                      pattern: /^\d{5,10}$/,
+                      pattern: /^\d{4,10}$/,
                       message: "Please enter a valid zip code"
                     }
                   ]}

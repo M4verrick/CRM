@@ -6,27 +6,46 @@ import utilities from './utilities';
 import tables from './tables';
 import tablesAgent from './tablesAgent';
 import utilitiesAgent from './utilitiesAgent';
+import { useState, useEffect } from 'react';
+
 
 const menuItems = () => {
   const { hasGroup } = useAccount();
+  const [menuConfig, setMenuConfig] = useState(null);
 
-  // Define menu configurations for different roles
-  const menuConfigs = {
-    admin: {
-      items: [dashboard, utilities, tables]
-    },
-    agent: {
-      items: [dashboard, utilitiesAgent, tablesAgent]
-    }
-  };
+  useEffect(() => {
+    const checkRoles = async () => {
+      const adminCheck = await hasGroup('admin');
+      const rootAdminCheck = await hasGroup('root-admin');
 
-  // Check roles in priority order
-  if (hasGroup('admin')) {
-    return menuConfigs.admin;
-  }
-  
-  // Default to agent menu items
-  return menuConfigs.agent;
+      // no need to check for status here, handled by await
+      if ((adminCheck) ||
+        (rootAdminCheck)) {
+        console.log('Admin')
+        console.log('adminCheck:', adminCheck);
+        console.log('rootAdminCheck:', rootAdminCheck);
+        setMenuConfig(menuConfigs.admin);
+      } else {
+        console.log('Agent')
+        console.log('adminCheck:', adminCheck);
+        console.log('rootAdminCheck:', rootAdminCheck);
+        setMenuConfig(menuConfigs.agent);
+      }
+    };
+
+    const menuConfigs = {
+      admin: {
+        items: [dashboard, utilities, tables]
+      },
+      agent: {
+        items: [dashboard, utilitiesAgent, tablesAgent]
+      }
+    };
+
+    checkRoles();
+  }, [hasGroup]);
+
+  return menuConfig || { items: [] };
 };
 
 export default menuItems;
