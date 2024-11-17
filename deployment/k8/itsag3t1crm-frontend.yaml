@@ -42,8 +42,12 @@ spec:
           - name: VITE_AWS_SECRET_ACCESS_KEY
             value: "oL4qW45zOIWGdoOvS8HcRSzq/ADII/nqDKTmmdD8"
         resources:
+          requests:
+            cpu: 5m
+            memory: 512Mi
           limits:
-            cpu: 100m
+            cpu: 10m
+            memory: 1024Mi
         livenessProbe:
           httpGet:
             path: /
