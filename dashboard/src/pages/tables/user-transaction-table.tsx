@@ -15,7 +15,7 @@ const client = new CloudWatchLogsClient({
   }
 });
 
-const LOG_GROUP_NAME = "/aws/eks/itsag3t1-crm/aws-fluentbit-logs-20241103110112589200000009/workload/itsag3t1-crm";
+const LOG_GROUP_NAME = "/aws/eks/itsag3t1-crm/aws-fluentbit-logs-2024111701300853120000002f/workload/itsag3t1-crm";
 
 async function getRecentBackendLogStreams(nextToken?: string) {
   try {

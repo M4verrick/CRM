@@ -254,7 +254,7 @@ export default () => {
             }}
             type="primary"
           >
-            Add new client
+            Add new profile
           </Button>
         ]}
       />
