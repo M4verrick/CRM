@@ -7,7 +7,7 @@ const dbService = require('../services/dbService');
 
 // SFTP Configuration
 const sftp = new Client();
-const targetHost = "10.0.10.119";
+const targetHost = "10.0.4.108";
 const targetPort = 22;
 const username = "ec2-user";
 const privateKeyPath = "/home/ec2-user/.ssh/feature4";
