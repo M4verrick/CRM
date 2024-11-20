@@ -11,9 +11,7 @@ const getTransactions = async (req, res) => {
 };
 const getTransactionsByAgent = async (req, res) => {
     const clientId = parseInt(req.params.agentID, 10); // Get client ID from route parameters and parse to integer
-    if (isNaN(clientId)) {
-        return res.status(400).json({ error: 'Invalid client ID' });
-    }
+   
 
     try {
         const data = await dbService.getTransactionsByAgentId(clientId);

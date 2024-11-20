@@ -8,7 +8,9 @@ const app = express();
 app.use(express.json()); // For parsing JSON bodies
 app.use('/db', dbRoutes); // Database-related routes under /api/db
 app.use('/sftp', sftpRoutes); // SFTP-related routes under /api/sftp
-
+app.get('/', (req, res) => {
+    res.send('a'); // Respond with "a"
+  });
 
 
 const PORT = 3000;
