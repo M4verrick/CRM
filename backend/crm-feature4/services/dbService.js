@@ -59,14 +59,18 @@ async function getTransactionsByAgentId(agentId) {
     try {
 	
         const client = await pool.connect();
-
+        console.log("pool connect done")
         // SQL query to join transactions and agent_profile and filter by agent_id
-        
-	const query = "SELECT t.* FROM transactions t INNER JOIN agent_profile ap ON t.client_id = ap.profile_id WHERE ap.agent_id = $1;";        // Execute the query with the provided agent_id
-        const result = await client.query(query, [agentId]);
-        // Process and print each row from the result
+
+
+        const query = "SELECT t.* FROM transactions t INNER JOIN agent_profile ap ON t.client_id = ap.profile_id WHERE ap.agent_id = 'AGENT_001';"
+//      const re2sult = await client.query(query, values);
+        const result = await client.query(query);
+                // Process and print each row from the result
+
         result.rows.forEach(row => {
-            console.log(row);
+            console.log(row,'foreach');
+           
         });
 	
 	client.release();

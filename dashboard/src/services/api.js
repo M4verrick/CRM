@@ -52,7 +52,7 @@ export const api = {
     return apiClient.get(`/transaction/download-file`);
   },
 
-  getTransactionsByClient: (clientId) => {
+  getTransactionsByAgent: (clientId) => {
     return apiClient.get(`/transaction/agent/${clientId}`);
   },
 
