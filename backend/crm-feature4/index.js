@@ -11,6 +11,9 @@ app.use('/sftp', sftpRoutes); // SFTP-related routes under /api/sftp
 app.get('/', (req, res) => {
     res.send('a'); // Respond with "a"
   });
+app.get('/transaction', (req, res) => {
+res.send('a'); // Respond with "a"
+});
 
 
 const PORT = 3000;
