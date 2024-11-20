@@ -10,15 +10,17 @@ const getTransactions = async (req, res) => {
     }
 };
 const getTransactionsByAgent = async (req, res) => {
-    const clientId =req.params.agentId;
-    
+    const clientId = parseInt(req.params.agentID, 10); // Get client ID from route parameters and parse to integer
+    if (isNaN(clientId)) {
+        return res.status(400).json({ error: 'Invalid client ID' });
+    }
+
     try {
         const data = await dbService.getTransactionsByAgentId(clientId);
-        
-	if (data.length === 0) {
+        if (data.rows.length === 0) {
             res.status(404).json({ message: 'No transactions found for this client ID' });
         } else {
-            res.status(200).json(data);
+            res.status(200).json(data.rows);
         }
     } catch (error) {
         res.status(500).json({ error: 'Failed to retrieve transactions for the specified client ID' });

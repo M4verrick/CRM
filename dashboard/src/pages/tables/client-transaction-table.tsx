@@ -89,14 +89,74 @@ export default () => {
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        request={async (params, sort, filter) => {
-          console.log(sort, filter);
-          const response = await api.getTransactions(params); // call your API to fetch transactions
-          return {
-            data: response, // assumes response is an array of TransactionItem
-            success: true,
-          };
-        }}
+        request={async (params: { pageSize?: number; current?: number; [key: string]: any }, sort, filter) => {
+          console.log('Search params:', params);
+          console.log('Sort params:', sort);
+          console.log('Filter params:', filter);
+      
+          try {
+              // Fetch the full data from the API
+              const response = await api.getTransactionsByAgent("AGENT_001");
+              console.log(response, 'um?');
+      
+              // Cast the response to the expected data format
+              const data: TransactionItem[] = response as unknown as TransactionItem[];
+      
+              // Step 1: Perform front-end filtering
+              const filteredData = data.filter((item) => {
+                  let matches = true;
+      
+                  // Match Client ID (if provided)
+                  if (params.client_id && !`${item.client_id}`.includes(`${params.client_id}`)) {
+                      matches = false;
+                  }
+      
+                  // Match Transaction Type (if provided)
+                  if (params.transaction_type && !item.transaction_type.toLowerCase().includes(params.transaction_type.toLowerCase())) {
+                      matches = false;
+                  }
+      
+                  // Match Amount (if provided, allow partial matches)
+                  if (params.amount && !`${item.amount}`.includes(`${params.amount}`)) {
+                      matches = false;
+                  }
+      
+                  return matches;
+              });
+      
+              // Step 2: Perform front-end sorting (if required)
+              const sortedData = sort?.transaction_date
+                ? filteredData.sort((a, b) => {
+                    const dateA = new Date(a.transaction_date).getTime();
+                    const dateB = new Date(b.transaction_date).getTime();
+                    return sort.transaction_date === 'ascend' ? dateA - dateB : dateB - dateA;
+                })
+                : filteredData;
+      
+              // Step 3: Apply pagination
+              const current = params.current || 1; // Current page number
+              const pageSize = params.pageSize || 10; // Items per page
+              const paginatedData = sortedData.slice((current - 1) * pageSize, current * pageSize);
+      
+              // Return the processed data
+              return {
+                  data: paginatedData,        // Data for the current page
+                  total: filteredData.length, // Total number of matching records
+                  success: true,             // Indicate successful data retrieval
+              };
+          } catch (error) {
+              console.error('Error fetching transactions:', error);
+      
+              // Return fallback values in case of an error
+              return {
+                  data: [],
+                  total: 0,
+                  success: false,
+              };
+          }
+      }}
+      
+      
         editable={{
           type: 'multiple',
         }}
@@ -137,8 +197,7 @@ export default () => {
             type="primary"
           >
             Retrieve Transactions
-          </Button>
-          ,
+          </Button>,
           <Dropdown
             key="menu"
             menu={{
