@@ -2,16 +2,15 @@ const { Client:PgClient,Pool } = require('pg');
 
 // Database configuration - replace with your actual RDS details
 const pool = new Pool({
-    host: 'my-primary-db.crcwuko4kdlb.ap-southeast-1.rds.amazonaws.com',
-    user: 'crmdbadmin',
-    password: 'Yhld_i%BmU62gmiv', // Add your actual password here or use environment variables for security
-    database: 'crmdb',
-    port: 5432,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
     ssl: {
-        rejectUnauthorized: false
+        rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true'
     }
 });
-
 // Function to fetch data from RDS
 async function getDataFromRDS() {
     try {
