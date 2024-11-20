@@ -45,7 +45,7 @@ export const api = {
   },
 
   getTransactions: () => {
-    return apiClient.get(`/transactions`);
+    return apiClient.get(`/transaction/transactions`);
   },
 
   retrieveUpdatedTransaction: () => {
