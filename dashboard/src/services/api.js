@@ -45,7 +45,7 @@ export const api = {
   },
 
   getTransactions: () => {
-    return apiClient.get(`/db/transactions`);
+    return apiClient.get(`/transactions`);
   },
 
   retrieveUpdatedTransaction: () => {
@@ -53,7 +53,7 @@ export const api = {
   },
 
   getTransactionsByClient: (clientId) => {
-    return apiClient.get(`/db/transactions/client/${clientId}`);
+    return apiClient.get(`/db/transactions/agent/${clientId}`);
   },
 
 
