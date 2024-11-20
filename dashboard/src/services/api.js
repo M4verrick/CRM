@@ -49,11 +49,11 @@ export const api = {
   },
 
   retrieveUpdatedTransaction: () => {
-    return apiClient.get(`/sftp/download-file`);
+    return apiClient.get(`/transaction/download-file`);
   },
 
   getTransactionsByClient: (clientId) => {
-    return apiClient.get(`/db/transactions/agent/${clientId}`);
+    return apiClient.get(`/transaction/agent/${clientId}`);
   },
 
 
