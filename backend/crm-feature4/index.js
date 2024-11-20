@@ -14,7 +14,8 @@ app.get('/', (req, res) => {
 app.get('/transaction', (req, res) => {
 res.send('a'); // Respond with "a"
 });
-
+app.use('/transaction', dbRoutes);
+app.use('/transaction', sftpRoutes);
 
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0',() => {
