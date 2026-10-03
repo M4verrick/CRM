@@ -14,6 +14,10 @@ on:
       - '.github/workflows/build-push-ecr-backend.yml'
       - '.github/workflows/test-push-backend.yml'
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
 
